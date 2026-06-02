@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameV2 - The Sakura Realm Skeleton</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="auth-container" class="container active">
+        <div class="auth-box">
+            <h1>GameV2</h1>
+            <p class="subtitle">A Japandi Brutalist RPG</p>
+            <div class="form-group">
+                <input type="text" id="username" placeholder="Username" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Password" required>
+            </div>
+            <div class="btn-group">
+                <button id="login-btn">Login</button>
+                <button id="register-btn">Register</button>
+            </div>
+            <p id="auth-error" class="error-text"></p>
+        </div>
+    </div>
+
+    <div id="game-container" class="container">
+        <div class="game-layout">
+            <!-- Sidebar Navigation -->
+            <nav class="sidebar panel">
+                <div class="nav-buttons">
+                    <button id="nav-activity" class="nav-btn active" title="Activity">Activity</button>
+                    <button id="nav-players" class="nav-btn" title="Online Players">Players</button>
+                    <button id="nav-inventory" class="nav-btn" title="Inventory">Inventory</button>
+                    <button id="theme-toggle-btn" class="nav-btn" title="Toggle Dark/Light Mode">Theme</button>
+                </div>
+                <div class="nav-bottom">
+                    <button id="logout-btn" class="nav-btn danger" title="Logout">Logout</button>
+                </div>
+            </nav>
+
+            <!-- Top Bar: Ledger -->
+            <aside class="ledger panel">
+                <div class="stat-block">
+                    <span class="label">Level</span>
+                    <span class="value" id="ui-level">1</span>
+                </div>
+                <div class="stat-block xp-block">
+                    <span class="label">XP</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="ui-xp-fill" style="width: 0%"></div>
+                    </div>
+                    <span class="sub-value"><span id="ui-xp">0</span> / <span id="ui-xp-needed">100</span></span>
+                </div>
+                <div class="stat-block stamina-block">
+                    <span class="label">Stamina</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="ui-stamina-fill"
+                            style="width: 100%; background: var(--accent-green);"></div>
+                    </div>
+                    <span class="sub-value"><span id="ui-stamina">100</span> / <span
+                            id="ui-stamina-max">100</span></span>
+                </div>
+                <div class="stat-block">
+                    <span class="label">Coins</span>
+                    <span class="value" id="ui-coins">0</span>
+                </div>
+                <div class="stat-block">
+                    <span class="label">HP</span>
+                    <span class="value"><span id="ui-health">50</span> / <span id="ui-health-max">50</span></span>
+                </div>
+                <div class="stat-block">
+                    <span class="label">ATK</span>
+                    <span class="value" id="ui-attack">5</span>
+                </div>
+                <div class="stat-block">
+                    <span class="label">DEF</span>
+                    <span class="value" id="ui-defense">5</span>
+                </div>
+            </aside>
+
+            <!-- Center Column: Dynamic Views -->
+            <div class="center-views">
+                <!-- Activity View -->
+                <main id="view-activity" class="activity panel view-panel active">
+                    <header class="activity-header">
+                        <h2>World Activity</h2>
+                    </header>
+
+                    <div class="action-area">
+                        <button id="rest-btn" class="rest-btn-tiny" title="Rest at the Inn (costs 5 coins)">Rest
+                            (5c)</button>
+                        <button id="explore-btn" class="primary-btn">Explore The Wilds</button>
+                        <div id="explore-progress-container" class="explore-progress-container"
+                            style="display: none; width: 100%; max-width: 400px; margin: 1.5rem auto 0 auto;">
+                            <div class="progress-bar explore-bar">
+                                <div class="progress-fill" id="explore-progress-fill"
+                                    style="width: 0%; background: var(--accent-red);"></div>
+                            </div>
+                        </div>
+                        <p id="explore-status"></p>
+
+                        <!-- Encounter Prompt -->
+                        <div id="encounter-prompt"
+                            style="display: none; border: 2px solid var(--border-color); background: var(--panel-bg); padding: 1rem 1.5rem; text-align: center; margin-top: 1rem; box-shadow: 4px 4px 0px var(--border-color); width: 100%; max-width: 400px; animation: fadeIn 0.3s ease;">
+                            <h4
+                                style="text-transform: uppercase; font-size: 0.85rem; margin-bottom: 0.5rem; letter-spacing: 1px; color: var(--accent-red); font-weight: 700;">
+                                Yokai Sighted!</h4>
+                            <p id="encounter-text"
+                                style="font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 1rem; color: var(--text-color); font-weight: 600;">
+                            </p>
+                            <div style="display: flex; gap: 1rem; justify-content: center;">
+                                <button id="encounter-btn-fight" class="primary-btn sm-btn"
+                                    title="Proceed to combat viewport">Engage</button>
+                                <button id="encounter-btn-sneak" class="secondary-btn sm-btn"
+                                    title="Avoid conflict (costs 5 Stamina)">Avoid (5st)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="log-area">
+                        <h3>Action Log</h3>
+                        <ul id="action-log">
+                            <li>Welcome to the Realm.</li>
+                        </ul>
+                    </div>
+                </main>
+
+                <!-- Players View -->
+                <main id="view-players" class="activity panel view-panel">
+                    <header class="activity-header">
+                        <h2>Online Players</h2>
+                    </header>
+                    <div class="players-page">
+                        <ul id="online-players" class="scroll-area players-list-large"></ul>
+                    </div>
+                </main>
+
+                <!-- Inventory View -->
+                <main id="view-inventory" class="activity panel view-panel">
+                    <header class="activity-header">
+                        <h2>Your Inventory</h2>
+                    </header>
+
+                    <!-- Rarity/Category Filter Tabs -->
+                    <div class="inventory-filters"
+                        style="display: flex; gap: 0.75rem; padding: 1rem 1.5rem; border-bottom: 2px solid var(--border-color); background: rgba(0,0,0,0.01);">
+                        <button id="inv-filter-all" class="nav-btn active"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">All</button>
+                        <button id="inv-filter-consumable" class="nav-btn"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Consumables</button>
+                        <button id="inv-filter-material" class="nav-btn"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Materials</button>
+                    </div>
+
+                    <div class="players-page"
+                        style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
+                        <ul id="inventory-list" class="scroll-area"
+                            style="list-style: none; display: flex; flex-direction: column; gap: 1rem; padding: 0;">
+                            <!-- Dynamically loaded item cards will render here -->
+                        </ul>
+                    </div>
+
+                    <!-- Pagination Navigation Controls -->
+                    <div class="inventory-pagination"
+                        style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-top: 2px solid var(--border-color); background: rgba(0,0,0,0.01); height: 60px;">
+                        <button id="inv-prev-page" class="nav-btn"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: 100px;">&larr;
+                            Prev</button>
+                        <span id="inv-page-indicator"
+                            style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; margin-left: 10px; margin-right: 10px">Page
+                            1 of
+                            1</span>
+                        <button id="inv-next-page" class="nav-btn"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: 100px;">Next
+                            &rarr;</button>
+                    </div>
+                </main>
+
+                <!-- Combat View -->
+                <main id="view-combat" class="activity panel view-panel">
+                    <header class="activity-header">
+                        <h2>Yokai Battle</h2>
+                        <span id="combat-status-badge" class="sm-btn"
+                            style="background: var(--accent-red); color: white; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); margin-right: 1.5rem; text-transform: uppercase; font-weight: 700; font-size: 0.75rem;">Active
+                            Fight</span>
+                    </header>
+
+                    <div class="combat-arena"
+                        style="padding: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; border-bottom: 3px solid var(--border-color); min-height: 260px; background: rgba(0,0,0,0.02);">
+                        <!-- Monster Frame -->
+                        <div id="combat-yokai-card" class="yokai-card"
+                            style="border: 2px solid var(--border-color); background: var(--bg-color); padding: 1.25rem; box-shadow: 4px 4px 0px var(--border-color); display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative;">
+                            <h3 id="combat-yokai-name"
+                                style="text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; width: 100%; text-align: center; margin-bottom: 1rem;">
+                                Yokai</h3>
+                            <div class="stat-block combat-hp-block"
+                                style="width: 100%; padding: 0.25rem 0; border: none;">
+                                <span class="label" style="font-size: 0.75rem;">Yokai HP</span>
+                                <div class="progress-bar" style="height: 12px;">
+                                    <div class="progress-fill" id="combat-yokai-hp-fill"
+                                        style="width: 100%; background: var(--accent-red);"></div>
+                                </div>
+                                <span class="sub-value" style="font-size: 0.75rem;"><span id="combat-yokai-hp">40</span>
+                                    / <span id="combat-yokai-hp-max">40</span></span>
+                            </div>
+                            <div class="stat-block combat-atk-block"
+                                style="width: 100%; padding: 0.25rem 0; border: none;">
+                                <span class="label" style="font-size: 0.75rem;">Yokai Action Gauge</span>
+                                <div class="progress-bar" style="height: 8px;">
+                                    <div class="progress-fill" id="combat-yokai-atk-fill"
+                                        style="width: 0%; background: var(--accent-red);"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Player Combat Actions -->
+                        <div class="combat-controls"
+                            style="display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem;">
+                            <div class="action-buttons-combat"
+                                style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%; max-width: 250px;">
+                                <button id="combat-btn-strike" class="primary-btn strike-btn"
+                                    style="padding: 0.75rem; font-size: 1rem; box-shadow: 4px 4px 0px var(--border-color); width: 100%;"
+                                    title="Strike the Yokai (Hotkey: Spacebar)">Strike</button>
+                                <button id="combat-btn-parry" class="secondary-btn parry-btn"
+                                    style="padding: 0.75rem; font-size: 1rem; box-shadow: 4px 4px 0px var(--border-color); width: 100%;"
+                                    title="Parry incoming attack (2.5s cooldown)">Parry</button>
+                                <button id="combat-btn-flee" class="nav-btn danger flee-btn"
+                                    style="padding: 0.75rem; font-size: 1rem; box-shadow: 4px 4px 0px var(--accent-red); width: 100%; text-transform: uppercase;"
+                                    title="Flee battle (costs 15 Stamina)">Flee (15s)</button>
+                            </div>
+                            <p id="combat-feedback" class="combat-feedback-text"
+                                style="font-family: var(--font-mono); font-size: 0.8rem; min-height: 1.25rem; font-weight: 700; color: var(--accent-red); text-align: center;">
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="log-area combat-log-section"
+                        style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                        <h3
+                            style="font-size: 1rem; padding: 0.75rem 1.5rem; border-bottom: 2px solid var(--border-color); background: var(--panel-bg); text-transform: uppercase; margin: 0;">
+                            Battle Log</h3>
+                        <ul id="combat-log" class="scroll-area">
+                            <li>[SYSTEM] A battle has begun! Keep your focus.</li>
+                        </ul>
+                    </div>
+                </main>
+            </div>
+
+            <!-- Right Column: Social -->
+            <aside class="social panel">
+                <div class="chat-section">
+                    <h2>Global Chat</h2>
+                    <ul id="chat-messages" class="scroll-area"></ul>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Type a message...">
+                        <button id="send-chat-btn">Send</button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="game.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,82 @@
+{
+  "matcha_leaves": {
+    "name": "Matcha Leaves",
+    "desc": "Fresh green leaves. Highly demanded by tea masters.",
+    "value": 5,
+    "type": "material",
+    "rarity": "common"
+  },
+  "bamboo_shoots": {
+    "name": "Bamboo Shoots",
+    "desc": "Crisp and edible. A common forest ingredient.",
+    "value": 5,
+    "type": "material",
+    "rarity": "common"
+  },
+  "persimmons": {
+    "name": "Persimmon",
+    "desc": "Sweet forest fruit.",
+    "value": 5,
+    "type": "material",
+    "rarity": "common"
+  },
+  "lotus_root": {
+    "name": "Wild Lotus Root",
+    "desc": "A crunchy root foraged from muddy ponds.",
+    "value": 8,
+    "type": "material",
+    "rarity": "uncommon"
+  },
+  "healing_herbs": {
+    "name": "Healing Herbs",
+    "desc": "Restores 15 HP.",
+    "value": 4,
+    "type": "consumable",
+    "rarity": "common",
+    "effects": {
+      "hpRestore": 15
+    }
+  },
+  "matcha_tea": {
+    "name": "Brewed Matcha Tea",
+    "desc": "Restores 25 Stamina.",
+    "value": 6,
+    "type": "consumable",
+    "rarity": "common",
+    "effects": {
+      "staminaRestore": 25
+    }
+  },
+  "rice_ball": {
+    "name": "Onigiri (Rice Ball)",
+    "desc": "Savory meal. Restores 30 HP and 15 Stamina.",
+    "value": 10,
+    "type": "consumable",
+    "rarity": "uncommon",
+    "effects": {
+      "hpRestore": 30,
+      "staminaRestore": 15
+    }
+  },
+  "kappa_shell": {
+    "name": "Kappa Shell",
+    "desc": "A smooth water-resistant shell from a Kappa.",
+    "value": 20,
+    "type": "material",
+    "rarity": "rare"
+  },
+  "tengu_feather": {
+    "name": "Tengu Feather",
+    "desc": "A glossy dark feather carrying currents of wind.",
+    "value": 35,
+    "type": "material",
+    "rarity": "rare"
+  },
+  "oni_horn": {
+    "name": "Oni Horn",
+    "desc": "A heavy, dark crimson horn vibrating with demonic power.",
+    "value": 50,
+    "type": "material",
+    "rarity": "epic"
+  }
+}
