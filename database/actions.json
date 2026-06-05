@@ -16,12 +16,12 @@
     "missMinDamage": 2
   },
   "flee": {
-    "staminaCost": 15,
+    "staminaCost": 20,
     "successRate": 0.5
   },
   "rest": {
     "coinCost": 5,
-    "innHealPercent": 1.0
+    "innHealPercent": 1
   },
   "startingState": {
     "level": 1,
@@ -36,7 +36,10 @@
       "attack": 5,
       "defense": 5
     },
-    "inventory": {}
+    "inventory": {},
+    "equipment": {
+      "weapon": null
+    }
   },
   "leveling": {
     "xpMultiplier": 1.5,
@@ -58,23 +61,24 @@
     "bonusLootChance": 0.35,
     "bonusLootPool": [
       "healing_herbs",
-      "matcha_tea",
-      "rice_ball"
+      "energy_tea",
+      "rice_bowl",
+      "iron_club"
     ],
-    "defenseMitigationFactor": 2.0
+    "defenseMitigationFactor": 2
   },
   "raritySettings": {
     "weights": {
-      "common": 0.70,
-      "uncommon": 0.20,
+      "common": 0.7,
+      "uncommon": 0.2,
       "rare": 0.08,
       "epic": 0.02
     },
     "valueMultipliers": {
-      "common": 1.0,
+      "common": 1,
       "uncommon": 1.5,
       "rare": 2.5,
-      "epic": 4.0
+      "epic": 4
     }
   },
   "explore": {
@@ -85,20 +89,44 @@
     "forageChance": 0.35,
     "shrineChance": 0.15,
     "springChance": 0.1,
+    "legendaryEncounterChance": 0.03,
+    "legendaryEvents": {
+      "sword_master": {
+        "name": "Wandering Sword Master",
+        "xpReward": 50,
+        "weaponChance": 0.5,
+        "weaponPool": [
+          "wooden_sword",
+          "steel_sword"
+        ]
+      },
+      "legendary_shrine": {
+        "name": "Ancient Shinto Shrine",
+        "xpReward": 100,
+        "minCoins": 25,
+        "maxCoins": 50,
+        "consumablePool": [
+          "healing_herbs",
+          "energy_tea",
+          "rice_bowl",
+          "golden_elixir"
+        ]
+      }
+    },
     "forageXpMin": 12,
     "forageXpMax": 20,
     "forageCoinsMin": 2,
     "forageCoinsMax": 6,
     "foragePool": {
       "material": [
-        "matcha_leaves",
+        "green_tea_leaves",
         "bamboo_shoots",
-        "persimmons",
-        "lotus_root"
+        "wild_fruit",
+        "wild_root"
       ],
       "consumable": [
         "healing_herbs",
-        "matcha_tea"
+        "energy_tea"
       ],
       "materialChance": 0.8
     },

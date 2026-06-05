@@ -1,0 +1,18 @@
+{
+  "level": 1,
+  "experience": 0,
+  "experienceNeeded": 100,
+  "coins": 0,
+  "stamina": 100,
+  "maxStamina": 100,
+  "stats": {
+    "health": 50,
+    "maxHealth": 50,
+    "attack": 5,
+    "defense": 5
+  },
+  "inventory": {},
+  "equipment": {
+    "weapon": null
+  }
+}

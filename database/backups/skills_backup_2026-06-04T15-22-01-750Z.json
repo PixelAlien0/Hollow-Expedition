@@ -1,0 +1,41 @@
+{
+  "heavy_slash": {
+    "name": "Heavy Slash",
+    "desc": "A sweeping heavy strike. Deals 1.6x weapon damage.",
+    "staminaCost": 15,
+    "cooldown": 4000,
+    "effects": {
+      "damageMultiplier": 1.6
+    }
+  },
+  "flame_strike": {
+    "name": "Flame Strike",
+    "desc": "Ignites the blade. Deals 1.2x damage and inflicts Burn (8 dmg/tick for 3 ticks).",
+    "staminaCost": 20,
+    "cooldown": 6000,
+    "effects": {
+      "damageMultiplier": 1.2,
+      "inflictEffect": "burned",
+      "effectTicks": 3
+    }
+  },
+  "remedy_light": {
+    "name": "Healing Remedy",
+    "desc": "Chants a minor healing spell, restoring 20 Health.",
+    "staminaCost": 25,
+    "cooldown": 8000,
+    "effects": {
+      "healAmount": 20
+    }
+  },
+  "piercing_stab": {
+    "name": "Piercing Stab",
+    "desc": "Ignores Yokai defense entirely. Deals flat 1.1x attack damage.",
+    "staminaCost": 12,
+    "cooldown": 5000,
+    "effects": {
+      "damageMultiplier": 1.1,
+      "ignoreDefense": true
+    }
+  }
+}

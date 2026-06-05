@@ -1,0 +1,56 @@
+{
+  "bamboo_grove": {
+    "name": "Bamboo Grove",
+    "desc": "A tranquil path lined with rustling bamboo stalks. Sights of common Yokai here.",
+    "minLevel": 1,
+    "encounterChance": 0.35,
+    "forageChance": 0.4,
+    "yokaiPool": [
+      "kappa",
+      "kitsune"
+    ],
+    "lootPool": [
+      "matcha_leaves",
+      "persimmons",
+      "healing_herbs"
+    ],
+    "difficultyMultiplier": 1,
+    "background": "item_102458.png"
+  },
+  "windy_peaks": {
+    "name": "Windy Peaks",
+    "desc": "A high cliffside trail swept by howling winds. More dangerous entities reside here.",
+    "minLevel": 3,
+    "encounterChance": 0.45,
+    "forageChance": 0.3,
+    "yokaiPool": [
+      "tengu",
+      "kitsune"
+    ],
+    "lootPool": [
+      "tengu_feather",
+      "rice_ball",
+      "matcha_tea",
+      "lotus_root"
+    ],
+    "difficultyMultiplier": 1.3
+  },
+  "demon_mount": {
+    "name": "Demon Mountain",
+    "desc": "A volcanic peak covered in ash. Home to the strongest Oni.",
+    "minLevel": 5,
+    "encounterChance": 0.5,
+    "forageChance": 0.25,
+    "yokaiPool": [
+      "oni",
+      "tengu"
+    ],
+    "lootPool": [
+      "oni_horn",
+      "training_sword",
+      "steel_katana",
+      "golden_elixir"
+    ],
+    "difficultyMultiplier": 1.7
+  }
+}

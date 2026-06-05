@@ -1,0 +1,139 @@
+{
+  "strike": {
+    "cooldown": 800,
+    "damageVariance": 3,
+    "baseMinDamage": 2
+  },
+  "parry": {
+    "cooldown": 2500,
+    "perfectWindow": 700,
+    "earlyWindow": 1800,
+    "perfectMitigation": 0.1,
+    "earlyMitigation": 0.5,
+    "missMultiplier": 1.4,
+    "counterMultiplier": 1.5,
+    "counterMinDamage": 3,
+    "missMinDamage": 2
+  },
+  "flee": {
+    "staminaCost": 15,
+    "successRate": 0.5
+  },
+  "rest": {
+    "coinCost": 5,
+    "innHealPercent": 1
+  },
+  "startingState": {
+    "level": 1,
+    "experience": 0,
+    "experienceNeeded": 100,
+    "coins": 0,
+    "stamina": 100,
+    "maxStamina": 100,
+    "stats": {
+      "health": 50,
+      "maxHealth": 50,
+      "attack": 5,
+      "defense": 5
+    },
+    "inventory": {},
+    "equipment": {
+      "weapon": null
+    }
+  },
+  "leveling": {
+    "xpMultiplier": 1.5,
+    "maxHealthIncrease": 10,
+    "attackIncrease": 2,
+    "defenseIncrease": 2
+  },
+  "passiveRegen": {
+    "interval": 5000,
+    "staminaAmount": 2
+  },
+  "combatDefeat": {
+    "minCoinsLost": 5,
+    "maxCoinsLost": 15,
+    "healthRestore": 10,
+    "staminaRestorePercent": 0.2
+  },
+  "combat": {
+    "bonusLootChance": 0.35,
+    "bonusLootPool": [
+      "healing_herbs",
+      "matcha_tea",
+      "rice_ball",
+      "oni_club"
+    ],
+    "defenseMitigationFactor": 2
+  },
+  "raritySettings": {
+    "weights": {
+      "common": 0.7,
+      "uncommon": 0.2,
+      "rare": 0.08,
+      "epic": 0.02
+    },
+    "valueMultipliers": {
+      "common": 1,
+      "uncommon": 1.5,
+      "rare": 2.5,
+      "epic": 4
+    }
+  },
+  "explore": {
+    "staminaCost": 10,
+    "sneakStaminaCost": 5,
+    "cooldown": 1500,
+    "encounterChance": 0.4,
+    "forageChance": 0.35,
+    "shrineChance": 0.15,
+    "springChance": 0.1,
+    "legendaryEncounterChance": 0.03,
+    "legendaryEvents": {
+      "sword_master": {
+        "name": "Wandering Sword Master",
+        "xpReward": 50,
+        "weaponChance": 0.5,
+        "weaponPool": [
+          "training_sword",
+          "steel_katana"
+        ]
+      },
+      "legendary_shrine": {
+        "name": "Ancient Shinto Shrine",
+        "xpReward": 100,
+        "minCoins": 25,
+        "maxCoins": 50,
+        "consumablePool": [
+          "healing_herbs",
+          "matcha_tea",
+          "rice_ball",
+          "golden_elixir"
+        ]
+      }
+    },
+    "forageXpMin": 12,
+    "forageXpMax": 20,
+    "forageCoinsMin": 2,
+    "forageCoinsMax": 6,
+    "foragePool": {
+      "material": [
+        "matcha_leaves",
+        "bamboo_shoots",
+        "persimmons",
+        "lotus_root"
+      ],
+      "consumable": [
+        "healing_herbs",
+        "matcha_tea"
+      ],
+      "materialChance": 0.8
+    },
+    "shrineStaminaMin": 20,
+    "shrineStaminaMax": 40,
+    "shrineXpReward": 10,
+    "springHealthMin": 20,
+    "springHealthMax": 40
+  }
+}

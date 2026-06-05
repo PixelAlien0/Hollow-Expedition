@@ -1,0 +1,34 @@
+{
+  "level": 8,
+  "experience": 1578,
+  "experienceNeeded": 1702,
+  "coins": 1098,
+  "stats": {
+    "health": 120,
+    "attack": 19,
+    "defense": 19,
+    "maxHealth": 120
+  },
+  "inventory": {
+    "persimmons": 10,
+    "bamboo_shoots": 11,
+    "matcha_leaves": 6,
+    "oni_horn": 10,
+    "rice_ball": 11,
+    "kappa_shell": 9,
+    "lotus_root": 1,
+    "matcha_tea": 8,
+    "healing_herbs": 9,
+    "tengu_feather": 7,
+    "training_sword": 5,
+    "golden_elixir": 1,
+    "rusted_tachi": 1,
+    "oni_club": 1,
+    "bamboo_staff": 3
+  },
+  "stamina": 100,
+  "maxStamina": 100,
+  "equipment": {
+    "weapon": "steel_katana"
+  }
+}

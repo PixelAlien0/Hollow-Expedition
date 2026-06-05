@@ -1,0 +1,249 @@
+{
+  "matcha_leaves": {
+    "name": "Green Tea Leaves",
+    "desc": "Fresh green leaves. Highly demanded by tea masters.",
+    "value": 5,
+    "type": "material",
+    "rarity": "common",
+    "sprite": "green_tea_leaves.png"
+  },
+  "bamboo_shoots": {
+    "name": "Bamboo Shoots",
+    "desc": "Crisp and edible. A common forest ingredient.",
+    "value": 5,
+    "type": "material",
+    "rarity": "common",
+    "sprite": "bamboo_shoots.png"
+  },
+  "persimmons": {
+    "name": "Wild Fruit",
+    "desc": "Sweet forest fruit.",
+    "value": 5,
+    "type": "material",
+    "rarity": "common",
+    "sprite": "wild_fruit.png"
+  },
+  "lotus_root": {
+    "name": "Wild Root",
+    "desc": "A crunchy root foraged from muddy ponds.",
+    "value": 8,
+    "type": "material",
+    "rarity": "uncommon",
+    "sprite": "wild_root.png"
+  },
+  "healing_herbs": {
+    "name": "Healing Herbs",
+    "desc": "Restores 15 HP.",
+    "value": 4,
+    "type": "consumable",
+    "rarity": "common",
+    "sprite": "healing_herbs.png",
+    "effects": {
+      "hpRestore": 15
+    }
+  },
+  "matcha_tea": {
+    "name": "Energy Tea",
+    "desc": "Restores 25 Stamina.",
+    "value": 6,
+    "type": "consumable",
+    "rarity": "common",
+    "sprite": "energy_tea.png",
+    "effects": {
+      "staminaRestore": 25
+    }
+  },
+  "rice_ball": {
+    "name": "Rice Bowl",
+    "desc": "Savory meal. Restores 30 HP and 15 Stamina.",
+    "value": 10,
+    "type": "consumable",
+    "rarity": "uncommon",
+    "sprite": "rice_bowl.png",
+    "effects": {
+      "hpRestore": 30,
+      "staminaRestore": 15
+    }
+  },
+  "kappa_shell": {
+    "name": "Water Shell",
+    "desc": "A smooth water-resistant shell.",
+    "value": 20,
+    "type": "material",
+    "rarity": "rare",
+    "sprite": "water_shell.png"
+  },
+  "tengu_feather": {
+    "name": "Wind Feather",
+    "desc": "A glossy dark feather carrying currents of wind.",
+    "value": 35,
+    "type": "material",
+    "rarity": "rare",
+    "sprite": "wind_feather.png"
+  },
+  "oni_horn": {
+    "name": "Demon Horn",
+    "desc": "A heavy, dark crimson horn vibrating with power.",
+    "value": 50,
+    "type": "material",
+    "rarity": "epic",
+    "sprite": "demon_horn.png"
+  },
+  "training_sword": {
+    "name": "Wooden Sword",
+    "desc": "A heavy wooden training sword. Adds +3 Attack.",
+    "value": 15,
+    "type": "weapon",
+    "rarity": "common",
+    "sprite": "wooden_sword.png",
+    "effects": {
+      "attackBonus": 3
+    }
+  },
+  "steel_katana": {
+    "name": "Righteousness Blade of Righteousness",
+    "desc": "An old legendary, Abandoned by the heavens. Adds +12 Attack.",
+    "value": 1500,
+    "type": "weapon",
+    "rarity": "legendary",
+    "sprite": "arch_sword.png",
+    "effects": {
+      "attackBonus": 12
+    }
+  },
+  "golden_elixir": {
+    "name": "Golden Elixir",
+    "desc": "An imperial elixir. Fully restores Health and Stamina.",
+    "value": 100,
+    "type": "consumable",
+    "rarity": "epic",
+    "sprite": "golden_elixir.gif",
+    "effects": {
+      "hpRestore": 999,
+      "staminaRestore": 999
+    }
+  },
+  "bamboo_staff": {
+    "name": "Wooden Staff",
+    "desc": "A simple, light wooden staff. Adds +2 Attack.",
+    "value": 10,
+    "type": "weapon",
+    "rarity": "common",
+    "sprite": "wooden_staff.png",
+    "effects": {
+      "attackBonus": 2
+    }
+  },
+  "tachi": {
+    "name": "Refined Blade",
+    "desc": "A battle-worn curved blade. Perfect Condition. Adds +6 Attack.",
+    "value": 50,
+    "type": "weapon",
+    "rarity": "rare",
+    "sprite": "refined_blade.png",
+    "effects": {
+      "attackBonus": 6
+    }
+  },
+  "eye_of_artic": {
+    "name": "Eye of Artic",
+    "desc": "Legendary artifact belonging to Alduin or the ancient dragons, this usually refers to the Eye of Magnus. Adds +5 Defense and +12 Attack.",
+    "value": 2000,
+    "type": "accessory",
+    "rarity": "legendary",
+    "sprite": "eye_of_artic.png",
+    "effects": {
+      "defenseBonus": 5,
+      "attackBonus": 12
+    }
+  },
+  "rusted_tachi": {
+    "name": "Rusted Blade",
+    "desc": "An old, battle-worn curved blade. Adds +4 Attack.",
+    "value": 25,
+    "type": "weapon",
+    "rarity": "uncommon",
+    "sprite": "rusted_blade.png",
+    "effects": {
+      "attackBonus": 4
+    }
+  },
+  "shinobi_kodachi": {
+    "name": "Agile Dagger",
+    "desc": "A short, agile steel sword used by stealth agents. Adds +6 Attack.",
+    "value": 65,
+    "type": "weapon",
+    "rarity": "rare",
+    "sprite": "agile_dagger.png",
+    "effects": {
+      "attackBonus": 6
+    }
+  },
+  "oni_club": {
+    "name": "Iron Club",
+    "desc": "A brutal, iron-spiked club capable of crushing bone. Adds +10 Attack.",
+    "value": 200,
+    "type": "weapon",
+    "rarity": "epic",
+    "sprite": "iron_club.png",
+    "effects": {
+      "attackBonus": 10
+    }
+  },
+  "straw_hat": {
+    "name": "Straw Hat",
+    "desc": "A simple woven straw hat. Adds +1 Defense.",
+    "value": 8,
+    "type": "helmet",
+    "rarity": "common",
+    "sprite": "straw_hat.png",
+    "effects": {
+      "defenseBonus": 1
+    }
+  },
+  "horned_demon_helmet": {
+    "name": "Horned Demon Helmet",
+    "desc": "Forged from blackened iron and etched with infernal runes, this jagged helm is topped by a pair of obsidian-like horns that pulse with a faint, rhythmic crimson light. Adds +12 Defense.",
+    "value": 1200,
+    "type": "helmet",
+    "rarity": "legendary",
+    "sprite": "horned_demon_helmet.png",
+    "effects": {
+      "defenseBonus": 12
+    }
+  },
+  "wooden_shield": {
+    "name": "Wooden Shield",
+    "desc": "A round wooden shield reinforced with iron rings. Adds +2 Defense.",
+    "value": 15,
+    "type": "shield",
+    "rarity": "common",
+    "sprite": "wooden_shield.png",
+    "effects": {
+      "defenseBonus": 2
+    }
+  },
+  "samurai_armor": {
+    "name": "Iron Plate Armor",
+    "desc": "Traditional iron plate armor. Adds +5 Defense.",
+    "value": 120,
+    "type": "armor",
+    "rarity": "rare",
+    "sprite": "iron_plate_armor.png",
+    "effects": {
+      "defenseBonus": 5
+    }
+  },
+  "amulet": {
+    "name": "Lucky Amulet",
+    "desc": "A protective temple amulet. Adds +1 Attack and +1 Defense.",
+    "value": 30,
+    "type": "accessory",
+    "rarity": "uncommon",
+    "sprite": "lucky_amulet.png",
+    "effects": {
+      "attackBonus": 1,
+      "defenseBonus": 1
+    }
+  }
+}

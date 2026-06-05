@@ -1,0 +1,19 @@
+{
+  "level": 1,
+  "experience": 85,
+  "experienceNeeded": 100,
+  "coins": 21,
+  "stamina": 100,
+  "maxStamina": 100,
+  "stats": {
+    "health": 49,
+    "maxHealth": 50,
+    "attack": 5,
+    "defense": 5
+  },
+  "inventory": {
+    "tengu_feather": 1,
+    "rice_ball": 1,
+    "matcha_leaves": 1
+  }
+}

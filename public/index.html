@@ -5,25 +5,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hollow Expedition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <div id="auth-container" class="container active">
-        <div class="auth-box">
-            <h1>Hollow Expedition</h1>
-            <p class="subtitle">Text Based Action RPG</p>
-            <div class="form-group">
-                <input type="text" id="username" placeholder="Username" required>
+        <div class="auth-sidebar">
+            <div class="auth-sidebar-content">
+                <h1>Hollow<br>Expedition</h1>
+                <p class="subtitle">✦ Text-Based Action RPG ✦</p>
+                <div class="form-group">
+                    <label for="username" class="auth-label">✦ User Identity</label>
+                    <input type="text" id="username" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="password" class="auth-label">✦ Pass-Key</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="btn-group">
+                    <button id="login-btn">Login</button>
+                    <button id="register-btn">Register</button>
+                </div>
+                <p id="auth-error" class="error-text"></p>
             </div>
-            <div class="form-group">
-                <input type="password" id="password" placeholder="Password" required>
-            </div>
-            <div class="btn-group">
-                <button id="login-btn">Login</button>
-                <button id="register-btn">Register</button>
-            </div>
-            <p id="auth-error" class="error-text"></p>
+        </div>
+        <div class="auth-scenic-canvas">
+            <div class="scenic-watermark">遠征</div>
+            <div class="scenic-subtext">Hollow Expedition // Ver 1.0</div>
         </div>
     </div>
 
@@ -32,10 +45,35 @@
             <!-- Sidebar Navigation -->
             <nav class="sidebar panel">
                 <div class="nav-buttons">
+                    <div class="nav-group-title"
+                        style="font-size:0.65rem; font-family:var(--font-mono); font-weight:bold; opacity:0.5; margin:0.5rem 0 0.25rem; text-transform:uppercase;">
+                        World</div>
                     <button id="nav-activity" class="nav-btn active" title="Activity">Activity</button>
-                    <button id="nav-players" class="nav-btn" title="Online Players">Players</button>
+                    <button id="nav-quests" class="nav-btn" title="Quest Board">Quests</button>
+
+                    <div class="nav-group-title"
+                        style="font-size:0.65rem; font-family:var(--font-mono); font-weight:bold; opacity:0.5; margin:1rem 0 0.25rem; text-transform:uppercase;">
+                        Character</div>
                     <button id="nav-inventory" class="nav-btn" title="Inventory">Inventory</button>
+                    <button id="nav-crafting" class="nav-btn" title="Crafting Guild">Crafting</button>
+
+                    <div class="nav-group-title"
+                        style="font-size:0.65rem; font-family:var(--font-mono); font-weight:bold; opacity:0.5; margin:1rem 0 0.25rem; text-transform:uppercase;">
+                        Social & Trade</div>
+                    <button id="nav-players" class="nav-btn" title="Online Players">Players</button>
+                    <button id="nav-party" class="nav-btn" title="Multiplayer Party"
+                        style="background: rgba(89, 124, 94, 0.05); color: var(--accent-green); border-color: var(--accent-green); box-shadow: 2px 2px 0px var(--accent-green); font-weight: 700;">Party</button>
+                    <button id="nav-shop" class="nav-btn" title="Merchant Shop">Shop</button>
+                    <button id="nav-market" class="nav-btn" title="Player Market">Market</button>
+
+                    <div class="nav-group-title"
+                        style="font-size:0.65rem; font-family:var(--font-mono); font-weight:bold; opacity:0.5; margin:1rem 0 0.25rem; text-transform:uppercase;">
+                        System</div>
+                    <button id="nav-admin-db" class="nav-btn" title="Database Visualizer"
+                        style="display: none; background: rgba(180, 50, 50, 0.05); color: var(--accent-red); border-color: var(--accent-red); box-shadow: 2px 2px 0px var(--accent-red); font-weight: 700;">Admin
+                        DB</button>
                     <button id="theme-toggle-btn" class="nav-btn" title="Toggle Dark/Light Mode">Theme</button>
+                    <button id="perf-toggle-btn" class="nav-btn" title="Toggle Performance Monitor">Perf</button>
                 </div>
                 <div class="nav-bottom">
                     <button id="logout-btn" class="nav-btn danger" title="Logout">Logout</button>
@@ -90,42 +128,47 @@
                         <h2>World Activity</h2>
                     </header>
 
-                    <div class="action-area">
-                        <button id="rest-btn" class="rest-btn-tiny" title="Rest at the Inn (costs 5 coins)">Rest
-                            (5c)</button>
-                        <button id="explore-btn" class="primary-btn">Explore The Wilds</button>
-                        <div id="explore-progress-container" class="explore-progress-container"
-                            style="display: none; width: 100%; max-width: 400px; margin: 1.5rem auto 0 auto;">
-                            <div class="progress-bar explore-bar">
-                                <div class="progress-fill" id="explore-progress-fill"
-                                    style="width: 0%; background: var(--accent-red);"></div>
+                    <div class="activity-body-layout">
+                        <!-- Left Column: Location & Actions -->
+                        <div class="activity-left-col">
+                            <div id="activity-area-container" class="area-banner">
+                                <div class="area-banner-info">
+                                    <div class="area-banner-label">Current Location</div>
+                                    <div id="current-area-title" class="area-banner-title">Loading Area...</div>
+                                    <div id="current-area-desc" class="area-banner-desc">-</div>
+                                </div>
+                                <div id="area-bg-preview" class="area-banner-bg"></div>
+                            </div>
+
+                            <div class="action-dashboard">
+                                <!-- Top Toolbar: Inn Rest & Area Selection -->
+                                <div class="action-toolbar">
+                                    <div class="toolbar-section toolbar-rest">
+                                        <span class="toolbar-label">✦ Inn Lodging</span>
+                                        <button id="rest-btn" class="rest-btn-tiny"
+                                            title="Rest at the Inn (costs 5 coins)">Rest (5c)</button>
+                                    </div>
+                                    <div class="toolbar-section toolbar-travel">
+                                        <span class="toolbar-label">✦ Travel Destination</span>
+                                        <select id="activity-area-travel" class="area-travel-select"></select>
+                                    </div>
+                                </div>
+
+                                <!-- Central Action Hub -->
+                                <div class="action-hub" id="action-area">
+                                    <button id="explore-btn" class="primary-btn explore-main-btn">✦ Explore The Wilds
+                                        ✦</button>
+                                </div>
                             </div>
                         </div>
-                        <p id="explore-status"></p>
 
-                        <!-- Encounter Prompt -->
-                        <div id="encounter-prompt"
-                            style="display: none; border: 2px solid var(--border-color); background: var(--panel-bg); padding: 1rem 1.5rem; text-align: center; margin-top: 1rem; box-shadow: 4px 4px 0px var(--border-color); width: 100%; max-width: 400px; animation: fadeIn 0.3s ease;">
-                            <h4
-                                style="text-transform: uppercase; font-size: 0.85rem; margin-bottom: 0.5rem; letter-spacing: 1px; color: var(--accent-red); font-weight: 700;">
-                                Yokai Sighted!</h4>
-                            <p id="encounter-text"
-                                style="font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 1rem; color: var(--text-color); font-weight: 600;">
-                            </p>
-                            <div style="display: flex; gap: 1rem; justify-content: center;">
-                                <button id="encounter-btn-fight" class="primary-btn sm-btn"
-                                    title="Proceed to combat viewport">Engage</button>
-                                <button id="encounter-btn-sneak" class="secondary-btn sm-btn"
-                                    title="Avoid conflict (costs 5 Stamina)">Avoid (5st)</button>
-                            </div>
+                        <!-- Right Column: Action Log -->
+                        <div class="activity-right-col log-area">
+                            <h3>Action Log</h3>
+                            <ul id="action-log">
+                                <li>Welcome to the Realm.</li>
+                            </ul>
                         </div>
-                    </div>
-
-                    <div class="log-area">
-                        <h3>Action Log</h3>
-                        <ul id="action-log">
-                            <li>Welcome to the Realm.</li>
-                        </ul>
                     </div>
                 </main>
 
@@ -133,9 +176,78 @@
                 <main id="view-players" class="activity panel view-panel">
                     <header class="activity-header">
                         <h2>Online Players</h2>
+                        <span id="player-count-badge" class="sm-btn"
+                            style="background: var(--accent-green); color: white; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); margin-right: 1.5rem; text-transform: uppercase; font-weight: 700; font-size: 0.75rem;">0
+                            Online</span>
                     </header>
                     <div class="players-page">
+                        <div class="search-bar-container"
+                            style="padding: 0 0 1rem 0; border-bottom: 2px solid var(--border-color); margin-bottom: 1.25rem; display: flex; gap: 0.75rem; align-items: center;">
+                            <input type="text" id="player-search" placeholder="Search players by name..."
+                                style="padding: 0.5rem 1rem; width: 100%; max-width: 300px; font-family: var(--font-mono); border: 2px solid var(--border-color); background: transparent; outline: none; transition: var(--transition);">
+                        </div>
                         <ul id="online-players" class="scroll-area players-list-large"></ul>
+                    </div>
+                </main>
+
+                <!-- Party View -->
+                <main id="view-party" class="activity panel view-panel">
+                    <header class="activity-header">
+                        <h2>Multiplayer Party</h2>
+                    </header>
+                    <div class="party-page"
+                        style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; height: 100%; overflow-y: auto;">
+                        <!-- Non-party setup panel -->
+                        <div id="party-setup-panel"
+                            style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px; border: 2px solid var(--border-color); background: var(--panel-bg); padding: 1.5rem; box-shadow: 4px 4px 0px var(--border-color);">
+                            <h3
+                                style="font-family: var(--font-main); text-transform: uppercase; font-size: 0.95rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.25rem; margin: 0;">
+                                Create a Party</h3>
+                            <p style="font-size: 0.8rem; opacity: 0.8; margin: 0;">Create a new party lobby to invite
+                                other players to explore and tackle powerful bosses together.</p>
+                            <button id="party-create-btn" class="nav-btn"
+                                style="width: fit-content; box-shadow: 3px 3px 0px var(--border-color); margin: 0; padding: 0.5rem 1rem;">Create
+                                Party Lobby</button>
+
+                            <h3
+                                style="font-family: var(--font-main); text-transform: uppercase; font-size: 0.95rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.25rem; margin-top: 1rem; margin-bottom: 0;">
+                                Join Existing Party</h3>
+                            <p style="font-size: 0.8rem; opacity: 0.8; margin: 0;">Enter a 6-character party lobby code
+                                to join another player's party.</p>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="party-code-input" placeholder="LOBBY CODE" maxlength="6"
+                                    style="padding: 0.5rem; font-family: var(--font-mono); border: 2px solid var(--border-color); background: var(--bg-color); color: var(--text-color); font-weight: bold; font-size: 0.9rem; text-transform: uppercase; width: 150px; outline: none;">
+                                <button id="party-join-btn" class="nav-btn"
+                                    style="box-shadow: 3px 3px 0px var(--border-color); margin: 0; padding: 0.5rem 1rem;">Join
+                                    Party</button>
+                            </div>
+                        </div>
+
+                        <!-- Active Party Lobby panel -->
+                        <div id="party-lobby-panel"
+                            style="display: none; flex-direction: column; gap: 1rem; max-width: 500px; border: 2px solid var(--border-color); background: var(--panel-bg); padding: 1.5rem; box-shadow: 4px 4px 0px var(--border-color);">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">
+                                <h3
+                                    style="font-family: var(--font-main); text-transform: uppercase; font-size: 0.95rem; margin: 0;">
+                                    Party Lobby</h3>
+                                <div style="font-family: var(--font-mono); font-weight: bold; font-size: 1.1rem; background: var(--bg-color); border: 2px solid var(--border-color); padding: 0.2rem 0.6rem; box-shadow: 2px 2px 0px var(--border-color);"
+                                    id="party-lobby-code-display">------</div>
+                            </div>
+                            <p style="font-size: 0.8rem; opacity: 0.8; margin: 0;">Share the lobby code above with
+                                friends. Once all members are ready, the leader can start combat in a boss area.</p>
+
+                            <h4
+                                style="font-family: var(--font-main); text-transform: uppercase; font-size: 0.85rem; margin-top: 0.5rem; margin-bottom: 0;">
+                                Party Members (Max 4):</h4>
+                            <div id="party-members-list" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <!-- Dynamically populated member cards -->
+                            </div>
+
+                            <button id="party-leave-btn" class="nav-btn danger"
+                                style="width: fit-content; box-shadow: 3px 3px 0px var(--accent-red); margin-top: 1rem; padding: 0.5rem 1rem;">Leave
+                                Party Lobby</button>
+                        </div>
                     </div>
                 </main>
 
@@ -147,14 +259,26 @@
 
                     <!-- Rarity/Category Filter Tabs -->
                     <div class="inventory-filters"
-                        style="display: flex; gap: 0.75rem; padding: 1rem 1.5rem; border-bottom: 2px solid var(--border-color); background: rgba(0,0,0,0.01);">
+                        style="display: flex; gap: 0.75rem; padding: 1rem 1.5rem; border-bottom: 2px solid var(--border-color); background: rgba(0,0,0,0.01); flex-wrap: wrap;">
                         <button id="inv-filter-all" class="nav-btn active"
                             style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">All</button>
+                        <button id="inv-filter-equipped" class="nav-btn"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Equipped</button>
+                        <button id="inv-filter-weapon" class="nav-btn"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Weapons</button>
+                        <button id="inv-filter-armor" class="nav-btn"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Armor</button>
+                        <button id="inv-filter-accessory" class="nav-btn"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Accessories</button>
                         <button id="inv-filter-consumable" class="nav-btn"
                             style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Consumables</button>
                         <button id="inv-filter-material" class="nav-btn"
                             style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Materials</button>
+                        <button id="inv-filter-avatar" class="nav-btn"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Avatars</button>
                     </div>
+
+
 
                     <div class="players-page"
                         style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
@@ -180,6 +304,308 @@
                     </div>
                 </main>
 
+                <!-- Shop View -->
+                <main id="view-shop" class="activity panel view-panel">
+                    <header class="activity-header">
+                        <h2>Village Merchant</h2>
+                    </header>
+
+                    <div class="players-page"
+                        style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
+                        <ul id="shop-list" class="scroll-area"
+                            style="list-style: none; display: flex; flex-direction: column; gap: 1rem; padding: 0;">
+                            <!-- Dynamically loaded shop item cards will render here -->
+                        </ul>
+                    </div>
+                </main>
+
+                <!-- Player Market View -->
+                <main id="view-market" class="activity panel view-panel">
+                    <header class="activity-header">
+                        <h2>Player Market</h2>
+                        <span id="market-listings-count" class="sm-btn"
+                            style="background: var(--accent-green); color: white; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); margin-right: 1.5rem; text-transform: uppercase; font-weight: 700; font-size: 0.75rem;">0
+                            Listings</span>
+                    </header>
+
+                    <div class="players-page"
+                        style="padding: 1.5rem; flex: 1; display: flex; flex-direction: row; gap: 1.5rem; overflow-y: auto; flex-wrap: wrap;">
+                        <!-- Left Column: List Item Form Panel -->
+                        <div class="market-list-form-container"
+                            style="background: var(--bg-color); border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; animation: fadeIn 0.2s ease; width: 320px; align-self: flex-start;">
+                            <h3
+                                style="font-family: var(--font-main); font-weight: 700; text-transform: uppercase; font-size: 1rem; margin-bottom: 0.25rem;">
+                                ⟁ List an Item</h3>
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                                    <label for="market-select-item"
+                                        style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Select
+                                        Item</label>
+                                    <select id="market-select-item"
+                                        style="padding: 0.5rem; font-family: var(--font-main); border: 2px solid var(--border-color); background: var(--bg-color); color: var(--text-color); outline: none; transition: var(--transition); cursor: pointer; width: 100%;"></select>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                                    <label for="market-input-qty"
+                                        style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Quantity</label>
+                                    <input type="number" id="market-input-qty" min="1" value="1"
+                                        style="padding: 0.5rem; font-family: var(--font-mono); border: 2px solid var(--border-color); background: var(--bg-color); color: var(--text-color); outline: none; width: 100%;">
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                                    <label for="market-input-price"
+                                        style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Price
+                                        (Coins)</label>
+                                    <input type="number" id="market-input-price" min="1" value="10"
+                                        style="padding: 0.5rem; font-family: var(--font-mono); border: 2px solid var(--border-color); background: var(--bg-color); color: var(--text-color); outline: none; width: 100%;">
+                                </div>
+                                <button id="market-btn-list" class="nav-btn active"
+                                    style="padding: 0.5rem 1rem; font-size: 0.9rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: 100%; font-family: var(--font-main); text-transform: uppercase; font-weight: 700;">Create
+                                    Listing</button>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Listings List -->
+                        <div style="flex: 1; min-width: 380px; display: flex; flex-direction: column; gap: 0.75rem;">
+                            <h3
+                                style="font-family: var(--font-main); font-weight: 700; text-transform: uppercase; font-size: 1rem; margin: 0;">
+                                ☻ Active Listings</h3>
+
+                            <!-- Rarity/Category Filter Tabs -->
+                            <div class="market-filters"
+                                style="display: flex; gap: 0.75rem; background: rgba(0,0,0,0.01); flex-wrap: wrap;">
+                                <button id="market-filter-all" class="nav-btn active"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">All</button>
+                                <button id="market-filter-weapon" class="nav-btn"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Weapons</button>
+                                <button id="market-filter-armor" class="nav-btn"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Armor</button>
+                                <button id="market-filter-accessory" class="nav-btn"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Accessories</button>
+                                <button id="market-filter-consumable" class="nav-btn"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Consumables</button>
+                                <button id="market-filter-material" class="nav-btn"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Materials</button>
+                                <button id="market-filter-avatar" class="nav-btn"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Avatars</button>
+                            </div>
+
+                            <ul id="market-list" class="scroll-area"
+                                style="list-style: none; display: flex; flex-direction: column; gap: 1rem; padding: 0; margin: 0;">
+                                <!-- Dynamically loaded market item cards will render here -->
+                            </ul>
+
+                            <!-- Pagination controls -->
+                            <div class="market-pagination"
+                                style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 2px solid var(--border-color); background: rgba(0,0,0,0.01); height: 60px;">
+                                <button id="market-prev-page" class="nav-btn"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: 100px;">&larr;
+                                    Prev</button>
+                                <span id="market-page-indicator"
+                                    style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; margin-left: 10px; margin-right: 10px">Page
+                                    1 of 1</span>
+                                <button id="market-next-page" class="nav-btn"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: 100px;">Next
+                                    &rarr;</button>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- Quest / Mission Board View -->
+                <main id="view-quests" class="activity panel view-panel">
+                    <header class="activity-header">
+                        <h2>Quest Board</h2>
+                    </header>
+
+                    <div class="players-page"
+                        style="padding: 1.5rem; flex: 1; display: flex; flex-direction: row; gap: 1.5rem; overflow-y: auto; flex-wrap: wrap;">
+                        <!-- Active Quests Section -->
+                        <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1rem;">
+                            <h3
+                                style="font-family: var(--font-main); font-weight: 700; text-transform: uppercase; font-size: 1.1rem; border-bottom: 3px solid var(--border-color); padding-bottom: 0.5rem; margin: 0;">
+                                ✦ Active Quests</h3>
+                            <ul id="active-quests-list"
+                                style="list-style: none; display: flex; flex-direction: column; gap: 1rem; padding: 0; margin: 0;">
+                                <!-- Active quests will render here -->
+                            </ul>
+                        </div>
+
+                        <!-- Available Quests Section -->
+                        <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1rem;">
+                            <h3
+                                style="font-family: var(--font-main); font-weight: 700; text-transform: uppercase; font-size: 1.1rem; border-bottom: 3px solid var(--border-color); padding-bottom: 0.5rem; margin: 0;">
+                                ⟁ Mission Board</h3>
+                            <ul id="available-quests-list"
+                                style="list-style: none; display: flex; flex-direction: column; gap: 1rem; padding: 0; margin: 0;">
+                                <!-- Available quests will render here -->
+                            </ul>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- Crafting View -->
+                <main id="view-crafting" class="activity panel view-panel">
+                    <header class="activity-header">
+                        <h2>Crafting Guild</h2>
+                    </header>
+
+                    <div class="players-page"
+                        style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
+                        <ul id="crafting-list" class="scroll-area"
+                            style="list-style: none; display: flex; flex-direction: column; gap: 1rem; padding: 0;">
+                            <!-- Dynamically loaded crafting recipes will render here -->
+                        </ul>
+                    </div>
+                </main>
+
+                <!-- Admin Database Visualizer View -->
+                <main id="view-admin-db" class="activity panel view-panel">
+                    <header class="activity-header">
+                        <h2>Database Visualizer</h2>
+                        <span class="sm-btn"
+                            style="background: var(--accent-red); color: white; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); font-size: 0.75rem; text-transform: uppercase; font-weight: 700; margin-right: 1.5rem;">Admin
+                            Access Only</span>
+                    </header>
+
+                    <div style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                        <div class="db-visualizer-selector"
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                                <button id="db-view-items" class="nav-btn active"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Items
+                                    Database</button>
+                                <button id="db-view-yokai" class="nav-btn"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Yokai
+                                    Database</button>
+                                <button id="db-view-actions" class="nav-btn"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Actions
+                                    Database</button>
+                                <button id="db-view-areas" class="nav-btn"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Areas
+                                    Database</button>
+                                <button id="db-view-skills" class="nav-btn"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Skills
+                                    Database</button>
+                                <button id="db-view-players" class="nav-btn"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Players
+                                    Database</button>
+                                <button id="db-view-backups" class="nav-btn"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto; color: var(--accent-red); border-color: var(--accent-red);">⟲
+                                    Backups</button>
+                            </div>
+                            <button id="db-save-btn" class="nav-btn"
+                                style="padding: 0.8rem; font-size: 0.8rem; background: var(--accent-green); color: white; border-color: var(--border-color); box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto; font-weight: 700;">Save
+                                Changes</button>
+                        </div>
+
+                        <!-- Editor mode toggler -->
+                        <div
+                            style="display: flex; justify-content: flex-end; margin-bottom: 0.75rem; gap: 0.5rem; align-items: center;">
+                            <span id="db-mode-label"
+                                style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; opacity: 0.6;">Active
+                                Mode: FORM</span>
+                            <button id="db-editor-mode-toggle" class="nav-btn"
+                                style="padding: 0.35rem 0.75rem; font-size: 0.75rem; box-shadow: 2px 2px 0px var(--border-color); width: auto; margin: 0; font-weight: 700;">Raw
+                                JSON</button>
+                        </div>
+
+                        <div id="db-editor-panel" class="db-visualizer-output-container"
+                            style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                            <!-- Raw JSON View Container -->
+                            <div id="db-raw-container" style="display: none; flex: 1; min-height: 0;">
+                                <textarea id="db-visualizer-input" spellcheck="false" placeholder="Loading database..."
+                                    style="width: 100%; height: 100%; padding: 1.5rem; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-color); background: transparent; border: none; outline: none; resize: none; white-space: pre-wrap; font-weight: 600; line-height: 1.45; overflow-y: auto;"></textarea>
+                            </div>
+
+                            <!-- Structured Form Editor Container -->
+                            <div id="db-structured-container"
+                                style="display: flex; flex: 1; min-height: 0; overflow: hidden; background: transparent;">
+                                <!-- Left Panel: Search & List -->
+                                <div class="db-list-panel"
+                                    style="flex: 0 0 280px; border-right: 3px solid var(--border-color); display: flex; flex-direction: column; padding: 1rem; overflow: hidden; gap: 0.75rem;">
+                                    <input type="text" id="db-search-input" placeholder="Search database..."
+                                        style="padding: 0.6rem; border: 2px solid var(--border-color); font-family: var(--font-mono); font-size: 0.85rem; background: transparent; outline: none;">
+                                    <div style="display: flex; gap: 0.5rem; width: 100%;">
+                                        <select id="db-category-filter"
+                                            style="flex: 1; padding: 0.4rem; border: 2px solid var(--border-color); font-family: var(--font-mono); font-size: 0.8rem; background: var(--bg-color); color: var(--text-color); outline: none;"></select>
+                                        <select id="db-sort-filter"
+                                            style="flex: 1; padding: 0.4rem; border: 2px solid var(--border-color); font-family: var(--font-mono); font-size: 0.8rem; background: var(--bg-color); color: var(--text-color); outline: none;">
+                                            <option value="key-asc">Key A-Z</option>
+                                            <option value="key-desc">Key Z-A</option>
+                                            <option value="name-asc">Name A-Z</option>
+                                            <option value="name-desc">Name Z-A</option>
+                                            <option value="val-desc">Value H-L</option>
+                                            <option value="val-asc">Value L-H</option>
+                                        </select>
+                                    </div>
+                                    <button id="db-add-entry-btn" class="nav-btn"
+                                        style="padding: 0.5rem; font-size: 0.82rem; font-weight: 700; width: 100%; margin: 0; box-shadow: 2px 2px 0px var(--border-color); flex: none;">+
+                                        Add New Entry</button>
+                                    <div id="db-entries-list" class="scroll-area"
+                                        style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.4rem; padding-right: 0.25rem;">
+                                        <!-- Populated via game.js -->
+                                    </div>
+                                </div>
+
+                                <!-- Right Panel: Form Fields & Live Preview -->
+                                <div class="db-details-panel"
+                                    style="flex: 1; display: flex; min-height: 0; overflow: hidden;">
+                                    <!-- Form Editor -->
+                                    <div class="db-form-panel scroll-area"
+                                        style="flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; border-right: 3px solid var(--border-color);">
+                                        <div id="db-form-container"
+                                            style="display: flex; flex-direction: column; gap: 1rem;">
+                                            <!-- Dynamically generated fields go here -->
+                                        </div>
+                                        <div
+                                            style="margin-top: auto; padding-top: 1rem; display: flex; justify-content: flex-end;">
+                                            <button id="db-delete-entry-btn" class="nav-btn danger"
+                                                style="padding: 0.6rem 1.2rem; font-size: 0.82rem; font-weight: 700; box-shadow: 2px 2px 0px var(--accent-red); width: auto; margin: 0;">Delete
+                                                Entry</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Live Preview -->
+                                    <div class="db-preview-panel"
+                                        style="flex: 0 0 280px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; gap: 1rem; background: rgba(0,0,0,0.02);">
+                                        <h4
+                                            style="font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; border-bottom: 2px solid var(--border-color); padding-bottom: 0.25rem; width: 100%; text-align: center; letter-spacing: 1px; color: #888;">
+                                            LIVE PREVIEW</h4>
+                                        <div id="db-item-preview-card" style="width: 100%;">
+                                            <!-- Dynamic preview matching game inv-item cards -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="db-backups-panel" class="db-backups-panel" style="display: none;">
+                            <div class="db-backups-header">
+                                <h3
+                                    style="padding: 0; border: none; background: none; text-transform: uppercase; font-size: 0.95rem; letter-spacing: 1px;">
+                                    Backup Storage</h3>
+                                <div class="db-backups-filter" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <button id="backup-filter-all" class="backup-filter-btn active"
+                                        data-filter="all">All</button>
+                                    <button id="backup-filter-items" class="backup-filter-btn"
+                                        data-filter="items">Items</button>
+                                    <button id="backup-filter-yokai" class="backup-filter-btn"
+                                        data-filter="yokai">Yokai</button>
+                                    <button id="backup-filter-actions" class="backup-filter-btn"
+                                        data-filter="actions">Actions</button>
+                                    <button id="backup-filter-areas" class="backup-filter-btn"
+                                        data-filter="areas">Areas</button>
+                                    <button id="backup-filter-skills" class="backup-filter-btn"
+                                        data-filter="skills">Skills</button>
+                                </div>
+                            </div>
+                            <div id="db-backups-list" class="db-backups-list">
+                                <div class="empty-inventory" style="margin: 1rem;">No backups found. Backups are created
+                                    automatically when you save changes.</div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
                 <!-- Combat View -->
                 <main id="view-combat" class="activity panel view-panel">
                     <header class="activity-header">
@@ -188,6 +614,12 @@
                             style="background: var(--accent-red); color: white; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); margin-right: 1.5rem; text-transform: uppercase; font-weight: 700; font-size: 0.75rem;">Active
                             Fight</span>
                     </header>
+
+                    <!-- Co-op Party Status -->
+                    <div id="combat-party-members"
+                        style="display: none; padding: 0.75rem 1.5rem; border-bottom: 2px solid var(--border-color); background: rgba(0, 0, 0, 0.03); flex-direction: row; gap: 1rem; flex-wrap: wrap;">
+                        <!-- Dynamically populated party member HP/stamina bars -->
+                    </div>
 
                     <div class="combat-arena"
                         style="padding: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; border-bottom: 3px solid var(--border-color); min-height: 260px; background: rgba(0,0,0,0.02);">
@@ -231,6 +663,9 @@
                                 <button id="combat-btn-flee" class="nav-btn danger flee-btn"
                                     style="padding: 0.75rem; font-size: 1rem; box-shadow: 4px 4px 0px var(--accent-red); width: 100%; text-transform: uppercase;"
                                     title="Flee battle (costs 15 Stamina)">Flee (15s)</button>
+                                <div id="combat-weapon-skills"
+                                    style="display: none; flex-direction: column; gap: 0.75rem; width: 100%; border-top: 2px dashed var(--border-color); padding-top: 0.75rem;">
+                                </div>
                             </div>
                             <p id="combat-feedback" class="combat-feedback-text"
                                 style="font-family: var(--font-mono); font-size: 0.8rem; min-height: 1.25rem; font-weight: 700; color: var(--accent-red); text-align: center;">
@@ -261,6 +696,182 @@
                     </div>
                 </div>
             </aside>
+        </div>
+    </div>
+
+    <!-- Performance Monitor Widget -->
+    <div id="perf-monitor" class="perf-monitor panel">
+        <div class="perf-body">
+            <div class="perf-row">
+                <span class="perf-label">FPS:</span>
+                <span id="perf-fps" class="perf-value">0</span>
+            </div>
+            <div class="perf-row">
+                <span class="perf-label">PING:</span>
+                <span id="perf-ping" class="perf-value">-- ms</span>
+            </div>
+            <div class="perf-row">
+                <span class="perf-label">DOM:</span>
+                <span id="perf-dom" class="perf-value">0</span>
+            </div>
+            <div class="perf-row" id="perf-mem-row" style="display: none;">
+                <span class="perf-label">MEM:</span>
+                <span id="perf-mem" class="perf-value">0 MB</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Preview Modal -->
+    <div id="item-preview-modal" class="modal-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; padding: 2rem;">
+        <div class="modal-content"
+            style="background: var(--bg-color); border: 3px solid var(--border-color); box-shadow: 8px 8px 0px var(--border-color); width: 360px; max-width: 95%; display: flex; flex-direction: column; overflow: hidden; animation: fadeIn 0.2s ease;">
+            <header class="modal-header"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 3px solid var(--border-color); background: var(--panel-bg);">
+                <h3
+                    style="margin: 0; font-family: var(--font-main); text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px;">
+                    Item Details</h3>
+                <button id="item-preview-close" class="nav-btn danger"
+                    style="padding: 0.3rem 0.6rem; font-size: 0.75rem; box-shadow: 2px 2px 0px var(--accent-red); margin: 0; width: auto; flex: none;">X</button>
+            </header>
+            <div id="item-preview-modal-body"
+                style="padding: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <!-- Card contents rendered via game.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Sprite Inspector & Picker Modal -->
+    <div id="sprite-inspector-modal" class="modal-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; padding: 2rem;">
+        <div class="modal-content"
+            style="background: var(--bg-color); border: 3px solid var(--border-color); box-shadow: 8px 8px 0px var(--border-color); width: 95vw; height: 90vh; max-width: 1400px; display: flex; flex-direction: column; overflow: hidden; animation: fadeIn 0.2s ease;">
+            <header class="modal-header"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 3px solid var(--border-color); background: var(--panel-bg);">
+                <h3 id="sprite-modal-title"
+                    style="margin: 0; font-family: var(--font-main); text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px;">
+                    Sprite Inspector</h3>
+                <button id="sprite-modal-close" class="nav-btn danger"
+                    style="padding: 0.3rem 0.6rem; font-size: 0.75rem; box-shadow: 2px 2px 0px var(--accent-red); margin: 0; width: auto; flex: none;">X</button>
+            </header>
+            <div id="sprite-modal-body" style="display: flex; flex: 1; overflow: hidden; min-height: 0;">
+                <!-- Left panel: visual preview -->
+                <div
+                    style="flex: 0 0 300px; border-right: 3px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 1.5rem; gap: 1.5rem; background: rgba(0,0,0,0.02); overflow-y: auto;">
+                    <div
+                        style="width: 220px; height: 220px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); display: flex; align-items: center; justify-content: center; background: var(--panel-bg); overflow: hidden;">
+                        <img id="sprite-inspect-big-img" src="" alt="Sprite Preview"
+                            style="max-width: 100%; max-height: 100%; image-rendering: pixelated; transform: scale(4); transform-origin: center;">
+                    </div>
+                    <div style="text-align: center; width: 100%;">
+                        <span id="sprite-inspect-filename"
+                            style="font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; word-break: break-all; display: block; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">filename.png</span>
+                        <div id="sprite-inspect-usage"
+                            style="font-family: var(--font-mono); font-size: 0.72rem; color: #666; text-align: left; max-height: 250px; overflow-y: auto;">
+                        </div>
+                    </div>
+                </div>
+                <!-- Right panel: gallery / picker search -->
+                <div
+                    style="flex: 1; display: flex; flex-direction: column; padding: 1.5rem; overflow: hidden; gap: 0.75rem;">
+                    <div id="sprite-picker-controls" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <span style="font-family: var(--font-main); font-weight: 700; font-size: 0.95rem;">Browse
+                            Sprites Gallery</span>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <select id="sprite-folder-select"
+                                style="flex: 1; padding: 0.6rem; border: 2px solid var(--border-color); font-family: var(--font-mono); font-size: 0.85rem; background: var(--bg-color); color: var(--text-color); outline: none;">
+                                <option value="all">All Folders</option>
+                            </select>
+                            <input type="text" id="sprite-search-input" placeholder="Search sprite files..."
+                                style="flex: 1; padding: 0.6rem; border: 2px solid var(--border-color); font-family: var(--font-mono); font-size: 0.85rem; background: transparent; outline: none; min-width: 150px;">
+                        </div>
+                    </div>
+                    <div id="sprite-gallery-list" class="scroll-area"
+                        style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.75rem; padding: 0.75rem; border: 2px solid var(--border-color); background: var(--bg-color); box-shadow: inset 3px 3px 0px rgba(0, 0, 0, 0.05);">
+                        <!-- Grid of thumbnail images -->
+                    </div>
+                    <div id="sprite-picker-actions"
+                        style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; border-top: 2px solid var(--border-color); padding-top: 0.75rem;">
+                        <!-- Left: Pagination Controls -->
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <button id="sprite-prev-page" class="nav-btn"
+                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Prev</button>
+                            <span id="sprite-page-indicator"
+                                style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700;">Page 1 of
+                                1</span>
+                            <button id="sprite-next-page" class="nav-btn"
+                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 2px 2px 0px var(--border-color); margin: 0; width: auto;">Next</button>
+                        </div>
+                        <!-- Right: Confirm Action Button -->
+                        <button id="sprite-modal-select-btn" class="secondary-btn"
+                            style="padding: 0.5rem 1.5rem; font-size: 0.85rem; box-shadow: 3px 3px 0px var(--border-color); margin: 0; width: auto; font-weight: 700; display: none;">Select
+                            Sprite</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Player Sprite Picker Modal -->
+    <div id="player-sprite-modal" class="modal-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; padding: 2rem;">
+        <div class="modal-content"
+            style="background: var(--bg-color); border: 3px solid var(--border-color); box-shadow: 8px 8px 0px var(--border-color); width: 450px; max-width: 95%; display: flex; flex-direction: column; overflow: hidden; animation: fadeIn 0.2s ease;">
+            <header class="modal-header"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 3px solid var(--border-color); background: var(--panel-bg);">
+                <h3
+                    style="margin: 0; font-family: var(--font-main); text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px;">
+                    Select Avatar</h3>
+                <button id="player-sprite-close" class="nav-btn danger"
+                    style="padding: 0.3rem 0.6rem; font-size: 0.75rem; box-shadow: 2px 2px 0px var(--accent-red); margin: 0; width: auto; flex: none;">X</button>
+            </header>
+            <div id="player-sprite-list" class="scroll-area"
+                style="padding: 1.5rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; max-height: 50vh; overflow-y: auto; background: rgba(0,0,0,0.02); justify-items: center;">
+                <!-- Dynamically loaded player sprites -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Exploration Progress Modal -->
+    <div id="explore-progress-container" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 550px; width: 95%;">
+            <header class="modal-header"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 3px solid var(--border-color); background: var(--panel-bg);">
+                <h3
+                    style="margin: 0; font-family: var(--font-main); text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px;">
+                    Exploration</h3>
+            </header>
+            <div style="padding: 2rem; display: flex; flex-direction: column; align-items: center; gap: 1.5rem;">
+                <div class="status-monitor">
+                    <span class="status-label">status //</span>
+                    <span id="explore-status" class="status-text">Standby</span>
+                </div>
+
+                <div class="explore-progress-wrapper" style="width: 100%; margin: 0;">
+                    <div class="progress-bar explore-bar">
+                        <div class="progress-fill" id="explore-progress-fill"
+                            style="width: 0%; background: var(--accent-red);"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Encounter Modal -->
+    <div id="encounter-prompt" class="modal-overlay" style="display: none;">
+        <div class="modal-content encounter-alert-box" style="max-width: 480px;">
+            <div class="encounter-header">
+                <span class="warning-symbol">✦</span> Yokai Sighted! <span class="warning-symbol">✦</span>
+            </div>
+            <div class="encounter-body">
+                <p id="encounter-text"></p>
+                <div class="encounter-actions">
+                    <button id="encounter-btn-fight" class="primary-btn sm-btn"
+                        title="Proceed to combat viewport">Engage</button>
+                    <button id="encounter-btn-sneak" class="secondary-btn sm-btn"
+                        title="Avoid conflict (costs 5 Stamina)">Avoid (5st)</button>
+                </div>
+            </div>
         </div>
     </div>
 
