@@ -53,40 +53,6 @@
     "sprite": "Materials/demon_horn.png",
     "shopListed": false
   },
-  "demon_kings_sword": {
-    "name": "Demon King's Sword",
-    "desc": "A blade of singular malice, forged from cooling star-fire and quenched in the blood of fallen monarchs.",
-    "value": 4000,
-    "type": "weapon",
-    "rarity": "legendary",
-    "sprite": "Animated Quality Weapons/demon_kings_sword.png",
-    "effects": {
-      "attackBonus": 20,
-      "lifesteal": 20,
-      "burnChance": 10
-    },
-    "skills": [
-      "heavy_slash",
-      "flame_strike"
-    ],
-    "recipe": {
-      "cost": 0,
-      "ingredients": {
-        "illuminati": 1000
-      }
-    }
-  },
-  "horned_demon_helmet": {
-    "name": "Horned Demon Helmet",
-    "desc": "Forged from blackened iron and etched with infernal runes, this jagged helm is topped by a pair of obsidian-like horns that pulse with a faint, rhythmic crimson light. Adds +12 Defense.",
-    "value": 1200,
-    "type": "helmet",
-    "rarity": "legendary",
-    "sprite": "Helmets/horned_demon_helmet.png",
-    "effects": {
-      "defenseBonus": 12
-    }
-  },
   "wooden_shield": {
     "name": "Wooden Shield",
     "desc": "A round wooden shield reinforced with iron rings. Adds +2 Defense.",
@@ -112,19 +78,6 @@
     },
     "shopListed": false
   },
-  "mana_sever_dagger": {
-    "name": "Mana Sever Dagger",
-    "desc": "This ritual blade is crafted from a single, translucent shard of void-glass that hums with a dissonant, jagged vibration.",
-    "value": 2000,
-    "type": "weapon",
-    "rarity": "legendary",
-    "sprite": "Animated Quality Weapons/mana_sever_dagger_177486.png",
-    "effects": {
-      "attackBonus": 10,
-      "defenseBonus": 10
-    },
-    "skills": []
-  },
   "sleepy_dragon": {
     "name": "Sleepy Dragon",
     "desc": "eepy eepy",
@@ -133,53 +86,6 @@
     "rarity": "legendary",
     "sprite": "Avatars/soulhunt34_179772.png",
     "shopListed": false
-  },
-  "einherjars_will": {
-    "name": "Einherjar Will",
-    "desc": "Here stands all the souls and blood of those send to eternal rest by Valhalla elite army. We shall honor the bond of those who share our war home will. Peace to all fallen souls. ",
-    "value": 4000,
-    "type": "weapon",
-    "rarity": "legendary",
-    "sprite": "Animated Quality Weapons/behelit_sword_174789.png",
-    "effects": {
-      "attackBonus": 15,
-      "critChance": 2,
-      "lifesteal": 2
-    },
-    "skills": [
-      "heavy_slash",
-      "piercing_stab"
-    ]
-  },
-  "behelit_sword": {
-    "name": "Behelit Sword",
-    "desc": "Through time it shears the wrath of doom, A swords resolve cursed ever higher. The Behelit Sword, in midnights gloom, cuts open Hell on wings of desire. ",
-    "value": 4000,
-    "type": "weapon",
-    "rarity": "legendary",
-    "sprite": "Animated Quality Weapons/einherjar039s_will_176907.gif",
-    "effects": {
-      "lifesteal": 10,
-      "attackBonus": 12,
-      "poisonChance": 2
-    },
-    "skills": [
-      "heavy_slash",
-      "flame_strike"
-    ]
-  },
-  "virtue": {
-    "name": "Virtue",
-    "desc": "This relic is a masterclass in conflicting design, blending the divine aesthetics of high-paladin armor with the chaotic, aggressive edges of the abyss.",
-    "value": 2000,
-    "type": "armor",
-    "rarity": "legendary",
-    "sprite": "Animated Armors/generic_armour_102372.png",
-    "effects": {
-      "defenseBonus": 25,
-      "lifesteal": 10,
-      "poisonChance": 10
-    }
   },
   "stick": {
     "name": "Wooden stick",
@@ -191,77 +97,292 @@
     "shopListed": false
   },
   "steel_dagger": {
-    "name": "Steel Dagger",
-    "desc": "A utilitarian blade forged from tempered steel, possessing a clean, minimalist profile.",
-    "value": 150,
+    "name": "Rusty Steel Dagger",
+    "desc": "A utilitarian blade forged from tempered steel.",
+    "value": 180,
     "type": "weapon",
     "rarity": "uncommon",
-    "sprite": "Non Animated Weapons/refined_blade.png",
+    "sprite": "High Quality Weapons/tile153.png",
     "effects": {
-      "attackBonus": 5
+      "attackBonus": 3,
+      "poisonChance": 0.5
     },
     "skills": []
-  },
-  "t1_healing_potion": {
-    "name": "low healing potion",
-    "desc": "Contained within a small, unadorned glass vial, this thin, translucent liquid glows with a faint, pale amber hue.",
-    "value": 10,
-    "type": "consumable",
-    "rarity": "common",
-    "sprite": "Consumable/energy_tea.png",
-    "effects": {
-      "hpRestore": 20
-    }
   },
   "basic_spear": {
     "name": "Wooden Spear",
     "desc": "A functional, no-nonsense weapon consisting of a straight, seasoned ash wood shaft topped with a simple iron spearhead.",
-    "value": 60,
+    "value": 80,
     "type": "weapon",
     "rarity": "common",
     "sprite": "Non Animated Weapons/wooden_staff.png",
     "effects": {
-      "attackBonus": 3
+      "attackBonus": 1,
+      "defenseBonus": 1
+    },
+    "skills": [],
+    "recipe": {
+      "cost": 0,
+      "ingredients": {
+        "tin_bar": 1,
+        "stick": 1
+      }
+    }
+  },
+  "swift-draw_stiletto": {
+    "name": "Swift-Draw Stiletto",
+    "desc": "Forged for the moment between breath and blood.",
+    "value": 380,
+    "type": "weapon",
+    "rarity": "rare",
+    "sprite": "High Quality Weapons/tile0075.png",
+    "effects": {
+      "attackBonus": 5,
+      "critChance": 0.5
     },
     "skills": []
   },
-  "star-fall_reaver": {
-    "name": "star-fall reaver",
-    "desc": "It is a piece of the heavens brought to earth to carve a path through the dark.",
-    "value": 1000,
+  "silent_striker": {
+    "name": "Silent Striker",
+    "desc": "Weighted perfectly for a quick, silent strike.",
+    "value": 500,
     "type": "weapon",
-    "rarity": "legendary",
-    "sprite": "High Quality Weapons/tile0062.png",
+    "rarity": "rare",
+    "sprite": "High Quality Weapons/tile177.png",
     "effects": {
-      "attackBonus": 20,
-      "burnChance": 25
+      "attackBonus": 2,
+      "poisonChance": 5
+    },
+    "skills": [],
+    "recipe": {
+      "cost": 50,
+      "ingredients": {
+        "iron_bar": 5,
+        "tin_bar": 3,
+        "stick": 1
+      }
     }
   },
-  "the_eternal_blade": {
-    "name": "The Eternal Blade",
-    "desc": "It does not care for the history of those it strikes, for it has seen the end of all things and remains unchanged.",
-    "value": 2000,
+  "vipers_kiss": {
+    "name": "Viper’s Kiss",
+    "desc": "A single scratch is all the medicine you'll ever need.",
+    "value": 950,
     "type": "weapon",
-    "rarity": "legendary",
-    "sprite": "High Quality Weapons/tile0047.png",
+    "rarity": "epic",
+    "sprite": "High Quality Weapons/tile0065.png",
     "effects": {
-      "attackBonus": 25
-    }
+      "poisonChance": 15,
+      "attackBonus": 5
+    },
+    "skills": []
   },
-  "light-eater": {
-    "name": "Light-Eater",
-    "desc": "It is the silence before the first word, the stillness before the first breath. It remembers a time when the world was young, and it is waiting for it to be born again.",
-    "value": 9999,
+  "calamitys_edge": {
+    "name": "Calamity’s Edge",
+    "desc": "To draw this blade is to invite catastrophe.",
+    "value": 6000,
     "type": "weapon",
     "rarity": "legendary",
-    "sprite": "High Quality Weapons/tile076.png",
+    "sprite": "Animated Quality Weapons/demon_kings_sword.png",
     "effects": {
-      "attackBonus": 50,
+      "attackBonus": 15,
+      "defenseBonus": 5,
+      "lifesteal": 30,
+      "burnChance": 5
+    },
+    "skills": [
+      "flame_strike",
+      "heavy_slash"
+    ]
+  },
+  "the_silence_of_eternity": {
+    "name": "The Silence of Eternity",
+    "desc": "It makes no sound, for it has seen the end of all things.",
+    "value": 6500,
+    "type": "weapon",
+    "rarity": "legendary",
+    "sprite": "Animated Quality Weapons/behelit_sword_174789.png",
+    "effects": {
+      "attackBonus": 15,
       "lifesteal": 50,
-      "defenseBonus": 50,
-      "critChance": 50,
-      "poisonChance": 50,
       "burnChance": 50
+    },
+    "skills": [
+      "heavy_slash",
+      "piercing_stab"
+    ],
+    "shopListed": false,
+    "recipe": {
+      "cost": 5000,
+      "ingredients": {
+        "vipers_kiss": 1,
+        "calamitys_edge": 1
+      }
     }
+  },
+  "the_world-severer": {
+    "name": "The World-Severer",
+    "desc": "A double-bladed axe where the inner edges are serrated. It vibrates at a frequency that causes armor to shatter upon contact, ignoring physical barriers entirely.",
+    "value": 6300,
+    "type": "weapon",
+    "rarity": "legendary",
+    "sprite": "Animated Quality Weapons/scarlet_wrath_146687.png",
+    "effects": {
+      "attackBonus": 30,
+      "critChance": 20,
+      "defenseBonus": 5,
+      "lifesteal": 5
+    },
+    "skills": [
+      "heavy_slash"
+    ],
+    "recipe": {
+      "cost": 0,
+      "ingredients": {
+        "demon_horn": 50,
+        "calamitys_edge": 1
+      }
+    },
+    "shopListed": false
+  },
+  "metal_scrap": {
+    "name": "Metal Scrap",
+    "desc": "Rusted plates of iron.",
+    "value": 5,
+    "type": "material",
+    "rarity": "common",
+    "sprite": "Materials/Resource591.png",
+    "shopListed": false
+  },
+  "copper": {
+    "name": "Copper ore",
+    "desc": "A soft, reddish-brown metal; highly conductive and ideal for basic mechanisms.",
+    "value": 5,
+    "type": "material",
+    "rarity": "common",
+    "sprite": "Materials/Resource516.png",
+    "shopListed": false
+  },
+  "tin": {
+    "name": "Tin ore",
+    "desc": "A dull, silvery-grey metal; brittle on its own, but essential for tempering alloys.",
+    "value": 7,
+    "type": "material",
+    "rarity": "common",
+    "sprite": "Materials/Resource513.png",
+    "shopListed": false
+  },
+  "iron": {
+    "name": "Iron Ore",
+    "desc": "A heavy, utilitarian staple; the backbone of all industrial forging.",
+    "value": 10,
+    "type": "material",
+    "rarity": "uncommon",
+    "sprite": "Materials/Resource514.png",
+    "shopListed": false
+  },
+  "gold": {
+    "name": "Gold Ore",
+    "desc": "A vibrant, malleable precious metal; the pinnacle of energy conductivity.",
+    "value": 20,
+    "type": "material",
+    "rarity": "rare",
+    "sprite": "Materials/Resource518.png",
+    "shopListed": false
+  },
+  "gold_bar": {
+    "name": "Gold Bar",
+    "desc": "A dense, rectangular ingot with a clean, brushed finish. It lacks the gaudy luster of decorative gold, appearing instead as a heavy, matte-yellow slab of functional wealth.",
+    "value": 100,
+    "type": "material",
+    "rarity": "epic",
+    "sprite": "Materials/Resource555.png",
+    "recipe": {
+      "cost": 0,
+      "ingredients": {
+        "gold": 5
+      }
+    },
+    "shopListed": false
+  },
+  "stone": {
+    "name": "Stone",
+    "desc": "A simple piece of the world. It doesn't need to be anything else.",
+    "value": 2,
+    "type": "material",
+    "rarity": "common",
+    "sprite": "Materials/Resource505.png",
+    "shopListed": false
+  },
+  "tin_bar": {
+    "name": "Tin Bar",
+    "desc": "A dull, cool-to-the-touch ingot with a muted, silvery-grey finish. It is softer and more malleable than iron, possessing a slightly grainy texture.",
+    "value": 15,
+    "type": "material",
+    "rarity": "uncommon",
+    "sprite": "Materials/Resource558.png",
+    "recipe": {
+      "cost": 0,
+      "ingredients": {
+        "tin": 5,
+        "stone": 2
+      }
+    },
+    "shopListed": false
+  },
+  "iron_bar": {
+    "name": "Iron Bar",
+    "desc": "A heavy, rectangular block of raw, unrefined metal with a rough, matte-grey surface. It is dense and cold, smelling faintly of the earth and the forge.",
+    "value": 25,
+    "type": "material",
+    "rarity": "rare",
+    "sprite": "Materials/Resource556.png",
+    "recipe": {
+      "cost": 10,
+      "ingredients": {
+        "iron": 5
+      }
+    },
+    "shopListed": false
+  },
+  "copper_bar": {
+    "name": "New Item",
+    "desc": "A newly added fantasy item.",
+    "value": 15,
+    "type": "material",
+    "rarity": "uncommon",
+    "sprite": "Materials/Resource557.png",
+    "recipe": {
+      "cost": 0,
+      "ingredients": {
+        "copper": 5,
+        "stone": 1
+      }
+    },
+    "shopListed": false
+  },
+  "milk_carton": {
+    "name": "Milk Carton",
+    "desc": "Cold, simple, and increasingly hard to find.",
+    "value": 30,
+    "type": "consumable",
+    "rarity": "uncommon",
+    "sprite": "More Food & Materials/milk_pack.png",
+    "effects": {
+      "hpRestore": 20,
+      "staminaRestore": 20
+    },
+    "shopListed": false
+  },
+  "chips": {
+    "name": "Bag of Chips",
+    "desc": "Empty calories, but the salt makes the shift easier to bear.",
+    "value": 15,
+    "type": "consumable",
+    "rarity": "common",
+    "sprite": "More Food & Materials/potatochip_yellow.png",
+    "effects": {
+      "hpRestore": 10
+    },
+    "shopListed": false
   }
 }

@@ -1,0 +1,73 @@
+{
+  "kappa": {
+    "name": "Kappa",
+    "hp": 40,
+    "maxHp": 40,
+    "attack": 4,
+    "defense": 3,
+    "speed": 3000,
+    "xpReward": 35,
+    "coinReward": 10,
+    "loot": {
+      "guaranteed": "water_shell",
+      "bonusChance": 0.35
+    }
+  },
+  "tengu": {
+    "name": "Tengu",
+    "hp": 60,
+    "maxHp": 60,
+    "attack": 6,
+    "defense": 4,
+    "speed": 2500,
+    "xpReward": 55,
+    "coinReward": 15,
+    "loot": {
+      "guaranteed": "wind_feather",
+      "bonusChance": 0.35
+    }
+  },
+  "kitsune": {
+    "name": "Kitsune",
+    "hp": 50,
+    "maxHp": 50,
+    "attack": 5,
+    "defense": 5,
+    "speed": 2000,
+    "xpReward": 50,
+    "coinReward": 12,
+    "loot": {
+      "guaranteed": "rice_bowl",
+      "bonusChance": 0.35
+    }
+  },
+  "oni": {
+    "name": "Oni",
+    "hp": 80,
+    "maxHp": 80,
+    "attack": 8,
+    "defense": 6,
+    "speed": 3500,
+    "xpReward": 75,
+    "coinReward": 20,
+    "loot": {
+      "guaranteed": "demon_horn",
+      "bonusChance": 0.35
+    }
+  },
+  "dragon_lord": {
+    "name": "Dragon Lord",
+    "hp": 400,
+    "maxHp": 400,
+    "attack": 18,
+    "defense": 8,
+    "speed": 2500,
+    "xpReward": 300,
+    "coinReward": 100,
+    "loot": {
+      "guaranteed": "demon_kings_sword",
+      "bonusChance": 0.5
+    },
+    "isBoss": true
+  }
+}

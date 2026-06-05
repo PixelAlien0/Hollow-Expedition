@@ -1,18 +1,4 @@
 {
-  "kappa": {
-    "name": "Kappa",
-    "hp": 40,
-    "maxHp": 40,
-    "attack": 4,
-    "defense": 3,
-    "speed": 3000,
-    "xpReward": 35,
-    "coinReward": 10,
-    "loot": {
-      "guaranteed": "water_shell",
-      "bonusChance": 0.35
-    }
-  },
   "tengu": {
     "name": "Tengu",
     "hp": 60,
@@ -24,8 +10,12 @@
     "coinReward": 15,
     "loot": {
       "guaranteed": "wind_feather",
-      "bonusChance": 0.35
-    }
+      "bonusChance": 0.35,
+      "pool": [
+        "wind_feather"
+      ]
+    },
+    "sprite": "Monsters & Pets/boar_172601.png"
   },
   "kitsune": {
     "name": "Kitsune",
@@ -38,8 +28,12 @@
     "coinReward": 12,
     "loot": {
       "guaranteed": "rice_bowl",
-      "bonusChance": 0.35
-    }
+      "bonusChance": 0.35,
+      "pool": [
+        "rice_bowl"
+      ]
+    },
+    "sprite": "Monsters & Pets/cedarheart_180918.png"
   },
   "oni": {
     "name": "Oni",
@@ -52,8 +46,12 @@
     "coinReward": 20,
     "loot": {
       "guaranteed": "demon_horn",
-      "bonusChance": 0.35
-    }
+      "bonusChance": 0.35,
+      "pool": [
+        "demon_horn"
+      ]
+    },
+    "sprite": "Monsters & Pets/sparky_the_spark_177409.png"
   },
   "dragon_lord": {
     "name": "Dragon Lord",
@@ -65,9 +63,30 @@
     "xpReward": 300,
     "coinReward": 100,
     "loot": {
-      "guaranteed": "demon_kings_sword",
+      "guaranteed": null,
       "bonusChance": 0.5
     },
-    "isBoss": true
+    "isBoss": true,
+    "sprite": "Avatars/soulhunt34_179772.png",
+    "xpreward": 350
+  },
+  "fire_wisp": {
+    "name": "Fire Wisp",
+    "sprite": "Monsters & Pets/last_spark_of_everwinter_180434.gif",
+    "hp": 60,
+    "maxHp": 50,
+    "attack": 5,
+    "defense": 10,
+    "speed": 1500,
+    "xpReward": 45,
+    "coinReward": 15,
+    "loot": {
+      "guaranteed": "copper",
+      "bonusChance": 0.2,
+      "pool": [
+        "copper"
+      ]
+    },
+    "maxhp": 30
   }
 }

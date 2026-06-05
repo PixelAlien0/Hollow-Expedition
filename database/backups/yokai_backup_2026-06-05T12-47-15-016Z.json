@@ -1,0 +1,92 @@
+{
+  "tengu": {
+    "name": "Tengu",
+    "hp": 60,
+    "maxHp": 60,
+    "attack": 6,
+    "defense": 4,
+    "speed": 2500,
+    "xpReward": 55,
+    "coinReward": 15,
+    "loot": {
+      "guaranteed": "wind_feather",
+      "bonusChance": 0.35,
+      "pool": [
+        "wind_feather"
+      ]
+    },
+    "sprite": "Monsters & Pets/boar_172601.png"
+  },
+  "kitsune": {
+    "name": "Kitsune",
+    "hp": 50,
+    "maxHp": 50,
+    "attack": 5,
+    "defense": 5,
+    "speed": 2000,
+    "xpReward": 50,
+    "coinReward": 12,
+    "loot": {
+      "guaranteed": "rice_bowl",
+      "bonusChance": 0.35,
+      "pool": [
+        "rice_bowl"
+      ]
+    },
+    "sprite": "Monsters & Pets/cedarheart_180918.png"
+  },
+  "oni": {
+    "name": "Oni",
+    "hp": 80,
+    "maxHp": 80,
+    "attack": 8,
+    "defense": 6,
+    "speed": 3500,
+    "xpReward": 75,
+    "coinReward": 20,
+    "loot": {
+      "guaranteed": "demon_horn",
+      "bonusChance": 0.35,
+      "pool": [
+        "demon_horn"
+      ]
+    },
+    "sprite": "Monsters & Pets/sparky_the_spark_177409.png"
+  },
+  "dragon_lord": {
+    "name": "Dragon Lord",
+    "hp": 400,
+    "maxHp": 400,
+    "attack": 18,
+    "defense": 8,
+    "speed": 2500,
+    "xpReward": 300,
+    "coinReward": 100,
+    "loot": {
+      "guaranteed": null,
+      "bonusChance": 0.5
+    },
+    "isBoss": true,
+    "sprite": "Avatars/soulhunt34_179772.png",
+    "xpreward": 350
+  },
+  "fire_wisp": {
+    "name": "Fire Wisp",
+    "sprite": "Monsters & Pets/last_spark_of_everwinter_180434.gif",
+    "hp": 60,
+    "maxHp": 50,
+    "attack": 5,
+    "defense": 10,
+    "speed": 1500,
+    "xpReward": 45,
+    "coinReward": 15,
+    "loot": {
+      "guaranteed": "metal_scrap",
+      "bonusChance": 0.2,
+      "pool": [
+        "metal_scrap"
+      ]
+    },
+    "maxhp": 30
+  }
+}

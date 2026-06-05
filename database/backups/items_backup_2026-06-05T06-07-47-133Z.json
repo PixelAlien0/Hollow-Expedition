@@ -1,0 +1,261 @@
+{
+  "green_tea_leaves": {
+    "name": "Green Tea Leaves",
+    "desc": "Fresh green leaves. Highly demanded by tea masters.",
+    "value": 5,
+    "type": "material",
+    "rarity": "common",
+    "sprite": "Materials/green_tea_leaves.png",
+    "shopListed": false
+  },
+  "wild_fruit": {
+    "name": "Wild Fruit",
+    "desc": "Sweet forest fruit.",
+    "value": 5,
+    "type": "material",
+    "rarity": "common",
+    "sprite": "Materials/wild_fruit.png",
+    "shopListed": false
+  },
+  "wild_root": {
+    "name": "Wild Root",
+    "desc": "A crunchy root foraged from muddy ponds.",
+    "value": 8,
+    "type": "material",
+    "rarity": "uncommon",
+    "sprite": "Materials/wild_root.png",
+    "shopListed": false
+  },
+  "water_shell": {
+    "name": "Water Shell",
+    "desc": "A smooth water-resistant shell.",
+    "value": 20,
+    "type": "material",
+    "rarity": "rare",
+    "sprite": "Materials/water_shell.png",
+    "shopListed": false
+  },
+  "wind_feather": {
+    "name": "Wind Feather",
+    "desc": "A glossy dark feather carrying currents of wind.",
+    "value": 35,
+    "type": "material",
+    "rarity": "rare",
+    "sprite": "Materials/wind_feather.png",
+    "shopListed": false
+  },
+  "demon_horn": {
+    "name": "Demon Horn",
+    "desc": "A heavy, dark crimson horn vibrating with power.",
+    "value": 50,
+    "type": "material",
+    "rarity": "epic",
+    "sprite": "Materials/demon_horn.png",
+    "shopListed": false
+  },
+  "demon_kings_sword": {
+    "name": "Demon King's Sword",
+    "desc": "A blade of singular malice, forged from cooling star-fire and quenched in the blood of fallen monarchs.",
+    "value": 4000,
+    "type": "weapon",
+    "rarity": "legendary",
+    "sprite": "Animated Quality Weapons/demon_kings_sword.png",
+    "effects": {
+      "attackBonus": 20,
+      "lifesteal": 20,
+      "burnChance": 10
+    },
+    "skills": [
+      "heavy_slash",
+      "flame_strike"
+    ]
+  },
+  "horned_demon_helmet": {
+    "name": "Horned Demon Helmet",
+    "desc": "Forged from blackened iron and etched with infernal runes, this jagged helm is topped by a pair of obsidian-like horns that pulse with a faint, rhythmic crimson light. Adds +12 Defense.",
+    "value": 1200,
+    "type": "helmet",
+    "rarity": "legendary",
+    "sprite": "Helmets/horned_demon_helmet.png",
+    "effects": {
+      "defenseBonus": 12
+    }
+  },
+  "wooden_shield": {
+    "name": "Wooden Shield",
+    "desc": "A round wooden shield reinforced with iron rings. Adds +2 Defense.",
+    "value": 15,
+    "type": "shield",
+    "rarity": "common",
+    "sprite": "Shields/wooden_shield.png",
+    "effects": {
+      "defenseBonus": 2
+    },
+    "shopListed": false
+  },
+  "lucky_amulet": {
+    "name": "Lucky Amulet",
+    "desc": "A protective temple amulet. Adds +1 Attack and +1 Defense.",
+    "value": 30,
+    "type": "accessory",
+    "rarity": "uncommon",
+    "sprite": "Accessory/lucky_amulet.png",
+    "effects": {
+      "attackBonus": 1,
+      "defenseBonus": 1
+    },
+    "shopListed": false
+  },
+  "mana_sever_dagger": {
+    "name": "Mana Sever Dagger",
+    "desc": "This ritual blade is crafted from a single, translucent shard of void-glass that hums with a dissonant, jagged vibration.",
+    "value": 2000,
+    "type": "weapon",
+    "rarity": "legendary",
+    "sprite": "Animated Quality Weapons/mana_sever_dagger_177486.png",
+    "effects": {
+      "attackBonus": 10,
+      "defenseBonus": 10
+    },
+    "skills": []
+  },
+  "sleepy_dragon": {
+    "name": "Sleepy Dragon",
+    "desc": "eepy eepy",
+    "value": 5000,
+    "type": "avatar",
+    "rarity": "legendary",
+    "sprite": "Avatars/soulhunt34_179772.png",
+    "shopListed": false
+  },
+  "einherjars_will": {
+    "name": "Einherjar Will",
+    "desc": "Here stands all the souls and blood of those send to eternal rest by Valhalla elite army. We shall honor the bond of those who share our war home will. Peace to all fallen souls. ",
+    "value": 4000,
+    "type": "weapon",
+    "rarity": "legendary",
+    "sprite": "Animated Quality Weapons/behelit_sword_174789.png",
+    "effects": {
+      "attackBonus": 15,
+      "critChance": 2,
+      "lifesteal": 2
+    },
+    "skills": [
+      "heavy_slash",
+      "piercing_stab"
+    ]
+  },
+  "behelit_sword": {
+    "name": "Behelit Sword",
+    "desc": "Through time it shears the wrath of doom, A swords resolve cursed ever higher. The Behelit Sword, in midnights gloom, cuts open Hell on wings of desire. ",
+    "value": 4000,
+    "type": "weapon",
+    "rarity": "legendary",
+    "sprite": "Animated Quality Weapons/einherjar039s_will_176907.gif",
+    "effects": {
+      "lifesteal": 10,
+      "attackBonus": 12,
+      "poisonChance": 2
+    },
+    "skills": [
+      "heavy_slash",
+      "flame_strike"
+    ]
+  },
+  "virtue": {
+    "name": "Virtue",
+    "desc": "This relic is a masterclass in conflicting design, blending the divine aesthetics of high-paladin armor with the chaotic, aggressive edges of the abyss.",
+    "value": 2000,
+    "type": "armor",
+    "rarity": "legendary",
+    "sprite": "Animated Armors/generic_armour_102372.png",
+    "effects": {
+      "defenseBonus": 25,
+      "lifesteal": 10,
+      "poisonChance": 10
+    }
+  },
+  "stick": {
+    "name": "Wooden stick",
+    "desc": "A simple, unadorned length of branch, roughly hewn and stripped of its bark.",
+    "value": 5,
+    "type": "material",
+    "rarity": "common",
+    "sprite": "Materials/wooden_sword.png",
+    "shopListed": false
+  },
+  "steel_dagger": {
+    "name": "Steel Dagger",
+    "desc": "A utilitarian blade forged from tempered steel, possessing a clean, minimalist profile.",
+    "value": 150,
+    "type": "weapon",
+    "rarity": "uncommon",
+    "sprite": "Non Animated Weapons/refined_blade.png",
+    "effects": {
+      "attackBonus": 5
+    },
+    "skills": []
+  },
+  "t1_healing_potion": {
+    "name": "low healing potion",
+    "desc": "Contained within a small, unadorned glass vial, this thin, translucent liquid glows with a faint, pale amber hue.",
+    "value": 10,
+    "type": "consumable",
+    "rarity": "common",
+    "sprite": "Consumable/energy_tea.png",
+    "effects": {
+      "hpRestore": 20
+    }
+  },
+  "basic_spear": {
+    "name": "Wooden Spear",
+    "desc": "A functional, no-nonsense weapon consisting of a straight, seasoned ash wood shaft topped with a simple iron spearhead.",
+    "value": 60,
+    "type": "weapon",
+    "rarity": "common",
+    "sprite": "Non Animated Weapons/wooden_staff.png",
+    "effects": {
+      "attackBonus": 3
+    },
+    "skills": []
+  },
+  "star-fall_reaver": {
+    "name": "star-fall reaver",
+    "desc": "It is a piece of the heavens brought to earth to carve a path through the dark.",
+    "value": 1000,
+    "type": "weapon",
+    "rarity": "legendary",
+    "sprite": "High Quality Weapons/tile0062.png",
+    "effects": {
+      "attackBonus": 20,
+      "burnChance": 25
+    }
+  },
+  "the_eternal_blade": {
+    "name": "The Eternal Blade",
+    "desc": "It does not care for the history of those it strikes, for it has seen the end of all things and remains unchanged.",
+    "value": 2000,
+    "type": "weapon",
+    "rarity": "legendary",
+    "sprite": "High Quality Weapons/tile0047.png",
+    "effects": {
+      "attackBonus": 25
+    }
+  },
+  "light-eater": {
+    "name": "Light-Eater",
+    "desc": "It is the silence before the first word, the stillness before the first breath. It remembers a time when the world was young, and it is waiting for it to be born again.",
+    "value": 9999,
+    "type": "weapon",
+    "rarity": "legendary",
+    "sprite": "High Quality Weapons/tile076.png",
+    "effects": {
+      "attackBonus": 50,
+      "lifesteal": 50,
+      "defenseBonus": 50,
+      "critChance": 50,
+      "poisonChance": 50,
+      "burnChance": 50
+    }
+  }
+}

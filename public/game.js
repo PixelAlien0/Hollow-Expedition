@@ -5,12 +5,13 @@ let allPlayers = [];
 
 let inventoryCategory = 'all';
 let inventoryPage = 1;
-const ITEMS_PER_PAGE = 4;
+const ITEMS_PER_PAGE = 8;
 let marketCategory = 'all';
 let marketPage = 1;
 let marketListingsData = [];
 let spritePage = 1;
 const SPRITES_PER_PAGE = 40;
+let dbListViewMode = 'list';
 
 // DOM Elements
 const containers = {
@@ -41,6 +42,7 @@ const ui = {
     defense: document.getElementById('ui-defense'),
     logoutBtn: document.getElementById('logout-btn'),
     exploreBtn: document.getElementById('explore-btn'),
+    scavengeBtn: document.getElementById('scavenge-btn'),
     restBtn: document.getElementById('rest-btn'),
     exploreProgressContainer: document.getElementById('explore-progress-container'),
     exploreProgressFill: document.getElementById('explore-progress-fill'),
@@ -164,8 +166,9 @@ const ui = {
     spriteGalleryList: document.getElementById('sprite-gallery-list'),
     spriteModalSelectBtn: document.getElementById('sprite-modal-select-btn'),
     actionArea: document.getElementById('action-area'),
+    quickBelt: document.getElementById('quick-belt'),
     areaBgPreview: document.getElementById('area-bg-preview'),
-    
+
     // Multiplayer Party UI
     navParty: document.getElementById('nav-party'),
     viewParty: document.getElementById('view-party'),
@@ -237,6 +240,7 @@ function cleanAdminDbDOM() {
     if (ui.dbItemPreviewCard) ui.dbItemPreviewCard.innerHTML = '';
     if (ui.dbVisualizerInput) ui.dbVisualizerInput.value = '';
     if (ui.spriteGalleryList) ui.spriteGalleryList.innerHTML = '';
+    document.querySelectorAll('.db-dynamic-modal').forEach(el => el.remove());
 }
 
 function switchView(viewName) {
@@ -328,12 +332,30 @@ if (ui.navAdminDb) {
 
 function logAction(message) {
     const li = document.createElement('li');
-    li.textContent = message;
-    if (message && message.includes('[LEGENDARY]')) {
-        li.classList.add('log-legendary');
+
+    let categoryClass = 'log-default';
+    if (message) {
+        if (message.includes('[WARNING]') || message.includes('[DEFEAT]') || message.includes('[EXHAUSTED]') || message.includes('[RESTRICTED]')) {
+            categoryClass = 'log-warning';
+        } else if (message.includes('[VICTORY]') || message.includes('[LEVEL UP]') || message.includes('[FORAGE]') || message.includes('[HEAL]') || message.includes('[SHRINE]') || message.includes('[CRAFT]')) {
+            categoryClass = 'log-success';
+        } else if (message.includes('[SYSTEM]') || message.includes('[MERCHANT]') || message.includes('[MARKET]') || message.includes('[TRAVEL]') || message.includes('[BELT]') || message.includes('[EQUIP]') || message.includes('[UNEQUIP]')) {
+            categoryClass = 'log-info';
+        } else if (message.includes('[LEGENDARY]')) {
+            categoryClass = 'log-legendary';
+        } else if (message.includes('[QUEST]')) {
+            categoryClass = 'log-quest';
+        }
     }
+
+    li.className = `log-entry ${categoryClass}`;
+
+    // Clean up timestamps and tags like [SYSTEM] or [WARNING] since the color category handles it
+    const cleanMessage = message ? message.replace(/^(\*\s*)?(\[.*?\]\s*)?/, '') : '';
+    li.innerHTML = `<span class="log-text">${cleanMessage}</span>`;
+
     ui.actionLog.appendChild(li);
-    while (ui.actionLog.children.length > 100) {
+    while (ui.actionLog.children.length > 50) {
         ui.actionLog.removeChild(ui.actionLog.firstChild);
     }
     ui.actionLog.scrollTop = ui.actionLog.scrollHeight;
@@ -394,6 +416,30 @@ function updateInventoryItem(li, entry) {
     const descEl = li.querySelector('.item-desc');
     if (descEl) descEl.textContent = item.desc;
 
+    let badgesContainer = li.querySelector('.item-effect-badges');
+    if (!badgesContainer) {
+        badgesContainer = document.createElement('div');
+        badgesContainer.className = 'item-effect-badges';
+        badgesContainer.style.display = 'flex';
+        badgesContainer.style.flexWrap = 'wrap';
+        badgesContainer.style.gap = '0.25rem';
+        badgesContainer.style.marginTop = '0.35rem';
+        if (descEl) descEl.parentNode.insertBefore(badgesContainer, descEl.nextSibling);
+    }
+
+    let statsHtml = '';
+    if (item.effects && Object.keys(item.effects).length > 0) {
+        if (item.effects.hpRestore) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.05rem 0.25rem;">♥ +${item.effects.hpRestore} HP</span>`;
+        if (item.effects.staminaRestore) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.05rem 0.25rem;">◆ +${item.effects.staminaRestore} ST</span>`;
+        if (item.effects.attackBonus) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.05rem 0.25rem;">⚔ +${item.effects.attackBonus} ATK</span>`;
+        if (item.effects.defenseBonus) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.05rem 0.25rem;">⛨ +${item.effects.defenseBonus} DEF</span>`;
+        if (item.effects.critChance) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.05rem 0.25rem;">❖ +${item.effects.critChance}% CRIT</span>`;
+        if (item.effects.lifesteal) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.05rem 0.25rem;">▲ +${item.effects.lifesteal}% LS</span>`;
+        if (item.effects.poisonChance) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:purple; font-weight:700; background:rgba(128,0,128,0.1); border:1px solid purple; padding:0.05rem 0.25rem;">☠ +${item.effects.poisonChance}% PSN</span>`;
+        if (item.effects.burnChance) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:orange; font-weight:700; background:rgba(255,165,0,0.1); border:1px solid orange; padding:0.05rem 0.25rem;">☼ +${item.effects.burnChance}% BRN</span>`;
+    }
+    badgesContainer.innerHTML = statsHtml;
+
     const imgEl = li.querySelector('.item-sprite');
     if (imgEl) {
         if (item.sprite) {
@@ -428,6 +474,30 @@ function updateInventoryItem(li, entry) {
                     socket.emit('useItem', { itemKey });
                 });
                 actionsDiv.appendChild(useBtn);
+
+                const onBelt = lastState && lastState.quickBelt && lastState.quickBelt.includes(itemKey);
+                if (!onBelt) {
+                    const equipBeltBtn = document.createElement('button');
+                    equipBeltBtn.className = 'secondary-btn item-action-btn';
+                    equipBeltBtn.textContent = 'Add to Belt';
+                    equipBeltBtn.title = `Assign to Quick Belt`;
+                    equipBeltBtn.addEventListener('click', () => {
+                        socket.emit('equipToBelt', { itemKey });
+                    });
+                    actionsDiv.appendChild(equipBeltBtn);
+                } else {
+                    const unequipBeltBtn = document.createElement('button');
+                    unequipBeltBtn.className = 'nav-btn danger item-action-btn';
+                    unequipBeltBtn.textContent = 'Remove from Belt';
+                    unequipBeltBtn.title = `Remove from Quick Belt`;
+                    unequipBeltBtn.addEventListener('click', () => {
+                        const slotIndex = lastState.quickBelt.indexOf(itemKey);
+                        if (slotIndex !== -1) {
+                            socket.emit('unequipFromBelt', { slotIndex });
+                        }
+                    });
+                    actionsDiv.appendChild(unequipBeltBtn);
+                }
             } else if (["weapon", "armor", "helmet", "shield", "accessory", "avatar"].includes(item.type)) {
                 const equipBtn = document.createElement('button');
                 equipBtn.className = 'secondary-btn item-action-btn';
@@ -439,10 +509,7 @@ function updateInventoryItem(li, entry) {
                 actionsDiv.appendChild(equipBtn);
             }
 
-            const baseValue = item.value || 0;
-            const multipliers = (gameDb && gameDb.actions && gameDb.actions.raritySettings) ? gameDb.actions.raritySettings.valueMultipliers : { common: 1.0, uncommon: 1.5, rare: 2.5, epic: 4.0 };
-            const mult = multipliers[rarity] || 1.0;
-            const finalSellValue = Math.floor(baseValue * mult);
+            const finalSellValue = Math.floor((item.value || 0) / 2);
 
             const sellBtn = document.createElement('button');
             sellBtn.className = 'nav-btn danger item-action-btn';
@@ -457,6 +524,14 @@ function updateInventoryItem(li, entry) {
 }
 
 function renderInventory() {
+    const invItemsPerPage = (inventoryCategory === 'material') ? 16 : 8;
+
+    if (inventoryCategory === 'material') {
+        ui.inventoryList.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    } else {
+        ui.inventoryList.style.gridTemplateColumns = 'repeat(2, 1fr)';
+    }
+
     const hasInventory = lastState && lastState.inventory && Object.keys(lastState.inventory).length > 0;
     const hasEquipment = lastState && lastState.equipment && Object.values(lastState.equipment).some(x => x !== null);
 
@@ -495,8 +570,31 @@ function renderInventory() {
         }
     }
 
+    // Sort inventory items for better organization
+    const rarityWeights = { legendary: 5, epic: 4, rare: 3, uncommon: 2, common: 1 };
+    const typeWeights = { weapon: 8, armor: 7, helmet: 6, shield: 5, accessory: 4, avatar: 3, consumable: 2, material: 1, other: 0 };
+
+    allEntries.sort((a, b) => {
+        const itemA = gameDb.items[a[0]];
+        const itemB = gameDb.items[b[0]];
+        if (!itemA || !itemB) return 0;
+
+        // 1. Sort by Rarity (Highest first)
+        const rarityA = rarityWeights[itemA.rarity || 'common'] || 0;
+        const rarityB = rarityWeights[itemB.rarity || 'common'] || 0;
+        if (rarityA !== rarityB) return rarityB - rarityA;
+
+        // 2. Sort by Item Type
+        const typeA = typeWeights[itemA.type || 'other'] || 0;
+        const typeB = typeWeights[itemB.type || 'other'] || 0;
+        if (typeA !== typeB) return typeB - typeA;
+
+        // 3. Sort Alphabetically by Name
+        return (itemA.name || '').localeCompare(itemB.name || '');
+    });
+
     const totalItems = allEntries.length;
-    const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+    const totalPages = Math.max(1, Math.ceil(totalItems / invItemsPerPage));
 
     if (inventoryPage > totalPages) inventoryPage = totalPages;
     if (inventoryPage < 1) inventoryPage = 1;
@@ -508,8 +606,8 @@ function renderInventory() {
         return;
     }
 
-    const startIndex = (inventoryPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
+    const startIndex = (inventoryPage - 1) * invItemsPerPage;
+    const endIndex = Math.min(startIndex + invItemsPerPage, totalItems);
     const paginatedEntries = allEntries.slice(startIndex, endIndex);
 
     reconcileList(
@@ -531,7 +629,7 @@ function renderShop() {
 
     const shopItemKeys = Object.keys(gameDb.items).filter(key => {
         const item = gameDb.items[key];
-        return item && item.value > 0 && item.type !== 'material' && item.shopListed !== false;
+        return item && item.value > 0 && item.shopListed !== false;
     });
 
     if (shopItemKeys.length === 0) {
@@ -539,14 +637,30 @@ function renderShop() {
         return;
     }
 
+    // Sort shop items for better organization
+    const rarityWeights = { legendary: 5, epic: 4, rare: 3, uncommon: 2, common: 1 };
+    const typeWeights = { weapon: 8, armor: 7, helmet: 6, shield: 5, accessory: 4, avatar: 3, consumable: 2, material: 1, other: 0 };
+
+    shopItemKeys.sort((a, b) => {
+        const itemA = gameDb.items[a];
+        const itemB = gameDb.items[b];
+
+        const rarityA = rarityWeights[itemA.rarity || 'common'] || 0;
+        const rarityB = rarityWeights[itemB.rarity || 'common'] || 0;
+        if (rarityA !== rarityB) return rarityB - rarityA;
+
+        const typeA = typeWeights[itemA.type || 'other'] || 0;
+        const typeB = typeWeights[itemB.type || 'other'] || 0;
+        if (typeA !== typeB) return typeB - typeA;
+
+        return (itemA.name || '').localeCompare(itemB.name || '');
+    });
+
     for (const itemKey of shopItemKeys) {
         const item = gameDb.items[itemKey];
         const rarity = item.rarity || "common";
 
-        const baseValue = item.value || 0;
-        const multipliers = (gameDb && gameDb.actions && gameDb.actions.raritySettings) ? gameDb.actions.raritySettings.valueMultipliers : { common: 1.0, uncommon: 1.5, rare: 2.5, epic: 4.0 };
-        const mult = multipliers[rarity] || 1.0;
-        const buyPrice = Math.floor(baseValue * mult * 2.0);
+        const buyPrice = item.value || 0;
 
         const li = document.createElement('li');
         li.className = `inventory-item item-rarity-${rarity}`;
@@ -579,6 +693,25 @@ function renderShop() {
 
         infoDiv.appendChild(nameQtyDiv);
         infoDiv.appendChild(descP);
+
+        if (item.effects && Object.keys(item.effects).length > 0) {
+            const badgesContainer = document.createElement('div');
+            badgesContainer.style.display = 'flex';
+            badgesContainer.style.flexWrap = 'wrap';
+            badgesContainer.style.gap = '0.25rem';
+            badgesContainer.style.marginTop = '0.35rem';
+            let statsHtml = '';
+            if (item.effects.hpRestore) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.05rem 0.25rem;">♥ +${item.effects.hpRestore} HP</span>`;
+            if (item.effects.staminaRestore) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.05rem 0.25rem;">◆ +${item.effects.staminaRestore} ST</span>`;
+            if (item.effects.attackBonus) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.05rem 0.25rem;">⚔ +${item.effects.attackBonus} ATK</span>`;
+            if (item.effects.defenseBonus) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.05rem 0.25rem;">⛨ +${item.effects.defenseBonus} DEF</span>`;
+            if (item.effects.critChance) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.05rem 0.25rem;">❖ +${item.effects.critChance}% CRIT</span>`;
+            if (item.effects.lifesteal) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.05rem 0.25rem;">▲ +${item.effects.lifesteal}% LS</span>`;
+            if (item.effects.poisonChance) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:purple; font-weight:700; background:rgba(128,0,128,0.1); border:1px solid purple; padding:0.05rem 0.25rem;">☠ +${item.effects.poisonChance}% PSN</span>`;
+            if (item.effects.burnChance) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:orange; font-weight:700; background:rgba(255,165,0,0.1); border:1px solid orange; padding:0.05rem 0.25rem;">☼ +${item.effects.burnChance}% BRN</span>`;
+            badgesContainer.innerHTML = statsHtml;
+            infoDiv.appendChild(badgesContainer);
+        }
 
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'item-actions';
@@ -634,6 +767,25 @@ function renderCrafting() {
         return;
     }
 
+    // Sort crafting recipes for better organization
+    const rarityWeights = { legendary: 5, epic: 4, rare: 3, uncommon: 2, common: 1 };
+    const typeWeights = { weapon: 8, armor: 7, helmet: 6, shield: 5, accessory: 4, avatar: 3, consumable: 2, material: 1, other: 0 };
+
+    craftableItemKeys.sort((a, b) => {
+        const itemA = gameDb.items[a];
+        const itemB = gameDb.items[b];
+
+        const rarityA = rarityWeights[itemA.rarity || 'common'] || 0;
+        const rarityB = rarityWeights[itemB.rarity || 'common'] || 0;
+        if (rarityA !== rarityB) return rarityB - rarityA;
+
+        const typeA = typeWeights[itemA.type || 'other'] || 0;
+        const typeB = typeWeights[itemB.type || 'other'] || 0;
+        if (typeA !== typeB) return typeB - typeA;
+
+        return (itemA.name || '').localeCompare(itemB.name || '');
+    });
+
     const playerCoins = lastState ? (lastState.coins || 0) : 0;
     const playerInventory = lastState ? (lastState.inventory || {}) : {};
 
@@ -686,26 +838,29 @@ function renderCrafting() {
         ingredientsDiv.className = 'recipe-ingredients';
         ingredientsDiv.style.display = 'flex';
         ingredientsDiv.style.flexWrap = 'wrap';
-        ingredientsDiv.style.gap = '0.5rem';
-        ingredientsDiv.style.marginTop = '0.5rem';
+        ingredientsDiv.style.gap = '0.25rem';
+        ingredientsDiv.style.marginTop = '0.35rem';
 
         let canCraft = true;
 
         if (cost > 0) {
             const costPill = document.createElement('span');
             costPill.style.fontFamily = 'var(--font-mono)';
-            costPill.style.fontSize = '0.8rem';
-            costPill.style.padding = '0.2rem 0.5rem';
-            costPill.style.border = '2px solid var(--border-color)';
-            costPill.style.background = 'var(--bg-color)';
+            costPill.style.fontSize = '0.65rem';
+            costPill.style.fontWeight = '700';
+            costPill.style.padding = '0.05rem 0.25rem';
 
             const hasEnoughCoins = playerCoins >= cost;
             if (hasEnoughCoins) {
-                costPill.style.color = '#4a7';
-                costPill.textContent = `${cost} / ${playerCoins} COINS`;
+                costPill.style.color = 'var(--accent-green)';
+                costPill.style.background = 'rgba(89,124,94,0.1)';
+                costPill.style.border = '1px solid var(--accent-green)';
+                costPill.textContent = `⟁ ${cost} / ${playerCoins} COINS`;
             } else {
                 costPill.style.color = 'var(--accent-red)';
-                costPill.textContent = `${cost} / ${playerCoins} COINS`;
+                costPill.style.background = 'rgba(201,74,74,0.1)';
+                costPill.style.border = '1px solid var(--accent-red)';
+                costPill.textContent = `⟁ ${cost} / ${playerCoins} COINS`;
                 canCraft = false;
             }
             ingredientsDiv.appendChild(costPill);
@@ -719,16 +874,19 @@ function renderCrafting() {
 
             const pill = document.createElement('span');
             pill.style.fontFamily = 'var(--font-mono)';
-            pill.style.fontSize = '0.8rem';
-            pill.style.padding = '0.2rem 0.5rem';
-            pill.style.border = '2px solid var(--border-color)';
-            pill.style.background = 'var(--bg-color)';
+            pill.style.fontSize = '0.65rem';
+            pill.style.fontWeight = '700';
+            pill.style.padding = '0.05rem 0.25rem';
 
             if (hasEnough) {
-                pill.style.color = '#4a7';
+                pill.style.color = 'var(--accent-green)';
+                pill.style.background = 'rgba(89,124,94,0.1)';
+                pill.style.border = '1px solid var(--accent-green)';
                 pill.textContent = `✓ ${ingName} (${currentQty}/${qtyRequired})`;
             } else {
                 pill.style.color = 'var(--accent-red)';
+                pill.style.background = 'rgba(201,74,74,0.1)';
+                pill.style.border = '1px solid var(--accent-red)';
                 pill.textContent = `✗ ${ingName} (${currentQty}/${qtyRequired})`;
                 canCraft = false;
             }
@@ -738,6 +896,25 @@ function renderCrafting() {
         infoDiv.appendChild(nameQtyDiv);
         infoDiv.appendChild(descP);
         infoDiv.appendChild(ingredientsDiv);
+
+        if (item.effects && Object.keys(item.effects).length > 0) {
+            const badgesContainer = document.createElement('div');
+            badgesContainer.style.display = 'flex';
+            badgesContainer.style.flexWrap = 'wrap';
+            badgesContainer.style.gap = '0.25rem';
+            badgesContainer.style.marginTop = '0.35rem';
+            let statsHtml = '';
+            if (item.effects.hpRestore) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.05rem 0.25rem;">♥ +${item.effects.hpRestore} HP</span>`;
+            if (item.effects.staminaRestore) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.05rem 0.25rem;">◆ +${item.effects.staminaRestore} ST</span>`;
+            if (item.effects.attackBonus) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.05rem 0.25rem;">⚔ +${item.effects.attackBonus} ATK</span>`;
+            if (item.effects.defenseBonus) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.05rem 0.25rem;">⛨ +${item.effects.defenseBonus} DEF</span>`;
+            if (item.effects.critChance) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.05rem 0.25rem;">❖ +${item.effects.critChance}% CRIT</span>`;
+            if (item.effects.lifesteal) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.05rem 0.25rem;">▲ +${item.effects.lifesteal}% LS</span>`;
+            if (item.effects.poisonChance) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:purple; font-weight:700; background:rgba(128,0,128,0.1); border:1px solid purple; padding:0.05rem 0.25rem;">☠ +${item.effects.poisonChance}% PSN</span>`;
+            if (item.effects.burnChance) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:orange; font-weight:700; background:rgba(255,165,0,0.1); border:1px solid orange; padding:0.05rem 0.25rem;">☼ +${item.effects.burnChance}% BRN</span>`;
+            badgesContainer.innerHTML = statsHtml;
+            infoDiv.appendChild(badgesContainer);
+        }
 
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'item-actions';
@@ -762,6 +939,45 @@ function renderCrafting() {
         li.appendChild(infoDiv);
         li.appendChild(actionsDiv);
         ui.craftingList.appendChild(li);
+    }
+}
+
+function renderQuickBelt(state) {
+    const beltEl = ui.quickBelt;
+    if (!beltEl) return;
+    beltEl.innerHTML = '';
+
+    const quickBelt = (state && state.quickBelt) ? state.quickBelt : [null, null, null];
+
+    for (let i = 0; i < 3; i++) {
+        const slotDiv = document.createElement('div');
+        slotDiv.className = 'quick-belt-slot';
+
+        const itemKey = quickBelt[i];
+        if (itemKey && gameDb && gameDb.items && gameDb.items[itemKey]) {
+            const item = gameDb.items[itemKey];
+            const qty = (state.inventory && state.inventory[itemKey]) || 0;
+
+            slotDiv.title = `${item.name} (x${qty})\nRight-click to remove`;
+            slotDiv.innerHTML = `<img src="/sprites/${item.sprite}" alt="${item.name}"><span class="qty-badge">${qty}</span>`;
+            slotDiv.onclick = () => {
+                if (isExploring) return;
+                if (qty > 0) {
+                    socket.emit('useItem', { itemKey });
+                } else {
+                    logAction(`[WARNING] You don't have any ${item.name} left!`);
+                }
+            };
+            slotDiv.oncontextmenu = (e) => {
+                e.preventDefault();
+                socket.emit('unequipFromBelt', { slotIndex: i });
+            };
+        } else {
+            slotDiv.classList.add('empty');
+            slotDiv.innerHTML = '+';
+            slotDiv.title = 'Empty Belt Slot\nAdd consumables from your inventory';
+        }
+        beltEl.appendChild(slotDiv);
     }
 }
 
@@ -1026,6 +1242,25 @@ function renderMarketListings(listings) {
         infoDiv.appendChild(nameQtyDiv);
         infoDiv.appendChild(sellerDiv);
 
+        if (item.effects && Object.keys(item.effects).length > 0) {
+            const badgesContainer = document.createElement('div');
+            badgesContainer.style.display = 'flex';
+            badgesContainer.style.flexWrap = 'wrap';
+            badgesContainer.style.gap = '0.25rem';
+            badgesContainer.style.marginTop = '0.35rem';
+            let statsHtml = '';
+            if (item.effects.hpRestore) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.05rem 0.25rem;">♥ +${item.effects.hpRestore} HP</span>`;
+            if (item.effects.staminaRestore) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.05rem 0.25rem;">◆ +${item.effects.staminaRestore} ST</span>`;
+            if (item.effects.attackBonus) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.05rem 0.25rem;">⚔ +${item.effects.attackBonus} ATK</span>`;
+            if (item.effects.defenseBonus) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.05rem 0.25rem;">⛨ +${item.effects.defenseBonus} DEF</span>`;
+            if (item.effects.critChance) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.05rem 0.25rem;">❖ +${item.effects.critChance}% CRIT</span>`;
+            if (item.effects.lifesteal) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.05rem 0.25rem;">▲ +${item.effects.lifesteal}% LS</span>`;
+            if (item.effects.poisonChance) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:purple; font-weight:700; background:rgba(128,0,128,0.1); border:1px solid purple; padding:0.05rem 0.25rem;">☠ +${item.effects.poisonChance}% PSN</span>`;
+            if (item.effects.burnChance) statsHtml += `<span style="font-size:0.65rem; font-family:var(--font-mono); color:orange; font-weight:700; background:rgba(255,165,0,0.1); border:1px solid orange; padding:0.05rem 0.25rem;">☼ +${item.effects.burnChance}% BRN</span>`;
+            badgesContainer.innerHTML = statsHtml;
+            infoDiv.appendChild(badgesContainer);
+        }
+
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'item-actions';
 
@@ -1263,6 +1498,7 @@ function updateStatsDisplay(state) {
     if (ui.viewShop && ui.viewShop.classList.contains('active')) {
         updateShopButtons(state.coins);
     }
+    renderQuickBelt(state);
     updateSkillButtonsDisabledState();
 }
 
@@ -1389,17 +1625,37 @@ socket.on('exploreStarted', (data) => {
     if (ui.actionArea) ui.actionArea.classList.add('is-exploring');
     if (ui.exploreProgressContainer) ui.exploreProgressContainer.classList.add('is-exploring');
     ui.exploreBtn.disabled = true;
+    if (ui.scavengeBtn) ui.scavengeBtn.disabled = true;
     ui.restBtn.disabled = true;
     ui.encounterPrompt.style.display = 'none';
+    if (ui.quickBelt) {
+        ui.quickBelt.style.opacity = '0.5';
+        ui.quickBelt.style.pointerEvents = 'none';
+    }
 
-    const currentAreaKey = (data.state && data.state.currentArea) ? data.state.currentArea : getDefaultAreaKey();
-    const area = (gameDb && gameDb.areas && gameDb.areas[currentAreaKey]) ? gameDb.areas[currentAreaKey] : { name: 'the Wilds' };
-    ui.exploreStatus.textContent = `Rustling through ${area.name}...`;
+    if (data.type === 'scavenge') {
+        ui.exploreStatus.textContent = `Scavenging the area...`;
+    } else {
+        const currentAreaKey = (data.state && data.state.currentArea) ? data.state.currentArea : getDefaultAreaKey();
+        const area = (gameDb && gameDb.areas && gameDb.areas[currentAreaKey]) ? gameDb.areas[currentAreaKey] : { name: 'the Wilds' };
+        ui.exploreStatus.textContent = `Rustling through ${area.name}...`;
+    }
 
     animateProgressBar(data.duration, () => {
         // Completion is server-authoritative
     });
 });
+
+if (ui.scavengeBtn) {
+    ui.scavengeBtn.addEventListener('click', () => {
+        if (isExploring) return;
+        isExploring = true;
+        ui.exploreBtn.disabled = true;
+        ui.scavengeBtn.disabled = true;
+        ui.restBtn.disabled = true;
+        socket.emit('scavengeStart');
+    });
+}
 
 ui.restBtn.addEventListener('click', () => {
     if (isExploring) return;
@@ -1427,19 +1683,19 @@ function showConflictModal(newDb, previousDb) {
         modal.className = 'modal-overlay';
         document.body.appendChild(modal);
     }
-    
+
     const type = newDb.updatedType;
     const author = newDb.updatedBy || 'Another Admin';
-    
+
     const oldEntries = previousDb ? previousDb[type] || {} : {};
     const newEntries = newDb[type] || {};
-    
+
     const addedKeys = Object.keys(newEntries).filter(k => !oldEntries[k]);
     const deletedKeys = Object.keys(oldEntries).filter(k => !newEntries[k]);
     const modifiedKeys = Object.keys(newEntries).filter(k => oldEntries[k] && JSON.stringify(oldEntries[k]) !== JSON.stringify(newEntries[k]));
-    
+
     let summaryHtml = `<strong>Admin ${author}</strong> has updated the <strong>${type}</strong> database.<br><br>`;
-    
+
     if (addedKeys.length > 0) {
         summaryHtml += `✦ <strong>Added keys:</strong> ${addedKeys.join(', ')}<br>`;
     }
@@ -1449,16 +1705,16 @@ function showConflictModal(newDb, previousDb) {
     if (modifiedKeys.length > 0) {
         summaryHtml += `✦ <strong>Modified keys:</strong> ${modifiedKeys.join(', ')}<br>`;
     }
-    
+
     const isDirty = JSON.stringify(activeDbData) !== JSON.stringify(originalDbData);
     let diffHtml = '';
     if (isDirty) {
         summaryHtml += `<br><span style="color: var(--accent-red); font-weight: bold;">⚠️ WARNING: You have unsaved changes in your editor! If you accept the server's changes, your edits will be overwritten.</span>`;
-        
+
         if (selectedEntryKey) {
             const localVal = activeDbData[selectedEntryKey];
             const serverVal = newEntries[selectedEntryKey];
-            
+
             if (!serverVal) {
                 diffHtml = `<div style="border: 2px solid var(--accent-red); padding: 1rem; background: rgba(201,74,74,0.05); font-family: var(--font-mono); font-size: 0.72rem; margin-top: 1rem; width: 100%;">
                     <strong>Entry "${selectedEntryKey}" was DELETED on the server.</strong>
@@ -1472,7 +1728,7 @@ function showConflictModal(newDb, previousDb) {
                         <td style="padding: 0.35rem; border-bottom: 1px solid var(--border-color); color: var(--accent-green); background: rgba(89,124,94,0.05);">${JSON.stringify(values.server)}</td>
                     </tr>`;
                 }).join('');
-                
+
                 if (diffRows) {
                     diffHtml = `
                     <div style="margin-top: 1rem; width: 100%;">
@@ -1496,7 +1752,7 @@ function showConflictModal(newDb, previousDb) {
             }
         }
     }
-    
+
     modal.innerHTML = `
         <div class="modal-content" style="max-width: 550px; width: 100%; padding: 1.5rem; gap: 1rem;">
             <h3 style="font-family: var(--font-main); text-transform: uppercase; font-size: 1.1rem; border-bottom: 3px solid var(--border-color); padding-bottom: 0.5rem; margin: 0; color: var(--accent-red); display: flex; align-items: center; gap: 0.5rem;">
@@ -1516,9 +1772,9 @@ function showConflictModal(newDb, previousDb) {
             </div>
         </div>
     `;
-    
+
     modal.style.display = 'flex';
-    
+
     document.getElementById('conflict-keep-btn').onclick = () => {
         originalDbData = JSON.parse(JSON.stringify(newDb[type] || {}));
         if (adminDbCache) {
@@ -1526,17 +1782,17 @@ function showConflictModal(newDb, previousDb) {
         }
         modal.style.display = 'none';
     };
-    
+
     document.getElementById('conflict-sync-btn').onclick = () => {
         activeDbData = JSON.parse(JSON.stringify(newDb[type] || {}));
         originalDbData = JSON.parse(JSON.stringify(newDb[type] || {}));
         if (adminDbCache) {
             adminDbCache[type] = newDb[type];
         }
-        
+
         initCategoryFilter();
         renderEntriesList();
-        
+
         if (selectedEntryKey && activeDbData[selectedEntryKey]) {
             selectEntry(selectedEntryKey);
         } else {
@@ -1547,7 +1803,7 @@ function showConflictModal(newDb, previousDb) {
                 renderFormAndPreview(null);
             }
         }
-        
+
         modal.style.display = 'none';
     };
 }
@@ -1599,8 +1855,13 @@ socket.on('exploreResult', (data) => {
     if (ui.actionArea) ui.actionArea.classList.remove('is-exploring');
     if (ui.exploreProgressContainer) ui.exploreProgressContainer.classList.remove('is-exploring');
     ui.exploreBtn.disabled = false;
+    if (ui.scavengeBtn) ui.scavengeBtn.disabled = false;
     ui.restBtn.disabled = false;
     ui.exploreStatus.textContent = 'Standby';
+    if (ui.quickBelt) {
+        ui.quickBelt.style.opacity = '1';
+        ui.quickBelt.style.pointerEvents = 'auto';
+    }
 
     if (data.success) {
         logAction(data.message);
@@ -1722,10 +1983,10 @@ socket.on('partyUpdate', (data) => {
             memberCard.style.background = 'var(--bg-color)';
             memberCard.style.fontFamily = 'var(--font-mono)';
             memberCard.style.fontSize = '0.85rem';
-            
+
             const isSelf = member === currentUsername;
             const isLeader = member === data.leader;
-            
+
             let nameTag = member;
             if (isSelf) nameTag += ' (You)';
             if (isLeader) nameTag = '⭐ ' + nameTag;
@@ -1734,7 +1995,7 @@ socket.on('partyUpdate', (data) => {
                 <span style="font-weight:bold;">${nameTag}</span>
                 <span style="font-size:0.75rem; text-transform:uppercase; color:${isLeader ? 'var(--accent-red)' : 'var(--text-color)'}; font-weight:700;">${isLeader ? 'Leader' : 'Member'}</span>
             `;
-            
+
             ui.partyMembersList.appendChild(memberCard);
         });
     }
@@ -2066,9 +2327,27 @@ let monsterAttackAnimFrame = null;
 
 function logCombatAction(message) {
     const li = document.createElement('li');
-    li.textContent = message;
+
+    let categoryClass = 'log-default';
+    if (message) {
+        if (message.includes('[CRIT]') || message.includes('[PERFECT PARRY]') || message.includes('countered')) {
+            categoryClass = 'log-legendary';
+        } else if (message.includes('[PARRY]') || message.includes('restoring')) {
+            categoryClass = 'log-success';
+        } else if (message.includes('[STAGGER]') || message.includes('[KNOCKED OUT]') || message.includes('missed') || message.includes('unconscious')) {
+            categoryClass = 'log-warning';
+        } else if (message.includes('[COMBAT]')) {
+            categoryClass = 'log-info';
+        }
+    }
+    li.className = `log-entry ${categoryClass}`;
+
+    // Clean up timestamps, bullets, and tags like [COMBAT] or [PERFECT PARRY]
+    const cleanMessage = message ? message.replace(/^(\*\s*)?(\[.*?\]\s*)?/, '') : '';
+    li.innerHTML = `<span class="log-text">${cleanMessage}</span>`;
+
     ui.combatLog.appendChild(li);
-    while (ui.combatLog.children.length > 100) {
+    while (ui.combatLog.children.length > 50) {
         ui.combatLog.removeChild(ui.combatLog.firstChild);
     }
     ui.combatLog.scrollTop = ui.combatLog.scrollHeight;
@@ -2107,6 +2386,44 @@ socket.on('combatStart', (data) => {
     ui.combatYokaiHpFill.style.width = '100%';
     ui.combatYokaiAtkFill.style.width = '0%';
     ui.combatFeedback.textContent = '';
+
+    // Update Yokai Image
+    let yokaiImg = document.getElementById('combat-yokai-img');
+    if (!yokaiImg) {
+        yokaiImg = document.createElement('img');
+        yokaiImg.id = 'combat-yokai-img';
+        yokaiImg.style.width = '96px';
+        yokaiImg.style.height = '96px';
+        yokaiImg.style.objectFit = 'contain';
+        yokaiImg.style.imageRendering = 'pixelated';
+        yokaiImg.style.display = 'block';
+        yokaiImg.style.margin = '0 auto 1rem auto';
+        ui.combatYokaiCard.prepend(yokaiImg);
+    }
+    yokaiImg.src = data.yokai.sprite ? `/sprites/${data.yokai.sprite}` : '/sprites/Emoji_Face_Demon_Devil_Horns.png';
+
+    // Update Player Image
+    let playerImg = document.getElementById('combat-player-img');
+    if (!playerImg) {
+        playerImg = document.createElement('img');
+        playerImg.id = 'combat-player-img';
+        playerImg.style.width = '96px';
+        playerImg.style.height = '96px';
+        playerImg.style.objectFit = 'contain';
+        playerImg.style.imageRendering = 'pixelated';
+        playerImg.style.display = 'block';
+        playerImg.style.margin = '0 auto 1rem auto';
+        const combatBtns = ui.combatBtnStrike.parentElement;
+        if (combatBtns && combatBtns.parentNode) {
+            combatBtns.parentNode.insertBefore(playerImg, combatBtns);
+        }
+    }
+    let pSprite = data.state.sprite;
+    if (!pSprite && data.state.equipment && data.state.equipment.avatar) {
+        const avatarItem = gameDb?.items?.[data.state.equipment.avatar];
+        if (avatarItem && avatarItem.sprite) pSprite = avatarItem.sprite;
+    }
+    if (pSprite) { playerImg.src = `/sprites/${pSprite}`; playerImg.style.display = 'block'; } else { playerImg.style.display = 'none'; }
 
     // Clear and set start log
     ui.combatLog.innerHTML = `<li>[SYSTEM] A wild ${data.yokai.name} blocked your path! Keep your focus.</li>`;
@@ -2218,8 +2535,13 @@ socket.on('combatEnd', (data) => {
     if (ui.actionArea) ui.actionArea.classList.remove('is-exploring');
     if (ui.exploreProgressContainer) ui.exploreProgressContainer.classList.remove('is-exploring');
     ui.exploreBtn.disabled = false;
+    if (ui.scavengeBtn) ui.scavengeBtn.disabled = false;
     ui.restBtn.disabled = false;
     ui.exploreStatus.textContent = 'Standby';
+    if (ui.quickBelt) {
+        ui.quickBelt.style.opacity = '1';
+        ui.quickBelt.style.pointerEvents = 'auto';
+    }
 
     setTimeout(() => {
         switchView('activity');
@@ -2423,6 +2745,22 @@ socket.on('combatEncounter', (data) => {
     ui.restBtn.disabled = true;
     ui.exploreStatus.textContent = 'Yokai Spotted!';
 
+    let encounterImg = document.getElementById('encounter-yokai-img');
+    if (!encounterImg) {
+        encounterImg = document.createElement('img');
+        encounterImg.id = 'encounter-yokai-img';
+        encounterImg.style.width = '80px';
+        encounterImg.style.height = '80px';
+        encounterImg.style.objectFit = 'contain';
+        encounterImg.style.imageRendering = 'pixelated';
+        encounterImg.style.display = 'block';
+        encounterImg.style.margin = '0 auto 1rem auto';
+        if (ui.encounterText && ui.encounterText.parentNode) {
+            ui.encounterText.parentNode.insertBefore(encounterImg, ui.encounterText);
+        }
+    }
+    encounterImg.src = data.yokai.sprite ? `/sprites/${data.yokai.sprite}` : '/sprites/Emoji_Face_Demon_Devil_Horns.png';
+
     ui.encounterText.textContent = `A wild ${data.yokai.name} blocks your path. Engage in active battle, or avoid it safely?`;
     ui.encounterPrompt.style.display = 'block';
 });
@@ -2441,8 +2779,13 @@ socket.on('combatSneakResult', (data) => {
     if (ui.actionArea) ui.actionArea.classList.remove('is-exploring');
     if (ui.exploreProgressContainer) ui.exploreProgressContainer.classList.remove('is-exploring');
     ui.exploreBtn.disabled = false;
+    if (ui.scavengeBtn) ui.scavengeBtn.disabled = false;
     ui.restBtn.disabled = false;
     ui.exploreStatus.textContent = 'Standby';
+    if (ui.quickBelt) {
+        ui.quickBelt.style.opacity = '1';
+        ui.quickBelt.style.pointerEvents = 'auto';
+    }
     logAction(data.message);
     updateStatsDisplay(data.state);
 });
@@ -2461,6 +2804,33 @@ ui.themeToggleBtn.addEventListener('click', () => {
 // Init & Load Theme (Locked to light mode)
 localStorage.setItem('theme', 'light');
 document.body.classList.remove('dark-theme');
+
+// Sidebar Group Collapse Logic
+document.querySelectorAll('.nav-group-title').forEach(title => {
+    const groupName = title.getAttribute('data-group');
+    if (!groupName) return;
+
+    const content = title.nextElementSibling;
+    const icon = title.querySelector('.toggle-icon');
+
+    const savedState = localStorage.getItem(`nav-group-${groupName}`);
+    if (savedState === 'collapsed') {
+        content.style.display = 'none';
+        if (icon) icon.textContent = '▶';
+    }
+
+    title.addEventListener('click', () => {
+        if (content.style.display === 'none') {
+            content.style.display = 'flex';
+            if (icon) icon.textContent = '▼';
+            localStorage.setItem(`nav-group-${groupName}`, 'expanded');
+        } else {
+            content.style.display = 'none';
+            if (icon) icon.textContent = '▶';
+            localStorage.setItem(`nav-group-${groupName}`, 'collapsed');
+        }
+    });
+});
 
 // Inventory Filter & Pagination Listeners
 function setupInventoryFilters() {
@@ -2596,7 +2966,7 @@ async function fetchSpritesList() {
         if (res.ok) {
             const data = await res.json();
             allSprites = data.sprites || [];
-            
+
             // Populate sprite folder dropdown
             if (ui.spriteFolderSelect) {
                 const folders = new Set();
@@ -2605,17 +2975,17 @@ async function fetchSpritesList() {
                     const folder = parts.length > 1 ? parts.slice(0, -1).join('/') : 'Base Sprites';
                     folders.add(folder);
                 });
-                
+
                 const currentSelection = ui.spriteFolderSelect.value;
                 ui.spriteFolderSelect.innerHTML = '<option value="all">All Folders</option>';
-                
+
                 Array.from(folders).sort().forEach(folder => {
                     const option = document.createElement('option');
                     option.value = folder;
                     option.textContent = folder;
                     ui.spriteFolderSelect.appendChild(option);
                 });
-                
+
                 if (currentSelection !== 'all' && folders.has(currentSelection)) {
                     ui.spriteFolderSelect.value = currentSelection;
                 } else if (currentSelection === 'all') {
@@ -2727,10 +3097,20 @@ function findCrossReferences(type, key) {
         }
         if (adminDbCache.yokai) {
             Object.entries(adminDbCache.yokai).forEach(([yKey, yokai]) => {
-                if (yokai && yokai.loot && yokai.loot.guaranteed === key) {
+                let hasDrop = false;
+                if (yokai && yokai.loot) {
+                    if (yokai.loot.pool && yokai.loot.pool.includes(key)) hasDrop = true;
+                    if (yokai.loot.guaranteed === key) hasDrop = true;
+                    if (yokai.loot.drops && Array.isArray(yokai.loot.drops)) {
+                        yokai.loot.drops.forEach(d => {
+                            if (d.pool && d.pool.includes(key)) hasDrop = true;
+                        });
+                    }
+                }
+                if (hasDrop) {
                     refs.push({
                         type: 'yokai',
-                        category: 'Guaranteed Drop',
+                        category: 'Loot Drop',
                         label: `${yokai.name || yKey} (${yKey})`,
                         key: yKey
                     });
@@ -2779,6 +3159,14 @@ function findCrossReferences(type, key) {
                     refs.push({
                         type: 'areas',
                         category: 'Area Yokai Pool',
+                        label: `${area.name || aKey} (${aKey})`,
+                        key: aKey
+                    });
+                }
+                if (area && area.scavengeLootPool && Array.isArray(area.scavengeLootPool) && area.scavengeLootPool.includes(key)) {
+                    refs.push({
+                        type: 'areas',
+                        category: 'Area Scavenge Loot',
                         label: `${area.name || aKey} (${aKey})`,
                         key: aKey
                     });
@@ -2866,6 +3254,36 @@ function initCategoryFilter() {
     } else if (activeDbTab === 'players') {
         ui.dbCategoryFilter.innerHTML = '<option value="all">All Players</option><option value="admins">Administrators</option>';
     }
+
+    if (ui.dbSortFilter) {
+        let hasRarity = false;
+        Array.from(ui.dbSortFilter.options).forEach(opt => {
+            if (opt.value === 'rarity-desc') hasRarity = true;
+        });
+
+        if (activeDbTab === 'items') {
+            if (!hasRarity) {
+                const optDesc = document.createElement('option');
+                optDesc.value = 'rarity-desc';
+                optDesc.textContent = 'Sort by Rarity (Highest First)';
+                ui.dbSortFilter.appendChild(optDesc);
+
+                const optAsc = document.createElement('option');
+                optAsc.value = 'rarity-asc';
+                optAsc.textContent = 'Sort by Rarity (Lowest First)';
+                ui.dbSortFilter.appendChild(optAsc);
+            }
+        } else if (hasRarity) {
+            Array.from(ui.dbSortFilter.options).forEach(opt => {
+                if (opt.value.startsWith('rarity-')) {
+                    opt.remove();
+                }
+            });
+            if (ui.dbSortFilter.value.startsWith('rarity-')) {
+                ui.dbSortFilter.value = 'key-asc';
+            }
+        }
+    }
 }
 
 function renderEntriesList() {
@@ -2892,8 +3310,16 @@ function renderEntriesList() {
                 return data.type === categoryVal;
             } else if (activeDbTab === 'yokai') {
                 // If filtering Yokai by loot rarity
-                if (data.loot && data.loot.guaranteed) {
-                    const lootItem = gameDb?.items?.[data.loot.guaranteed];
+                let firstDrop = null;
+                if (data.loot) {
+                    if (data.loot.pool && data.loot.pool.length > 0) {
+                        firstDrop = data.loot.pool[0];
+                    } else if (data.loot.guaranteed) {
+                        firstDrop = data.loot.guaranteed;
+                    }
+                }
+                if (firstDrop) {
+                    const lootItem = gameDb?.items?.[firstDrop];
                     const lootRarity = lootItem ? (lootItem.rarity || 'common') : 'common';
                     return lootRarity === categoryVal;
                 }
@@ -2908,6 +3334,8 @@ function renderEntriesList() {
     });
 
     // Sort
+    const rarityWeights = { legendary: 5, epic: 4, rare: 3, uncommon: 2, common: 1 };
+
     entries.sort((a, b) => {
         const keyA = a[0];
         const keyB = b[0];
@@ -2915,6 +3343,23 @@ function renderEntriesList() {
         const nameB = (b[1].name || '').toLowerCase();
         const valA = a[1].value || 0;
         const valB = b[1].value || 0;
+
+        const rarityA = rarityWeights[a[1].rarity || 'common'] || 0;
+        const rarityB = rarityWeights[b[1].rarity || 'common'] || 0;
+
+        if (sortVal === 'rarity-desc') {
+            if (rarityA !== rarityB) return rarityB - rarityA;
+            return nameA.localeCompare(nameB);
+        }
+        if (sortVal === 'rarity-asc') {
+            if (rarityA !== rarityB) return rarityA - rarityB;
+            return nameA.localeCompare(nameB);
+        }
+
+        // If items tab and sorting by default key, sort by rarity first
+        if (activeDbTab === 'items' && sortVal === 'key-asc') {
+            if (rarityA !== rarityB) return rarityB - rarityA;
+        }
 
         if (sortVal === 'key-asc') return keyA.localeCompare(keyB);
         if (sortVal === 'key-desc') return keyB.localeCompare(keyA);
@@ -2942,7 +3387,11 @@ function renderEntriesList() {
         if (activeDbTab === 'items' && val.sprite) {
             iconHtml = `<img src="/sprites/${val.sprite}" class="entry-icon" alt="">`;
         } else if (activeDbTab === 'yokai') {
-            iconHtml = `<img src="/sprites/Emoji_Face_Demon_Devil_Horns.png" class="entry-icon" alt="">`;
+            if (val.sprite) {
+                iconHtml = `<img src="/sprites/${val.sprite}" class="entry-icon" alt="">`;
+            } else {
+                iconHtml = `<img src="/sprites/Emoji_Face_Demon_Devil_Horns.png" class="entry-icon" alt="">`;
+            }
         } else if (activeDbTab === 'areas') {
             iconHtml = `<img src="/sprites/Map_Markers_Travel_Map_Folded.png" class="entry-icon" alt="">`;
         } else if (activeDbTab === 'players') {
@@ -2966,10 +3415,51 @@ function renderEntriesList() {
             iconHtml = `<img src="/sprites/Controller_Buttons_Menu_Options_Settings.png" class="entry-icon" alt="">`;
         }
 
-        const labelText = val.name ? `${val.name} (${key})` : key;
+        let badgesHtml = '';
+        if (activeDbTab === 'items') {
+            if (val.type) {
+                badgesHtml += `<span class="db-badge" style="font-family: var(--font-mono); font-size: 0.6rem; padding: 0.1rem 0.3rem; background: rgba(0,0,0,0.05); border: 1px solid var(--border-color); border-radius: 2px;">${val.type.toUpperCase()}</span>`;
+            }
+            if (val.rarity) {
+                badgesHtml += `<span class="db-badge rarity-badge badge-${val.rarity}" style="font-family: var(--font-mono); font-size: 0.6rem; padding: 0.1rem 0.3rem; border-radius: 2px;">${val.rarity.toUpperCase()}</span>`;
+            }
+        } else if (activeDbTab === 'yokai') {
+            if (val.hp) badgesHtml += `<span class="db-badge" style="font-family: var(--font-mono); font-size: 0.6rem; padding: 0.1rem 0.3rem; background: rgba(89,124,94,0.1); color: var(--accent-green); border: 1px solid var(--accent-green); border-radius: 2px;">♥ ${val.hp}</span>`;
+            if (val.attack) badgesHtml += `<span class="db-badge" style="font-family: var(--font-mono); font-size: 0.6rem; padding: 0.1rem 0.3rem; background: rgba(201,74,74,0.1); color: var(--accent-red); border: 1px solid var(--accent-red); border-radius: 2px;">⚔ ${val.attack}</span>`;
+        } else if (activeDbTab === 'areas') {
+            if (val.minLevel) badgesHtml += `<span class="db-badge" style="font-family: var(--font-mono); font-size: 0.6rem; padding: 0.1rem 0.3rem; background: rgba(0,0,0,0.05); border: 1px solid var(--border-color); border-radius: 2px;">Lv. ${val.minLevel}</span>`;
+        } else if (activeDbTab === 'players') {
+            if (val.isAdmin) badgesHtml += `<span class="db-badge" style="font-family: var(--font-mono); font-size: 0.6rem; padding: 0.1rem 0.3rem; background: rgba(212,47,47,0.1); color: var(--accent-red); border: 1px solid var(--accent-red); border-radius: 2px;">ADMIN</span>`;
+            if (val.state && val.state.level) badgesHtml += `<span class="db-badge" style="font-family: var(--font-mono); font-size: 0.6rem; padding: 0.1rem 0.3rem; background: rgba(0,0,0,0.05); border: 1px solid var(--border-color); border-radius: 2px;">Lv. ${val.state.level}</span>`;
+        } else if (activeDbTab === 'skills') {
+            if (val.staminaCost) badgesHtml += `<span class="db-badge" style="font-family: var(--font-mono); font-size: 0.6rem; padding: 0.1rem 0.3rem; background: rgba(0,0,0,0.05); border: 1px solid var(--border-color); border-radius: 2px;">${val.staminaCost}st</span>`;
+        }
+
+        const displayName = val.name ? val.name : key;
+        const displayKey = val.name ? key : '';
+
+        if (dbListViewMode === 'grid') {
+            row.className = 'db-entry-grid-item';
+            if (key === selectedEntryKey) row.classList.add('active');
+
+            row.innerHTML = `
+                ${iconHtml}
+                <span class="db-entry-name" title="${displayName}">${displayName}</span>
+            `;
+
+            row.addEventListener('click', () => { selectEntry(key); });
+            return row;
+        }
+
         row.innerHTML = `
             ${iconHtml}
-            <span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${labelText}">${labelText}</span>
+            <div class="db-entry-text" style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 0.15rem;">
+                <span class="db-entry-name" style="font-family: var(--font-main); font-weight: 700; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${displayName}">${displayName}</span>
+                ${displayKey ? `<span class="db-entry-id" style="font-family: var(--font-mono); font-size: 0.65rem; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${displayKey}">${displayKey}</span>` : ''}
+            </div>
+            <div class="db-entry-badges" style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem;">
+                ${badgesHtml}
+            </div>
         `;
 
         row.addEventListener('click', () => {
@@ -2978,10 +3468,50 @@ function renderEntriesList() {
         return row;
     };
 
-    const createSectionHeader = (title) => {
+    const createSectionHeader = (title, count, rows) => {
         const header = document.createElement('div');
         header.className = 'db-section-header';
-        header.textContent = title;
+        header.style.cursor = 'pointer';
+        header.style.display = 'flex';
+        header.style.justifyContent = 'space-between';
+        header.style.alignItems = 'center';
+        header.style.userSelect = 'none';
+
+        const storageKey = `db-section-${activeDbTab}-${title.replace(/\s+/g, '-')}`;
+        let isCollapsed = localStorage.getItem(storageKey) === 'true';
+
+        const titleSpan = document.createElement('span');
+        titleSpan.innerHTML = `${isCollapsed ? '▶' : '▼'} ${title}`;
+        header.appendChild(titleSpan);
+
+        if (count !== undefined) {
+            const countBadge = document.createElement('span');
+            countBadge.style.fontFamily = 'var(--font-mono)';
+            countBadge.style.fontSize = '0.65rem';
+            countBadge.style.background = 'rgba(0,0,0,0.1)';
+            countBadge.style.padding = '0.1rem 0.4rem';
+            countBadge.style.borderRadius = '10px';
+            countBadge.textContent = count;
+            header.appendChild(countBadge);
+        }
+
+        if (isCollapsed && rows) {
+            rows.forEach(row => {
+                row.style.display = 'none';
+            });
+        }
+
+        header.addEventListener('click', () => {
+            isCollapsed = !isCollapsed;
+            localStorage.setItem(storageKey, isCollapsed);
+            titleSpan.innerHTML = `${isCollapsed ? '▶' : '▼'} ${title}`;
+            if (rows) {
+                rows.forEach(row => {
+                    row.style.display = isCollapsed ? 'none' : '';
+                });
+            }
+        });
+
         return header;
     };
 
@@ -3021,22 +3551,39 @@ function renderEntriesList() {
             const groupEntries = buckets[type];
             if (groupEntries && groupEntries.length > 0) {
                 const label = groupLabels[type] || (type.charAt(0).toUpperCase() + type.slice(1));
-                ui.dbEntriesList.appendChild(createSectionHeader(label));
+                const rows = [];
                 groupEntries.forEach(([key, val]) => {
-                    ui.dbEntriesList.appendChild(createEntryRow(key, val));
+                    rows.push(createEntryRow(key, val));
                 });
+
+                const wrapper = document.createElement('div');
+                wrapper.className = dbListViewMode === 'grid' ? 'db-grid-container' : 'db-list-container';
+                rows.forEach(row => wrapper.appendChild(row));
+
+                ui.dbEntriesList.appendChild(createSectionHeader(label, groupEntries.length, [wrapper]));
+                ui.dbEntriesList.appendChild(wrapper);
             }
         });
     } else if (activeDbTab === 'yokai') {
-        ui.dbEntriesList.appendChild(createSectionHeader('Yokai Entities'));
+        const rows = [];
         entries.forEach(([key, val]) => {
-            ui.dbEntriesList.appendChild(createEntryRow(key, val));
+            rows.push(createEntryRow(key, val));
         });
+        const wrapper = document.createElement('div');
+        wrapper.className = dbListViewMode === 'grid' ? 'db-grid-container' : 'db-list-container';
+        rows.forEach(row => wrapper.appendChild(row));
+        ui.dbEntriesList.appendChild(createSectionHeader('Yokai Entities', entries.length, [wrapper]));
+        ui.dbEntriesList.appendChild(wrapper);
     } else if (activeDbTab === 'areas') {
-        ui.dbEntriesList.appendChild(createSectionHeader('World Areas'));
+        const rows = [];
         entries.forEach(([key, val]) => {
-            ui.dbEntriesList.appendChild(createEntryRow(key, val));
+            rows.push(createEntryRow(key, val));
         });
+        const wrapper = document.createElement('div');
+        wrapper.className = dbListViewMode === 'grid' ? 'db-grid-container' : 'db-list-container';
+        rows.forEach(row => wrapper.appendChild(row));
+        ui.dbEntriesList.appendChild(createSectionHeader('World Areas', entries.length, [wrapper]));
+        ui.dbEntriesList.appendChild(wrapper);
     } else if (activeDbTab === 'actions') {
         const playerActionKeys = ['strike', 'parry', 'flee', 'rest'];
         const playerActions = [];
@@ -3051,28 +3598,48 @@ function renderEntriesList() {
         });
 
         if (playerActions.length > 0) {
-            ui.dbEntriesList.appendChild(createSectionHeader('Player Actions'));
+            const rows = [];
             playerActions.forEach(([key, val]) => {
-                ui.dbEntriesList.appendChild(createEntryRow(key, val));
+                rows.push(createEntryRow(key, val));
             });
+            const wrapper = document.createElement('div');
+            wrapper.className = dbListViewMode === 'grid' ? 'db-grid-container' : 'db-list-container';
+            rows.forEach(row => wrapper.appendChild(row));
+            ui.dbEntriesList.appendChild(createSectionHeader('Player Actions', playerActions.length, [wrapper]));
+            ui.dbEntriesList.appendChild(wrapper);
         }
 
         if (systemConfigs.length > 0) {
-            ui.dbEntriesList.appendChild(createSectionHeader('System Configurations'));
+            const rows = [];
             systemConfigs.forEach(([key, val]) => {
-                ui.dbEntriesList.appendChild(createEntryRow(key, val));
+                rows.push(createEntryRow(key, val));
             });
+            const wrapper = document.createElement('div');
+            wrapper.className = dbListViewMode === 'grid' ? 'db-grid-container' : 'db-list-container';
+            rows.forEach(row => wrapper.appendChild(row));
+            ui.dbEntriesList.appendChild(createSectionHeader('System Configurations', systemConfigs.length, [wrapper]));
+            ui.dbEntriesList.appendChild(wrapper);
         }
     } else if (activeDbTab === 'skills') {
-        ui.dbEntriesList.appendChild(createSectionHeader('Weapon Skills'));
+        const rows = [];
         entries.forEach(([key, val]) => {
-            ui.dbEntriesList.appendChild(createEntryRow(key, val));
+            rows.push(createEntryRow(key, val));
         });
+        const wrapper = document.createElement('div');
+        wrapper.className = dbListViewMode === 'grid' ? 'db-grid-container' : 'db-list-container';
+        rows.forEach(row => wrapper.appendChild(row));
+        ui.dbEntriesList.appendChild(createSectionHeader('Weapon Skills', entries.length, [wrapper]));
+        ui.dbEntriesList.appendChild(wrapper);
     } else if (activeDbTab === 'players') {
-        ui.dbEntriesList.appendChild(createSectionHeader('Player Accounts'));
+        const rows = [];
         entries.forEach(([key, val]) => {
-            ui.dbEntriesList.appendChild(createEntryRow(key, val));
+            rows.push(createEntryRow(key, val));
         });
+        const wrapper = document.createElement('div');
+        wrapper.className = dbListViewMode === 'grid' ? 'db-grid-container' : 'db-list-container';
+        rows.forEach(row => wrapper.appendChild(row));
+        ui.dbEntriesList.appendChild(createSectionHeader('Player Accounts', entries.length, [wrapper]));
+        ui.dbEntriesList.appendChild(wrapper);
     }
 }
 
@@ -3086,10 +3653,12 @@ function createFormField(f, onChange) {
     const row = document.createElement('div');
     row.className = 'db-form-row';
 
-    const label = document.createElement('label');
-    label.setAttribute('for', f.id);
-    label.textContent = f.label;
-    row.appendChild(label);
+    if (f.label) {
+        const label = document.createElement('label');
+        label.setAttribute('for', f.id);
+        label.textContent = f.label;
+        row.appendChild(label);
+    }
 
     let input;
     if (f.type === 'textarea') {
@@ -3172,6 +3741,338 @@ function createFormField(f, onChange) {
         pickerWrapper.appendChild(input);
         pickerWrapper.appendChild(pickBtn);
         row.appendChild(pickerWrapper);
+        return row;
+    } else if (f.type === 'multi-select') {
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.gap = '0.5rem';
+        wrapper.style.width = '100%';
+
+        const tagsContainer = document.createElement('div');
+        tagsContainer.style.display = 'flex';
+        tagsContainer.style.flexWrap = 'wrap';
+        tagsContainer.style.gap = '0.35rem';
+
+        let selectedValues = Array.isArray(f.value) ? [...f.value] : (f.value && typeof f.value === 'string' ? f.value.split(',').map(s => s.trim()).filter(Boolean) : []);
+
+        const renderTags = () => {
+            tagsContainer.innerHTML = '';
+            if (selectedValues.length === 0) {
+                const noItems = document.createElement('span');
+                noItems.style.fontSize = '0.75rem';
+                noItems.style.opacity = '0.5';
+                noItems.style.fontStyle = 'italic';
+                noItems.textContent = 'None selected';
+                tagsContainer.appendChild(noItems);
+                return;
+            }
+            selectedValues.forEach(val => {
+                const tag = document.createElement('div');
+                tag.style.display = 'inline-flex';
+                tag.style.alignItems = 'center';
+                tag.style.gap = '0.35rem';
+                tag.style.background = 'var(--bg-color)';
+                tag.style.border = '1px solid var(--border-color)';
+                tag.style.padding = '0.15rem 0.5rem';
+                tag.style.fontSize = '0.72rem';
+                tag.style.fontFamily = 'var(--font-mono)';
+
+                const optInfo = f.options ? f.options[val] : null;
+                const labelText = optInfo ? (optInfo.name || val) : val;
+
+                const labelSpan = document.createElement('span');
+                labelSpan.textContent = labelText;
+                labelSpan.title = val;
+
+                const removeBtn = document.createElement('span');
+                removeBtn.textContent = '×';
+                removeBtn.style.cursor = 'pointer';
+                removeBtn.style.color = 'var(--accent-red)';
+                removeBtn.style.fontWeight = 'bold';
+                removeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectedValues = selectedValues.filter(v => v !== val);
+                    renderTags();
+                    onChange(selectedValues.join(', '));
+                });
+
+                tag.appendChild(labelSpan);
+                tag.appendChild(removeBtn);
+                tagsContainer.appendChild(tag);
+            });
+        };
+        renderTags();
+        wrapper.appendChild(tagsContainer);
+
+        const controlRow = document.createElement('div');
+        controlRow.style.position = 'relative';
+
+        const addBtn = document.createElement('button');
+        addBtn.className = 'nav-btn';
+        addBtn.style.padding = '0.3rem 0.6rem';
+        addBtn.style.fontSize = '0.75rem';
+        addBtn.style.margin = '0';
+        addBtn.style.width = 'auto';
+        addBtn.style.boxShadow = '2px 2px 0px var(--border-color)';
+        addBtn.textContent = '+ Add Entry';
+
+        const modalOverlay = document.createElement('div');
+        modalOverlay.classList.add('db-dynamic-modal');
+        modalOverlay.style.display = 'none';
+        modalOverlay.style.position = 'fixed';
+        modalOverlay.style.top = '0';
+        modalOverlay.style.left = '0';
+        modalOverlay.style.width = '100%';
+        modalOverlay.style.height = '100%';
+        modalOverlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        modalOverlay.style.zIndex = '9999';
+        modalOverlay.style.alignItems = 'center';
+        modalOverlay.style.justifyContent = 'center';
+
+        const modalContent = document.createElement('div');
+        modalContent.style.background = 'var(--panel-bg)';
+        modalContent.style.border = '2px solid var(--border-color)';
+        modalContent.style.boxShadow = '4px 4px 0px var(--border-color)';
+        modalContent.style.width = '850px';
+        modalContent.style.maxWidth = '95%';
+        modalContent.style.height = '600px';
+        modalContent.style.maxHeight = '90vh';
+        modalContent.style.display = 'flex';
+        modalContent.style.flexDirection = 'column';
+
+        const modalHeader = document.createElement('div');
+        modalHeader.style.padding = '0.75rem 1rem';
+        modalHeader.style.borderBottom = '2px solid var(--border-color)';
+        modalHeader.style.display = 'flex';
+        modalHeader.style.justifyContent = 'space-between';
+        modalHeader.style.alignItems = 'center';
+
+        const title = document.createElement('h3');
+        title.textContent = f.label || 'Select Entry';
+        title.style.margin = '0';
+        title.style.fontFamily = 'var(--font-main)';
+        title.style.fontSize = '1.1rem';
+        title.style.textTransform = 'uppercase';
+
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'nav-btn danger';
+        closeBtn.textContent = '×';
+        closeBtn.style.padding = '0.2rem 0.5rem';
+        closeBtn.style.margin = '0';
+        closeBtn.style.width = 'auto';
+        closeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            modalOverlay.style.display = 'none';
+        });
+
+        modalHeader.appendChild(title);
+        modalHeader.appendChild(closeBtn);
+
+        const modalBody = document.createElement('div');
+        modalBody.style.display = 'flex';
+        modalBody.style.flex = '1';
+        modalBody.style.minHeight = '0';
+
+        const mainCol = document.createElement('div');
+        mainCol.style.flex = '2';
+        mainCol.style.display = 'flex';
+        mainCol.style.flexDirection = 'column';
+        mainCol.style.borderRight = '2px solid var(--border-color)';
+
+        const sideCol = document.createElement('div');
+        sideCol.style.flex = '1';
+        sideCol.style.display = 'flex';
+        sideCol.style.flexDirection = 'column';
+        sideCol.style.padding = '1.5rem 1rem';
+        sideCol.style.background = 'rgba(0,0,0,0.05)';
+        sideCol.style.borderLeft = '1px solid var(--border-color)';
+        sideCol.style.alignItems = 'center';
+        sideCol.style.gap = '0.5rem';
+        sideCol.innerHTML = '<div style="opacity:0.5; font-style:italic; margin-top:2rem;">Hover an item to preview</div>';
+
+        const searchContainer = document.createElement('div');
+        searchContainer.style.padding = '0.5rem';
+        searchContainer.style.borderBottom = '2px solid var(--border-color)';
+        searchContainer.style.display = 'flex';
+        searchContainer.style.gap = '0.5rem';
+
+        const categorySelect = document.createElement('select');
+        categorySelect.style.padding = '0.4rem';
+        categorySelect.style.border = '2px solid var(--border-color)';
+        categorySelect.style.background = 'var(--bg-color)';
+        categorySelect.style.color = 'var(--text-color)';
+        categorySelect.style.outline = 'none';
+        categorySelect.innerHTML = '<option value="all">All Categories</option>';
+        categorySelect.style.display = 'none';
+
+        if (f.options) {
+            const types = new Set();
+            Object.values(f.options).forEach(opt => {
+                if (opt && opt.type) types.add(opt.type);
+            });
+            if (types.size > 0) {
+                categorySelect.style.display = 'block';
+                Array.from(types).sort().forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t;
+                    opt.textContent = t.toUpperCase();
+                    categorySelect.appendChild(opt);
+                });
+            }
+        }
+
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.placeholder = 'Search...';
+        searchInput.style.flex = '1';
+        searchInput.style.padding = '0.4rem';
+        searchInput.style.border = '2px solid var(--border-color)';
+        searchInput.style.background = 'var(--bg-color)';
+        searchInput.style.color = 'var(--text-color)';
+        searchInput.style.outline = 'none';
+
+        searchContainer.appendChild(categorySelect);
+        searchContainer.appendChild(searchInput);
+
+        const listContainer = document.createElement('div');
+        listContainer.style.display = 'flex';
+        listContainer.style.flexDirection = 'column';
+        listContainer.style.overflowY = 'auto';
+        listContainer.style.flex = '1';
+        listContainer.style.padding = '0.5rem';
+
+        modalContent.appendChild(modalHeader);
+        mainCol.appendChild(searchContainer);
+        mainCol.appendChild(listContainer);
+        modalBody.appendChild(mainCol);
+        modalBody.appendChild(sideCol);
+        modalContent.appendChild(modalBody);
+        modalOverlay.appendChild(modalContent);
+        document.body.appendChild(modalOverlay);
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.style.display = 'none';
+            }
+        });
+
+        const updateDropdown = () => {
+            listContainer.innerHTML = '';
+            const query = searchInput.value.toLowerCase().trim();
+            const cat = categorySelect.value;
+            const allKeys = f.options ? Object.keys(f.options) : [];
+            const unselected = allKeys.filter(k => !selectedValues.includes(k));
+
+            const filtered = unselected.filter(k => {
+                const opt = f.options[k];
+                const name = (opt && opt.name) ? opt.name.toLowerCase() : '';
+                const matchQuery = k.toLowerCase().includes(query) || name.includes(query);
+                const matchCat = cat === 'all' || (opt && opt.type === cat);
+                return matchQuery && matchCat;
+            });
+
+            if (filtered.length === 0) {
+                const empty = document.createElement('div');
+                empty.style.padding = '0.5rem';
+                empty.style.fontSize = '0.75rem';
+                empty.style.opacity = '0.5';
+                empty.style.fontStyle = 'italic';
+                empty.style.textAlign = 'center';
+                empty.textContent = 'No matching entries';
+                listContainer.appendChild(empty);
+                return;
+            }
+
+            const grid = document.createElement('div');
+            grid.style.display = 'grid';
+            grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
+            grid.style.gap = '0.5rem';
+
+            filtered.forEach(k => {
+                const opt = f.options[k];
+                const optionEl = document.createElement('div');
+                optionEl.style.padding = '0.4rem 0.6rem';
+                optionEl.style.cursor = 'pointer';
+                optionEl.style.fontSize = '0.75rem';
+                optionEl.style.border = '1px solid var(--border-color)';
+                optionEl.style.background = 'var(--panel-bg)';
+                optionEl.style.display = 'flex';
+                optionEl.style.alignItems = 'center';
+
+                const spriteHtml = (opt && opt.sprite)
+                    ? `<img src="/sprites/${opt.sprite}" style="width:32px; height:32px; object-fit:contain; image-rendering:pixelated; margin-right:0.5rem;" alt="">`
+                    : `<div style="width:32px; height:32px; margin-right:0.5rem; display:inline-block; border:1px dashed var(--border-color);"></div>`;
+
+                optionEl.innerHTML = `
+                        ${spriteHtml}
+                    <div style="display:flex; flex-direction:column; gap:0.1rem; flex:1; min-width:0;">
+                        <div style="font-weight:bold; font-family:var(--font-main); text-transform:uppercase; font-size:0.8rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${(opt && opt.name) ? opt.name : k}</div>
+                        <div style="font-size:0.65rem; font-family:var(--font-mono); opacity:0.6; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${k}</div>
+                        </div>
+                    `;
+
+                optionEl.addEventListener('mouseenter', () => {
+                    optionEl.style.borderColor = 'var(--accent-red)';
+                    const previewImg = (opt && opt.sprite)
+                        ? `<img src="/sprites/${opt.sprite}" style="width:80px; height:80px; object-fit:contain; image-rendering:pixelated; margin-bottom:0.5rem; filter: drop-shadow(2px 2px 0px var(--border-color));">`
+                        : `<div style="width:80px; height:80px; display:flex; align-items:center; justify-content:center; border:2px dashed var(--border-color); font-size:2rem; margin-bottom:0.5rem;">?</div>`;
+                    const nameText = (opt && opt.name) ? opt.name : k;
+                    const descText = (opt && opt.desc) ? opt.desc : 'No description available.';
+                    const typeBadge = (opt && opt.type) ? `<span style="font-family:var(--font-mono); font-size:0.65rem; padding:0.15rem 0.4rem; border:1px solid var(--border-color); background:var(--bg-color); text-transform:uppercase;">${opt.type}</span>` : '';
+                    const rarityBadge = (opt && opt.rarity) ? `<span class="rarity-badge badge-${opt.rarity}" style="font-size:0.65rem; padding:0.15rem 0.4rem; text-transform:uppercase;">${opt.rarity}</span>` : '';
+
+                    sideCol.innerHTML = `
+                        ${previewImg}
+                        <div style="font-family:var(--font-main); font-weight:bold; font-size:1.1rem; text-transform:uppercase; text-align:center;">${nameText}</div>
+                        <div style="font-family:var(--font-mono); font-size:0.7rem; opacity:0.6; margin-bottom:0.5rem;">ID: ${k}</div>
+                        <div style="display:flex; gap:0.25rem; justify-content:center; flex-wrap:wrap; margin-bottom:0.5rem;">${typeBadge}${rarityBadge}</div>
+                        <p style="font-size:0.8rem; text-align:center; opacity:0.8; line-height:1.3; width:100%;">${descText}</p>
+                        <div style="margin-top:auto; padding-top:1rem; font-size:0.75rem; color:var(--accent-red); font-weight:bold; font-style:italic; text-align:center;">Click item to add</div>
+                    `;
+                });
+                optionEl.addEventListener('mouseleave', () => {
+                    optionEl.style.borderColor = 'var(--border-color)';
+                });
+
+                optionEl.addEventListener('click', () => {
+                    selectedValues.push(k);
+                    renderTags();
+                    onChange(selectedValues.join(', '));
+                    modalOverlay.style.display = 'none';
+                    searchInput.value = '';
+                });
+
+                grid.appendChild(optionEl);
+            });
+            listContainer.appendChild(grid);
+        };
+
+        addBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            modalOverlay.style.display = 'flex';
+            updateDropdown();
+            setTimeout(() => searchInput.focus(), 50);
+        });
+
+        categorySelect.addEventListener('change', updateDropdown);
+        searchInput.addEventListener('input', updateDropdown);
+
+        controlRow.appendChild(addBtn);
+
+        wrapper.appendChild(controlRow);
+        row.appendChild(wrapper);
+
+        if (f.help) {
+            const helpEl = document.createElement('span');
+            helpEl.style.fontSize = '0.7rem';
+            helpEl.style.opacity = '0.6';
+            helpEl.style.fontStyle = 'italic';
+            helpEl.style.marginTop = '0.15rem';
+            helpEl.textContent = f.help;
+            row.appendChild(helpEl);
+        }
+
         return row;
     } else {
         input = document.createElement('input');
@@ -3310,6 +4211,7 @@ function renderFieldsInLayout(fields, layout, container, onChange) {
 function renderFormAndPreview(key) {
     if (!ui.dbFormContainer) return;
     ui.dbFormContainer.innerHTML = '';
+    document.querySelectorAll('.db-dynamic-modal').forEach(el => el.remove());
 
     const val = activeDbData[key];
     if (!val) {
@@ -3328,7 +4230,7 @@ function renderFormAndPreview(key) {
             { id: 'db-field-desc', label: 'Description', type: 'textarea', value: val.desc || '' },
             { id: 'db-field-type', label: 'Item Type', type: 'select', value: type, options: ['material', 'consumable', 'weapon', 'helmet', 'shield', 'armor', 'accessory', 'avatar'] },
             { id: 'db-field-rarity', label: 'Rarity', type: 'select', value: rarity, options: ['common', 'uncommon', 'rare', 'epic', 'legendary'] },
-            { id: 'db-field-value', label: 'Base Value (Coins)', type: 'number', value: val.value || 0 },
+            { id: 'db-field-value', label: 'Shop Price (Coins)', type: 'number', value: val.value || 0 },
             { id: 'db-field-shopListed', label: 'Listed in Shop', type: 'checkbox', value: val.shopListed !== false },
             { id: 'db-field-sprite', label: 'Sprite Filename', type: 'sprite-picker', value: val.sprite || '' }
         ];
@@ -3532,48 +4434,157 @@ function renderFormAndPreview(key) {
             addBtn.style.boxShadow = '2px 2px 0px var(--border-color)';
             addBtn.textContent = '+ Assign Combat Skill';
 
-            const dropdownPanel = document.createElement('div');
-            dropdownPanel.style.display = 'none';
-            dropdownPanel.style.position = 'absolute';
-            dropdownPanel.style.top = '100%';
-            dropdownPanel.style.left = '0';
-            dropdownPanel.style.zIndex = '100';
-            dropdownPanel.style.width = '100%';
-            dropdownPanel.style.maxHeight = '200px';
-            dropdownPanel.style.overflowY = 'auto';
-            dropdownPanel.style.border = '2px solid var(--border-color)';
-            dropdownPanel.style.background = 'var(--panel-bg)';
-            dropdownPanel.style.boxShadow = '4px 4px 0px var(--border-color)';
-            dropdownPanel.style.marginTop = '0.25rem';
-            dropdownPanel.style.flexDirection = 'column';
+            const modalOverlay = document.createElement('div');
+            modalOverlay.classList.add('db-dynamic-modal');
+            modalOverlay.style.display = 'none';
+            modalOverlay.style.position = 'fixed';
+            modalOverlay.style.top = '0';
+            modalOverlay.style.left = '0';
+            modalOverlay.style.width = '100%';
+            modalOverlay.style.height = '100%';
+            modalOverlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            modalOverlay.style.zIndex = '9999';
+            modalOverlay.style.alignItems = 'center';
+            modalOverlay.style.justifyContent = 'center';
+
+            const modalContent = document.createElement('div');
+            modalContent.style.background = 'var(--panel-bg)';
+            modalContent.style.border = '2px solid var(--border-color)';
+            modalContent.style.boxShadow = '4px 4px 0px var(--border-color)';
+            modalContent.style.width = '850px';
+            modalContent.style.maxWidth = '95%';
+            modalContent.style.height = '600px';
+            modalContent.style.maxHeight = '90vh';
+            modalContent.style.display = 'flex';
+            modalContent.style.flexDirection = 'column';
+
+            const modalHeader = document.createElement('div');
+            modalHeader.style.padding = '0.75rem 1rem';
+            modalHeader.style.borderBottom = '2px solid var(--border-color)';
+            modalHeader.style.display = 'flex';
+            modalHeader.style.justifyContent = 'space-between';
+            modalHeader.style.alignItems = 'center';
+
+            const title = document.createElement('h3');
+            title.textContent = 'Assign Combat Skill';
+            title.style.margin = '0';
+            title.style.fontFamily = 'var(--font-main)';
+            title.style.fontSize = '1.1rem';
+            title.style.textTransform = 'uppercase';
+
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'nav-btn danger';
+            closeBtn.textContent = '×';
+            closeBtn.style.padding = '0.2rem 0.5rem';
+            closeBtn.style.margin = '0';
+            closeBtn.style.width = 'auto';
+            closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                modalOverlay.style.display = 'none';
+            });
+
+            modalHeader.appendChild(title);
+            modalHeader.appendChild(closeBtn);
+
+            const modalBody = document.createElement('div');
+            modalBody.style.display = 'flex';
+            modalBody.style.flex = '1';
+            modalBody.style.minHeight = '0';
+
+            const mainCol = document.createElement('div');
+            mainCol.style.flex = '2';
+            mainCol.style.display = 'flex';
+            mainCol.style.flexDirection = 'column';
+            mainCol.style.borderRight = '2px solid var(--border-color)';
+
+            const sideCol = document.createElement('div');
+            sideCol.style.flex = '1';
+            sideCol.style.display = 'flex';
+            sideCol.style.flexDirection = 'column';
+            sideCol.style.padding = '1.5rem 1rem';
+            sideCol.style.background = 'rgba(0,0,0,0.05)';
+            sideCol.style.borderLeft = '1px solid var(--border-color)';
+            sideCol.style.alignItems = 'center';
+            sideCol.style.gap = '0.5rem';
+            sideCol.innerHTML = '<div style="opacity:0.5; font-style:italic; margin-top:2rem;">Hover a skill to preview</div>';
+
+            const searchContainer = document.createElement('div');
+            searchContainer.style.padding = '0.5rem';
+            searchContainer.style.borderBottom = '2px solid var(--border-color)';
+            searchContainer.style.display = 'flex';
+            searchContainer.style.gap = '0.5rem';
+
+            const filterSelect = document.createElement('select');
+            filterSelect.style.padding = '0.4rem';
+            filterSelect.style.border = '2px solid var(--border-color)';
+            filterSelect.style.background = 'var(--bg-color)';
+            filterSelect.style.color = 'var(--text-color)';
+            filterSelect.style.outline = 'none';
+            filterSelect.innerHTML = `
+                <option value="all">All Skills</option>
+                <option value="attack">Attack / Damage</option>
+                <option value="healing">Healing</option>
+                <option value="status">Status Effects</option>
+            `;
+            searchContainer.appendChild(filterSelect);
 
             const searchInput = document.createElement('input');
             searchInput.type = 'text';
             searchInput.placeholder = 'Search skills...';
-            searchInput.style.width = '100%';
+            searchInput.style.flex = '1';
             searchInput.style.padding = '0.4rem';
-            searchInput.style.border = 'none';
-            searchInput.style.borderBottom = '2px solid var(--border-color)';
-            searchInput.style.fontSize = '0.8rem';
+            searchInput.style.border = '2px solid var(--border-color)';
             searchInput.style.background = 'var(--bg-color)';
             searchInput.style.color = 'var(--text-color)';
+            searchInput.style.outline = 'none';
+            searchContainer.appendChild(searchInput);
 
             const listContainer = document.createElement('div');
             listContainer.style.display = 'flex';
             listContainer.style.flexDirection = 'column';
+            listContainer.style.overflowY = 'auto';
+            listContainer.style.flex = '1';
+            listContainer.style.padding = '0.5rem';
+
+            modalContent.appendChild(modalHeader);
+            mainCol.appendChild(searchContainer);
+            mainCol.appendChild(listContainer);
+            modalBody.appendChild(mainCol);
+            modalBody.appendChild(sideCol);
+            modalContent.appendChild(modalBody);
+            modalOverlay.appendChild(modalContent);
+            document.body.appendChild(modalOverlay);
+
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    modalOverlay.style.display = 'none';
+                }
+            });
 
             const updateDropdownList = () => {
                 listContainer.innerHTML = '';
                 const query = searchInput.value.toLowerCase().trim();
+                const filterVal = filterSelect.value;
                 const allSkills = gameDb && gameDb.skills ? Object.keys(gameDb.skills) : [];
-                
+
                 const unassignedSkills = allSkills.filter(sKey => !val.skills.includes(sKey));
-                
+
                 const filtered = unassignedSkills.filter(sKey => {
                     const skill = gameDb.skills[sKey];
                     const name = (skill.name || '').toLowerCase();
                     const desc = (skill.desc || '').toLowerCase();
-                    return sKey.toLowerCase().includes(query) || name.includes(query) || desc.includes(query);
+                    const matchQuery = sKey.toLowerCase().includes(query) || name.includes(query) || desc.includes(query);
+
+                    let matchFilter = true;
+                    if (filterVal === 'healing') {
+                        matchFilter = skill.effects && !!skill.effects.healAmount;
+                    } else if (filterVal === 'attack') {
+                        matchFilter = skill.effects && !!skill.effects.damageMultiplier;
+                    } else if (filterVal === 'status') {
+                        matchFilter = skill.effects && !!skill.effects.inflictEffect;
+                    }
+
+                    return matchQuery && matchFilter;
                 });
 
                 if (filtered.length === 0) {
@@ -3588,6 +4599,11 @@ function renderFormAndPreview(key) {
                     return;
                 }
 
+                const grid = document.createElement('div');
+                grid.style.display = 'grid';
+                grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
+                grid.style.gap = '0.5rem';
+
                 filtered.forEach(sKey => {
                     const skill = gameDb.skills[sKey];
                     const name = skill.name || sKey;
@@ -3596,10 +4612,11 @@ function renderFormAndPreview(key) {
                     option.style.padding = '0.4rem 0.6rem';
                     option.style.cursor = 'pointer';
                     option.style.fontSize = '0.75rem';
-                    option.style.borderBottom = '1px solid var(--border-color)';
+                    option.style.border = '1px solid var(--border-color)';
+                    option.style.background = 'var(--panel-bg)';
                     option.style.display = 'flex';
                     option.style.flexDirection = 'column';
-                    option.style.gap = '0.1rem';
+                    option.style.gap = '0.15rem';
 
                     option.innerHTML = `
                         <div style="font-weight:bold; font-family:var(--font-mono);">${name} (${sKey})</div>
@@ -3607,52 +4624,52 @@ function renderFormAndPreview(key) {
                     `;
 
                     option.addEventListener('mouseenter', () => {
-                        option.style.background = 'var(--border-color)';
-                        option.style.color = 'var(--bg-color)';
+                        option.style.borderColor = 'var(--accent-red)';
+                        sideCol.innerHTML = `
+                        <div style="width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg, #4c6ef5, #3b5bdb); color:white; display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:bold; margin-bottom:0.5rem; box-shadow:2px 2px 0px var(--border-color); border:2px solid var(--border-color);">S</div>
+                        <div style="font-family:var(--font-main); font-weight:bold; font-size:1.1rem; text-transform:uppercase; text-align:center;">${name}</div>
+                        <div style="font-family:var(--font-mono); font-size:0.7rem; opacity:0.6; margin-bottom:0.5rem;">ID: ${sKey}</div>
+                        <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem; justify-content:center; flex-wrap:wrap;">
+                            <span style="font-family:var(--font-mono); font-size:0.7rem; background:rgba(0,0,0,0.05); border:1px solid var(--border-color); padding:0.15rem 0.4rem;">${skill.staminaCost || 0}st</span>
+                            <span style="font-family:var(--font-mono); font-size:0.7rem; background:rgba(0,0,0,0.05); border:1px solid var(--border-color); padding:0.15rem 0.4rem;">${(skill.cooldown || 0) / 1000}s CD</span>
+                        </div>
+                        <p style="font-size:0.8rem; text-align:center; opacity:0.8; line-height:1.3; width:100%;">${skill.desc || 'No description provided.'}</p>
+                        <div style="margin-top:auto; padding-top:1rem; font-size:0.75rem; color:var(--accent-red); font-weight:bold; font-style:italic; text-align:center;">Click to assign skill</div>
+                    `;
                     });
                     option.addEventListener('mouseleave', () => {
-                        option.style.background = '';
-                        option.style.color = '';
+                        option.style.borderColor = 'var(--border-color)';
                     });
 
                     option.addEventListener('click', () => {
                         val.skills.push(sKey);
                         renderTags();
                         updateLivePreview();
-                        dropdownPanel.style.display = 'none';
+                        modalOverlay.style.display = 'none';
                         searchInput.value = '';
                     });
 
-                    listContainer.appendChild(option);
+                    grid.appendChild(option);
                 });
+                listContainer.appendChild(grid);
             };
 
             addBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const isOpen = dropdownPanel.style.display === 'flex';
-                if (isOpen) {
-                    dropdownPanel.style.display = 'none';
-                } else {
-                    dropdownPanel.style.display = 'flex';
-                    updateDropdownList();
-                    setTimeout(() => searchInput.focus(), 50);
-                }
+                modalOverlay.style.display = 'flex';
+                updateDropdownList();
+                setTimeout(() => searchInput.focus(), 50);
             });
 
             searchInput.addEventListener('input', () => {
                 updateDropdownList();
             });
 
-            document.addEventListener('click', (e) => {
-                if (!controlRow.contains(e.target)) {
-                    dropdownPanel.style.display = 'none';
-                }
+            filterSelect.addEventListener('change', () => {
+                updateDropdownList();
             });
 
-            dropdownPanel.appendChild(searchInput);
-            dropdownPanel.appendChild(listContainer);
             controlRow.appendChild(addBtn);
-            controlRow.appendChild(dropdownPanel);
             wrapper.appendChild(controlRow);
 
             ui.dbFormContainer.appendChild(wrapper);
@@ -3763,6 +4780,7 @@ function renderFormAndPreview(key) {
                     removeBtn.style.fontSize = '0.75rem';
                     removeBtn.style.boxShadow = '1px 1px 0px var(--border-color)';
                     removeBtn.style.margin = '0';
+                    removeBtn.style.width = 'auto';
                     removeBtn.textContent = 'Remove';
                     removeBtn.addEventListener('click', () => {
                         delete ingredients[ingKey];
@@ -3781,41 +4799,257 @@ function renderFormAndPreview(key) {
 
             // Add Ingredient Control
             const addIngRow = document.createElement('div');
-            addIngRow.style.display = 'flex';
-            addIngRow.style.gap = '0.5rem';
+            addIngRow.style.position = 'relative';
             addIngRow.style.marginTop = '0.25rem';
-
-            const ingSelect = document.createElement('select');
-            ingSelect.style.flex = '1';
-            ingSelect.style.padding = '0.3rem';
-
-            // Populate select with all item keys except the current item
-            Object.keys(activeDbData).forEach(itemKey => {
-                if (itemKey !== key) {
-                    const opt = document.createElement('option');
-                    opt.value = itemKey;
-                    opt.textContent = `${activeDbData[itemKey].name || itemKey} (${itemKey})`;
-                    ingSelect.appendChild(opt);
-                }
-            });
 
             const addIngBtn = document.createElement('button');
             addIngBtn.className = 'nav-btn';
             addIngBtn.style.padding = '0.3rem 0.6rem';
-            addIngBtn.style.fontSize = '0.8rem';
+            addIngBtn.style.fontSize = '0.75rem';
             addIngBtn.style.margin = '0';
+            addIngBtn.style.width = 'auto';
             addIngBtn.style.boxShadow = '2px 2px 0px var(--border-color)';
             addIngBtn.textContent = '+ Add Ingredient';
-            addIngBtn.addEventListener('click', () => {
-                const selectedKey = ingSelect.value;
-                if (selectedKey) {
-                    ingredients[selectedKey] = 1;
-                    renderFormAndPreview(key);
-                    updateLivePreview();
+
+            const modalOverlay = document.createElement('div');
+            modalOverlay.classList.add('db-dynamic-modal');
+            modalOverlay.style.display = 'none';
+            modalOverlay.style.position = 'fixed';
+            modalOverlay.style.top = '0';
+            modalOverlay.style.left = '0';
+            modalOverlay.style.width = '100%';
+            modalOverlay.style.height = '100%';
+            modalOverlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            modalOverlay.style.zIndex = '9999';
+            modalOverlay.style.alignItems = 'center';
+            modalOverlay.style.justifyContent = 'center';
+
+            const modalContent = document.createElement('div');
+            modalContent.style.background = 'var(--panel-bg)';
+            modalContent.style.border = '2px solid var(--border-color)';
+            modalContent.style.boxShadow = '4px 4px 0px var(--border-color)';
+            modalContent.style.width = '850px';
+            modalContent.style.maxWidth = '95%';
+            modalContent.style.height = '600px';
+            modalContent.style.maxHeight = '90vh';
+            modalContent.style.display = 'flex';
+            modalContent.style.flexDirection = 'column';
+
+            const modalHeader = document.createElement('div');
+            modalHeader.style.padding = '0.75rem 1rem';
+            modalHeader.style.borderBottom = '2px solid var(--border-color)';
+            modalHeader.style.display = 'flex';
+            modalHeader.style.justifyContent = 'space-between';
+            modalHeader.style.alignItems = 'center';
+
+            const title = document.createElement('h3');
+            title.textContent = 'Select Ingredient';
+            title.style.margin = '0';
+            title.style.fontFamily = 'var(--font-main)';
+            title.style.fontSize = '1.1rem';
+            title.style.textTransform = 'uppercase';
+
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'nav-btn danger';
+            closeBtn.textContent = '×';
+            closeBtn.style.padding = '0.2rem 0.5rem';
+            closeBtn.style.margin = '0';
+            closeBtn.style.width = 'auto';
+            closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                modalOverlay.style.display = 'none';
+            });
+
+            modalHeader.appendChild(title);
+            modalHeader.appendChild(closeBtn);
+
+            const modalBody = document.createElement('div');
+            modalBody.style.display = 'flex';
+            modalBody.style.flex = '1';
+            modalBody.style.minHeight = '0';
+
+            const mainCol = document.createElement('div');
+            mainCol.style.flex = '2';
+            mainCol.style.display = 'flex';
+            mainCol.style.flexDirection = 'column';
+            mainCol.style.borderRight = '2px solid var(--border-color)';
+
+            const sideCol = document.createElement('div');
+            sideCol.style.flex = '1';
+            sideCol.style.display = 'flex';
+            sideCol.style.flexDirection = 'column';
+            sideCol.style.padding = '1.5rem 1rem';
+            sideCol.style.background = 'rgba(0,0,0,0.05)';
+            sideCol.style.borderLeft = '1px solid var(--border-color)';
+            sideCol.style.alignItems = 'center';
+            sideCol.style.gap = '0.5rem';
+            sideCol.innerHTML = '<div style="opacity:0.5; font-style:italic; margin-top:2rem;">Hover an item to preview</div>';
+
+            const searchContainer = document.createElement('div');
+            searchContainer.style.padding = '0.5rem';
+            searchContainer.style.borderBottom = '2px solid var(--border-color)';
+            searchContainer.style.display = 'flex';
+            searchContainer.style.gap = '0.5rem';
+
+            const categorySelect = document.createElement('select');
+            categorySelect.style.padding = '0.4rem';
+            categorySelect.style.border = '2px solid var(--border-color)';
+            categorySelect.style.background = 'var(--bg-color)';
+            categorySelect.style.color = 'var(--text-color)';
+            categorySelect.style.outline = 'none';
+            categorySelect.innerHTML = '<option value="all">All Categories</option>';
+
+            const types = new Set();
+            Object.values(activeDbData).forEach(opt => {
+                if (opt && opt.type) types.add(opt.type);
+            });
+            Array.from(types).sort().forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.textContent = t.toUpperCase();
+                categorySelect.appendChild(opt);
+            });
+            searchContainer.appendChild(categorySelect);
+
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'Search items...';
+            searchInput.style.flex = '1';
+            searchInput.style.padding = '0.4rem';
+            searchInput.style.border = '2px solid var(--border-color)';
+            searchInput.style.background = 'var(--bg-color)';
+            searchInput.style.color = 'var(--text-color)';
+            searchInput.style.outline = 'none';
+            searchContainer.appendChild(searchInput);
+
+            const listContainer = document.createElement('div');
+            listContainer.style.display = 'flex';
+            listContainer.style.flexDirection = 'column';
+            listContainer.style.overflowY = 'auto';
+            listContainer.style.flex = '1';
+            listContainer.style.padding = '0.5rem';
+
+            modalContent.appendChild(modalHeader);
+            mainCol.appendChild(searchContainer);
+            mainCol.appendChild(listContainer);
+            modalBody.appendChild(mainCol);
+            modalBody.appendChild(sideCol);
+            modalContent.appendChild(modalBody);
+            modalOverlay.appendChild(modalContent);
+            document.body.appendChild(modalOverlay);
+
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    modalOverlay.style.display = 'none';
                 }
             });
 
-            addIngRow.appendChild(ingSelect);
+            const updateDropdownList = () => {
+                listContainer.innerHTML = '';
+                const query = searchInput.value.toLowerCase().trim();
+                const cat = categorySelect.value;
+                const allItemKeys = Object.keys(activeDbData);
+                const unassignedItems = allItemKeys.filter(iKey => iKey !== key && !ingredients[iKey]);
+
+                const filtered = unassignedItems.filter(iKey => {
+                    const item = activeDbData[iKey];
+                    const name = (item.name || '').toLowerCase();
+                    const matchQuery = iKey.toLowerCase().includes(query) || name.includes(query);
+                    const matchCat = cat === 'all' || item.type === cat;
+                    return matchQuery && matchCat;
+                });
+
+                if (filtered.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.style.padding = '0.5rem';
+                    empty.style.fontSize = '0.75rem';
+                    empty.style.opacity = '0.5';
+                    empty.style.fontStyle = 'italic';
+                    empty.style.textAlign = 'center';
+                    empty.textContent = 'No matching items';
+                    listContainer.appendChild(empty);
+                    return;
+                }
+
+                const grid = document.createElement('div');
+                grid.style.display = 'grid';
+                grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
+                grid.style.gap = '0.5rem';
+
+                filtered.forEach(iKey => {
+                    const item = activeDbData[iKey];
+                    const name = item.name || iKey;
+
+                    const option = document.createElement('div');
+                    option.style.padding = '0.4rem 0.6rem';
+                    option.style.cursor = 'pointer';
+                    option.style.fontSize = '0.75rem';
+                    option.style.border = '1px solid var(--border-color)';
+                    option.style.background = 'var(--panel-bg)';
+                    option.style.display = 'flex';
+                    option.style.alignItems = 'center';
+
+                    const spriteHtml = (item && item.sprite)
+                        ? `<img src="/sprites/${item.sprite}" style="width:32px; height:32px; object-fit:contain; image-rendering:pixelated; margin-right:0.5rem;" alt="">`
+                        : `<div style="width:32px; height:32px; margin-right:0.5rem; display:inline-block; border:1px dashed var(--border-color);"></div>`;
+
+                    option.innerHTML = `
+                        ${spriteHtml}
+                        <div style="display:flex; flex-direction:column; gap:0.1rem; flex:1; min-width:0;">
+                            <div style="font-weight:bold; font-family:var(--font-main); text-transform:uppercase; font-size:0.8rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${name}</div>
+                            <div style="font-size:0.65rem; font-family:var(--font-mono); opacity:0.6; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${iKey}</div>
+                        </div>
+                    `;
+
+                    option.addEventListener('mouseenter', () => {
+                        option.style.borderColor = 'var(--accent-red)';
+                        const previewImg = (item && item.sprite)
+                            ? `<img src="/sprites/${item.sprite}" style="width:80px; height:80px; object-fit:contain; image-rendering:pixelated; margin-bottom:0.5rem; filter: drop-shadow(2px 2px 0px var(--border-color));">`
+                            : `<div style="width:80px; height:80px; display:flex; align-items:center; justify-content:center; border:2px dashed var(--border-color); font-size:2rem; margin-bottom:0.5rem;">?</div>`;
+                        const typeBadge = (item && item.type) ? `<span style="font-family:var(--font-mono); font-size:0.65rem; padding:0.15rem 0.4rem; border:1px solid var(--border-color); background:var(--bg-color); text-transform:uppercase;">${item.type}</span>` : '';
+                        const rarityBadge = (item && item.rarity) ? `<span class="rarity-badge badge-${item.rarity}" style="font-size:0.65rem; padding:0.15rem 0.4rem; text-transform:uppercase;">${item.rarity}</span>` : '';
+
+                        sideCol.innerHTML = `
+                            ${previewImg}
+                            <div style="font-family:var(--font-main); font-weight:bold; font-size:1.1rem; text-transform:uppercase; text-align:center;">${name}</div>
+                            <div style="font-family:var(--font-mono); font-size:0.7rem; opacity:0.6; margin-bottom:0.5rem;">ID: ${iKey}</div>
+                            <div style="display:flex; gap:0.25rem; justify-content:center; flex-wrap:wrap; margin-bottom:0.5rem;">${typeBadge}${rarityBadge}</div>
+                            <p style="font-size:0.8rem; text-align:center; opacity:0.8; line-height:1.3; width:100%;">${item.desc || 'No description available.'}</p>
+                            <div style="margin-top:auto; padding-top:1rem; font-size:0.75rem; color:var(--accent-red); font-weight:bold; font-style:italic; text-align:center;">Click item to add</div>
+                        `;
+                    });
+                    option.addEventListener('mouseleave', () => {
+                        option.style.borderColor = 'var(--border-color)';
+                    });
+
+                    option.addEventListener('click', () => {
+                        ingredients[iKey] = 1;
+                        renderFormAndPreview(key);
+                        updateLivePreview();
+                        modalOverlay.style.display = 'none';
+                        searchInput.value = '';
+                    });
+
+                    grid.appendChild(option);
+                });
+                listContainer.appendChild(grid);
+            };
+
+            addIngBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                modalOverlay.style.display = 'flex';
+                updateDropdownList();
+                setTimeout(() => searchInput.focus(), 50);
+            });
+
+            categorySelect.addEventListener('change', () => {
+                updateDropdownList();
+            });
+
+            searchInput.addEventListener('input', () => {
+                updateDropdownList();
+            });
+
             addIngRow.appendChild(addIngBtn);
             recipeEditDiv.appendChild(addIngRow);
 
@@ -3845,27 +5079,33 @@ function renderFormAndPreview(key) {
         const fields = [
             { id: 'db-field-key', label: 'Yokai Key / ID', type: 'text', value: key, readonly: true, help: 'Keys are unique identifiers and cannot be renamed.' },
             { id: 'db-field-name', label: 'Yokai Name', type: 'text', value: val.name || '' },
+            { id: 'db-field-sprite', label: 'Sprite Filename', type: 'sprite-picker', value: val.sprite || '' },
             { id: 'db-field-hp', label: 'Base HP', type: 'number', value: val.hp || 0 },
-            { id: 'db-field-maxhp', label: 'Max HP', type: 'number', value: val.maxHp || 0 },
+            { id: 'db-field-maxHp', label: 'Max HP', type: 'number', value: val.maxHp || val.maxhp || 0 },
             { id: 'db-field-attack', label: 'Attack Power', type: 'number', value: val.attack || 0 },
             { id: 'db-field-defense', label: 'Defense Power', type: 'number', value: val.defense || 0 },
             { id: 'db-field-speed', label: 'Attack Speed Cooldown (ms)', type: 'number', value: val.speed || 3000 },
-            { id: 'db-field-xpreward', label: 'XP Reward', type: 'number', value: val.xpReward || 0 },
-            { id: 'db-field-coinreward', label: 'Coin Reward', type: 'number', value: val.coinReward || 0 }
+            { id: 'db-field-xpReward', label: 'XP Reward', type: 'number', value: val.xpReward || val.xpreward || 0 },
+            { id: 'db-field-coinReward', label: 'Coin Reward', type: 'number', value: val.coinReward || val.coinreward || 0 }
         ];
 
         const layout = [
             ['db-field-key', 'db-field-name'],
-            ['db-field-hp', 'db-field-maxhp'],
+            ['db-field-sprite'],
+            ['db-field-hp', 'db-field-maxHp'],
             ['db-field-attack', 'db-field-defense'],
             ['db-field-speed'],
-            ['db-field-xpreward', 'db-field-coinreward']
+            ['db-field-xpReward', 'db-field-coinReward']
         ];
 
         renderFieldsInLayout(fields, layout, ui.dbFormContainer, (f, newVal) => {
             if (f.id === 'db-field-key') return;
             const fieldName = f.id.replace('db-field-', '');
             val[fieldName] = newVal;
+            // Cleanup mistakenly lowercased properties from previous saves
+            if (fieldName === 'maxHp') delete val.maxhp;
+            if (fieldName === 'xpReward') delete val.xpreward;
+            if (fieldName === 'coinReward') delete val.coinreward;
             updateLivePreview();
         });
 
@@ -3874,22 +5114,26 @@ function renderFormAndPreview(key) {
         lootHeader.textContent = 'Loot & Drops';
         ui.dbFormContainer.appendChild(lootHeader);
 
-        if (!val.loot) val.loot = { guaranteed: null, bonusChance: 0 };
+        if (!val.loot) val.loot = { pool: [], bonusChance: 0 };
+        if (val.loot.guaranteed && (!val.loot.pool || val.loot.pool.length === 0)) {
+            val.loot.pool = [val.loot.guaranteed];
+        }
 
-        const itemKeys = Object.keys(gameDb?.items || {});
         const lootGrid = document.createElement('div');
         lootGrid.className = 'db-form-grid';
 
-        const guaranteedField = {
-            id: 'db-loot-guaranteed',
-            label: 'Guaranteed Drop Item',
-            type: 'select',
-            value: val.loot.guaranteed || '',
-            options: ['', ...itemKeys]
+        const poolField = {
+            id: 'db-loot-pool',
+            label: 'Guaranteed Drops Pool',
+            type: 'multi-select',
+            options: gameDb?.items || {},
+            value: Array.isArray(val.loot.pool) ? val.loot.pool.join(', ') : ''
         };
 
-        lootGrid.appendChild(createFormField(guaranteedField, (v) => {
-            val.loot.guaranteed = v || null;
+        lootGrid.appendChild(createFormField(poolField, (v) => {
+            val.loot.pool = v.split(',').map(s => s.trim()).filter(s => s !== '');
+            if (val.loot.pool.length > 0) val.loot.guaranteed = val.loot.pool[0];
+            else val.loot.guaranteed = null;
             updateLivePreview();
         }));
 
@@ -3899,6 +5143,89 @@ function renderFormAndPreview(key) {
         }));
 
         ui.dbFormContainer.appendChild(lootGrid);
+
+        const customDropsHeader = document.createElement('div');
+        customDropsHeader.className = 'db-form-section-title';
+        customDropsHeader.textContent = 'Independent Drop Pools';
+        customDropsHeader.style.marginTop = '1.5rem';
+        ui.dbFormContainer.appendChild(customDropsHeader);
+
+        if (!val.loot.drops) val.loot.drops = [];
+
+        const dropsContainer = document.createElement('div');
+        dropsContainer.style.display = 'flex';
+        dropsContainer.style.flexDirection = 'column';
+        dropsContainer.style.gap = '0.5rem';
+        dropsContainer.style.marginTop = '0.5rem';
+
+        const renderDrops = () => {
+            dropsContainer.innerHTML = '';
+            val.loot.drops.forEach((drop, index) => {
+                const row = document.createElement('div');
+                row.style.display = 'flex';
+                row.style.gap = '0.5rem';
+                row.style.alignItems = 'flex-start';
+
+                const poolField = createFormField({
+                    id: `db-drop-pool-${index}`,
+                    label: '',
+                    type: 'multi-select',
+                    options: gameDb?.items || {},
+                    value: (drop.pool || []).join(', ')
+                }, (v) => {
+                    drop.pool = v.split(',').map(s => s.trim()).filter(s => s);
+                    updateLivePreview();
+                });
+                poolField.style.flex = '1';
+                poolField.style.margin = '0';
+
+                const chanceInput = document.createElement('input');
+                chanceInput.type = 'number';
+                chanceInput.value = drop.chance || 0;
+                chanceInput.placeholder = 'Chance (0-1)';
+                chanceInput.style.width = '80px';
+                chanceInput.style.padding = '0.3rem';
+                chanceInput.step = '0.01';
+                chanceInput.addEventListener('input', () => {
+                    drop.chance = Math.max(0, Math.min(1, parseFloat(chanceInput.value) || 0));
+                    updateLivePreview();
+                });
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'nav-btn danger';
+                removeBtn.textContent = 'Remove';
+                removeBtn.style.margin = '0';
+                removeBtn.style.padding = '0.3rem 0.6rem';
+                removeBtn.style.fontSize = '0.75rem';
+                removeBtn.style.width = 'auto';
+                removeBtn.addEventListener('click', () => {
+                    val.loot.drops.splice(index, 1);
+                    renderDrops();
+                    updateLivePreview();
+                });
+
+                row.appendChild(poolField);
+                row.appendChild(chanceInput);
+                row.appendChild(removeBtn);
+                dropsContainer.appendChild(row);
+            });
+        };
+        renderDrops();
+        ui.dbFormContainer.appendChild(dropsContainer);
+
+        const addDropBtn = document.createElement('button');
+        addDropBtn.className = 'nav-btn';
+        addDropBtn.textContent = '+ Add Independent Drop';
+        addDropBtn.style.marginTop = '0.75rem';
+        addDropBtn.style.width = 'fit-content';
+        addDropBtn.style.padding = '0.4rem 0.8rem';
+        addDropBtn.style.fontSize = '0.8rem';
+        addDropBtn.addEventListener('click', () => {
+            val.loot.drops.push({ pool: [], chance: 0.1 });
+            renderDrops();
+            updateLivePreview();
+        });
+        ui.dbFormContainer.appendChild(addDropBtn);
 
     } else if (activeDbTab === 'areas') {
         const fields = [
@@ -3936,15 +5263,12 @@ function renderFormAndPreview(key) {
         poolsHeader.textContent = 'Encounter & Forage Pools';
         ui.dbFormContainer.appendChild(poolsHeader);
 
-        const yokaiKeys = Object.keys(gameDb?.yokai || {});
-        const itemKeys = Object.keys(gameDb?.items || {});
-
         const yokaiPoolField = {
             id: 'db-field-yokaipool',
-            label: 'Yokai Encounter Pool (comma-separated)',
-            type: 'text',
-            value: Array.isArray(val.yokaiPool) ? val.yokaiPool.join(', ') : '',
-            help: `Available Yokai: ${yokaiKeys.join(', ')}`
+            label: 'Yokai Encounter Pool',
+            type: 'multi-select',
+            options: gameDb?.yokai || {},
+            value: Array.isArray(val.yokaiPool) ? val.yokaiPool.join(', ') : ''
         };
         ui.dbFormContainer.appendChild(createFormField(yokaiPoolField, (newVal) => {
             val.yokaiPool = newVal.split(',').map(s => s.trim()).filter(s => s !== '');
@@ -3953,13 +5277,25 @@ function renderFormAndPreview(key) {
 
         const lootPoolField = {
             id: 'db-field-lootpool',
-            label: 'Loot Forage Pool (comma-separated)',
-            type: 'text',
-            value: Array.isArray(val.lootPool) ? val.lootPool.join(', ') : '',
-            help: `Available Items: ${itemKeys.join(', ')}`
+            label: 'Loot Forage Pool',
+            type: 'multi-select',
+            options: gameDb?.items || {},
+            value: Array.isArray(val.lootPool) ? val.lootPool.join(', ') : ''
         };
         ui.dbFormContainer.appendChild(createFormField(lootPoolField, (newVal) => {
             val.lootPool = newVal.split(',').map(s => s.trim()).filter(s => s !== '');
+            updateLivePreview();
+        }));
+
+        const scavengeLootPoolField = {
+            id: 'db-field-scavengelootpool',
+            label: 'Scavenge Loot Pool',
+            type: 'multi-select',
+            options: gameDb?.items || {},
+            value: Array.isArray(val.scavengeLootPool) ? val.scavengeLootPool.join(', ') : ''
+        };
+        ui.dbFormContainer.appendChild(createFormField(scavengeLootPoolField, (newVal) => {
+            val.scavengeLootPool = newVal.split(',').map(s => s.trim()).filter(s => s !== '');
             updateLivePreview();
         }));
 
@@ -4084,7 +5420,7 @@ function renderFormAndPreview(key) {
 
         renderFieldsInLayout(fields, layout, ui.dbFormContainer, (f, newVal) => {
             if (f.id === 'db-field-key') return;
-            
+
             if (f.id === 'db-field-isadmin') {
                 val.isAdmin = newVal;
             } else if (f.id === 'db-field-level') {
@@ -4132,14 +5468,14 @@ function updateLivePreview() {
 
         let statsHtml = '';
         if (val.effects) {
-            if (val.effects.hpRestore) statsHtml += `<div style="font-size:0.75rem; color:var(--accent-green); font-weight:700;">♥ Restores ${val.effects.hpRestore} HP</div>`;
-            if (val.effects.staminaRestore) statsHtml += `<div style="font-size:0.75rem; color:var(--accent-green); font-weight:700;">◆ Restores ${val.effects.staminaRestore} Stamina</div>`;
-            if (val.effects.attackBonus) statsHtml += `<div style="font-size:0.75rem; color:var(--accent-red); font-weight:700;">⚔ +${val.effects.attackBonus} Attack</div>`;
-            if (val.effects.defenseBonus) statsHtml += `<div style="font-size:0.75rem; color:var(--accent-green); font-weight:700;">⛨ +${val.effects.defenseBonus} Defense</div>`;
-            if (val.effects.critChance) statsHtml += `<div style="font-size:0.75rem; color:var(--accent-red); font-weight:700;">❖ +${val.effects.critChance}% Critical Chance</div>`;
-            if (val.effects.lifesteal) statsHtml += `<div style="font-size:0.75rem; color:var(--accent-red); font-weight:700;">▲ +${val.effects.lifesteal}% Lifesteal</div>`;
-            if (val.effects.poisonChance) statsHtml += `<div style="font-size:0.75rem; color:purple; font-weight:700;">☠ +${val.effects.poisonChance}% Poison Chance</div>`;
-            if (val.effects.burnChance) statsHtml += `<div style="font-size:0.75rem; color:orange; font-weight:700;">☼ +${val.effects.burnChance}% Burn Chance</div>`;
+            if (val.effects.hpRestore) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.1rem 0.3rem;">♥ +${val.effects.hpRestore} HP</span>`;
+            if (val.effects.staminaRestore) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.1rem 0.3rem;">◆ +${val.effects.staminaRestore} ST</span>`;
+            if (val.effects.attackBonus) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.1rem 0.3rem;">⚔ +${val.effects.attackBonus} ATK</span>`;
+            if (val.effects.defenseBonus) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.1rem 0.3rem;">⛨ +${val.effects.defenseBonus} DEF</span>`;
+            if (val.effects.critChance) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.1rem 0.3rem;">❖ +${val.effects.critChance}% CRIT</span>`;
+            if (val.effects.lifesteal) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.1rem 0.3rem;">▲ +${val.effects.lifesteal}% LS</span>`;
+            if (val.effects.poisonChance) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:purple; font-weight:700; background:rgba(128,0,128,0.1); border:1px solid purple; padding:0.1rem 0.3rem;">☠ +${val.effects.poisonChance}% PSN</span>`;
+            if (val.effects.burnChance) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:orange; font-weight:700; background:rgba(255,165,0,0.1); border:1px solid orange; padding:0.1rem 0.3rem;">☼ +${val.effects.burnChance}% BRN</span>`;
         }
 
         const imgHtml = val.sprite
@@ -4194,8 +5530,12 @@ function updateLivePreview() {
                 </div>
                 <p class="item-desc" style="font-size:0.8rem; text-align:center; opacity:0.8; margin-top:0.25rem;">${val.desc || 'No description provided.'}</p>
                 <div style="display:flex; flex-direction:column; align-items:center; margin-top:0.25rem; gap:0.15rem;">
-                    ${statsHtml}
-                    <div style="font-size:0.75rem; font-family:var(--font-mono); font-weight:700; margin-top:0.25rem; background:rgba(0,0,0,0.05); padding:0.1rem 0.4rem; border:1px solid var(--border-color);">⟁ Price: ${val.value || 0} coins</div>
+                    <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center; margin-top:0.5rem; gap:0.35rem;">
+                        ${statsHtml}
+                    </div>
+                    <div style="display:flex; justify-content:center;">
+                        <div style="font-size:0.75rem; font-family:var(--font-mono); font-weight:700; margin-top:0.25rem; background:rgba(0,0,0,0.05); padding:0.1rem 0.4rem; border:1px solid var(--border-color);">⟁ Shop Price: ${val.value || 0} coins</div>
+                    </div>
                 </div>
                 ${recipeHtml}
                 ${skillsHtml}
@@ -4226,12 +5566,31 @@ function updateLivePreview() {
         card.style.gap = '0.5rem';
 
         let lootInfo = 'None';
-        if (val.loot && val.loot.guaranteed) {
+        if (val.loot && val.loot.pool && val.loot.pool.length > 0) {
+            const itemNames = val.loot.pool.map(k => gameDb?.items?.[k]?.name || k);
+            lootInfo = `${itemNames.join(', ')} (Guaranteed)`;
+        } else if (val.loot && val.loot.guaranteed) {
             const item = gameDb?.items?.[val.loot.guaranteed] || { name: val.loot.guaranteed };
-            lootInfo = `${item.name} (${Math.floor(val.loot.bonusChance * 100)}% bonus chance)`;
+            lootInfo = `${item.name} (Guaranteed)`;
         }
 
+        let extraDropsHtml = '';
+        if (val.loot && val.loot.bonusChance > 0) {
+            extraDropsHtml += `<div style="color:var(--text-color); margin-top:0.15rem; font-size:0.68rem;">+ Bonus Roll (${Math.floor(val.loot.bonusChance * 100)}%)</div>`;
+        }
+        if (val.loot && val.loot.drops && val.loot.drops.length > 0) {
+            val.loot.drops.forEach(d => {
+                const names = (d.pool || []).map(k => gameDb?.items?.[k]?.name || k).join(', ');
+                extraDropsHtml += `<div style="color:var(--text-color); margin-top:0.15rem; font-size:0.68rem;">+ ${names} (${Math.floor(d.chance * 100)}%)</div>`;
+            });
+        }
+
+        const imgHtml = val.sprite
+            ? `<img src="/sprites/${val.sprite}" style="width:64px; height:64px; object-fit:contain; image-rendering:pixelated; margin-bottom: 0.5rem;" alt="">`
+            : `<img src="/sprites/Emoji_Face_Demon_Devil_Horns.png" style="width:64px; height:64px; margin-bottom: 0.5rem;" alt="">`;
+
         card.innerHTML = `
+            ${imgHtml}
             <h3 style="text-transform: uppercase; font-size: 1rem; letter-spacing: 1px; border-bottom: 2px solid var(--border-color); padding-bottom: 0.35rem; width: 100%; text-align: center; margin-bottom: 0.5rem;">${val.name || selectedEntryKey}</h3>
             <div style="display:flex; flex-direction:column; width:100%; font-family:var(--font-mono); font-size:0.72rem; gap:0.25rem;">
                 <div style="display:flex; justify-content:space-between;"><span>♥ HP:</span> <strong>${val.hp} / ${val.maxHp}</strong></div>
@@ -4241,8 +5600,9 @@ function updateLivePreview() {
                 <div style="display:flex; justify-content:space-between; border-top:1px dashed var(--border-color); padding-top:0.25rem;"><span>◈ XP Reward:</span> <strong>${val.xpReward}</strong></div>
                 <div style="display:flex; justify-content:space-between;"><span>⟁ Coins Reward:</span> <strong>${val.coinReward}</strong></div>
                 <div style="display:flex; flex-direction:column; border-top:1px dashed var(--border-color); padding-top:0.25rem; word-break:break-all;">
-                    <span>❖ Drop:</span>
+                    <span>❖ Drops:</span>
                     <strong style="color:var(--accent-green); margin-top:0.1rem;">${lootInfo}</strong>
+                    ${extraDropsHtml}
                 </div>
             </div>
         `;
@@ -4261,6 +5621,7 @@ function updateLivePreview() {
 
         const yPool = Array.isArray(val.yokaiPool) ? val.yokaiPool.join(', ') : 'None';
         const lPool = Array.isArray(val.lootPool) ? val.lootPool.join(', ') : 'None';
+        const sPool = Array.isArray(val.scavengeLootPool) ? val.scavengeLootPool.join(', ') : 'None';
 
         let bgPreviewHtml = '';
         if (val.background) {
@@ -4289,6 +5650,10 @@ function updateLivePreview() {
                 <div style="display:flex; flex-direction:column; border-top:1px dashed var(--border-color); padding-top:0.25rem; margin-top: 0.25rem;">
                     <span>❖ Forage Drops:</span>
                     <strong style="color:var(--accent-green); margin-top:0.1rem;">${lPool}</strong>
+                </div>
+                <div style="display:flex; flex-direction:column; border-top:1px dashed var(--border-color); padding-top:0.25rem; margin-top: 0.25rem;">
+                    <span>❖ Scavenge Drops:</span>
+                    <strong style="color:var(--text-color); margin-top:0.1rem;">${sPool}</strong>
                 </div>
             </div>
         `;
@@ -4482,6 +5847,7 @@ function addNewEntry() {
     } else if (activeDbTab === 'yokai') {
         activeDbData[cleanKey] = {
             name: 'New Yokai',
+            sprite: '',
             hp: 50,
             maxHp: 50,
             attack: 5,
@@ -4490,6 +5856,7 @@ function addNewEntry() {
             xpReward: 40,
             coinReward: 10,
             loot: {
+                pool: [],
                 guaranteed: null,
                 bonusChance: 0.35
             }
@@ -4503,6 +5870,7 @@ function addNewEntry() {
             forageChance: 0.3,
             yokaiPool: [],
             lootPool: [],
+            scavengeLootPool: [],
             difficultyMultiplier: 1.0,
             background: ''
         };
@@ -4531,7 +5899,8 @@ function addNewEntry() {
                 stats: { health: 50, maxHealth: 50, attack: 5, defense: 5 },
                 inventory: {},
                 currentArea: getDefaultAreaKey(),
-                quests: { active: [], available: [] }
+                quests: { active: [], available: [] },
+                quickBelt: [null, null, null]
             }
         };
     }
@@ -4622,9 +5991,9 @@ function renderSpriteGallery(selectedSprite) {
 
     const searchVal = (ui.spriteSearchInput ? ui.spriteSearchInput.value.trim().toLowerCase() : '');
     const folderVal = (ui.spriteFolderSelect ? ui.spriteFolderSelect.value : 'all');
-    
+
     let filteredSprites = allSprites;
-    
+
     if (folderVal !== 'all') {
         filteredSprites = filteredSprites.filter(sprite => {
             const parts = sprite.split('/');
@@ -4632,7 +6001,7 @@ function renderSpriteGallery(selectedSprite) {
             return folder === folderVal;
         });
     }
-    
+
     filteredSprites = filteredSprites.filter(f => f.toLowerCase().includes(searchVal));
 
     const totalSprites = filteredSprites.length;
@@ -4733,19 +6102,19 @@ function showItemPreviewModal(itemKey) {
 
     let statsHtml = '';
     if (item.effects) {
-        if (item.effects.hpRestore) statsHtml += `<div style="font-size:0.75rem; color:var(--accent-green); font-weight:700;">♥ Restores ${item.effects.hpRestore} HP</div>`;
-        if (item.effects.staminaRestore) statsHtml += `<div style="font-size:0.75rem; color:var(--accent-green); font-weight:700;">◆ Restores ${item.effects.staminaRestore} Stamina</div>`;
-        if (item.effects.attackBonus) statsHtml += `<div style="font-size:0.75rem; color:var(--accent-red); font-weight:700;">⚔ +${item.effects.attackBonus} Attack</div>`;
-        if (item.effects.defenseBonus) statsHtml += `<div style="font-size:0.75rem; color:var(--accent-green); font-weight:700;">⛨ +${item.effects.defenseBonus} Defense</div>`;
-        if (item.effects.critChance) statsHtml += `<div style="font-size:0.75rem; color:var(--accent-red); font-weight:700;">❖ +${item.effects.critChance}% Critical Chance</div>`;
-        if (item.effects.lifesteal) statsHtml += `<div style="font-size:0.75rem; color:var(--accent-red); font-weight:700;">▲ +${item.effects.lifesteal}% Lifesteal</div>`;
-        if (item.effects.poisonChance) statsHtml += `<div style="font-size:0.75rem; color:purple; font-weight:700;">☠ +${item.effects.poisonChance}% Poison Chance</div>`;
-        if (item.effects.burnChance) statsHtml += `<div style="font-size:0.75rem; color:orange; font-weight:700;">☼ +${item.effects.burnChance}% Burn Chance</div>`;
+        if (item.effects.hpRestore) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.1rem 0.3rem;">♥ +${item.effects.hpRestore} HP</span>`;
+        if (item.effects.staminaRestore) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.1rem 0.3rem;">◆ +${item.effects.staminaRestore} ST</span>`;
+        if (item.effects.attackBonus) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.1rem 0.3rem;">⚔ +${item.effects.attackBonus} ATK</span>`;
+        if (item.effects.defenseBonus) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:var(--accent-green); font-weight:700; background:rgba(89,124,94,0.1); border:1px solid var(--accent-green); padding:0.1rem 0.3rem;">⛨ +${item.effects.defenseBonus} DEF</span>`;
+        if (item.effects.critChance) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.1rem 0.3rem;">❖ +${item.effects.critChance}% CRIT</span>`;
+        if (item.effects.lifesteal) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:var(--accent-red); font-weight:700; background:rgba(201,74,74,0.1); border:1px solid var(--accent-red); padding:0.1rem 0.3rem;">▲ +${item.effects.lifesteal}% LS</span>`;
+        if (item.effects.poisonChance) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:purple; font-weight:700; background:rgba(128,0,128,0.1); border:1px solid purple; padding:0.1rem 0.3rem;">☠ +${item.effects.poisonChance}% PSN</span>`;
+        if (item.effects.burnChance) statsHtml += `<span style="font-size:0.7rem; font-family:var(--font-mono); color:orange; font-weight:700; background:rgba(255,165,0,0.1); border:1px solid orange; padding:0.1rem 0.3rem;">☼ +${item.effects.burnChance}% BRN</span>`;
     }
 
     const imgHtml = item.sprite
-        ? `<img src="/sprites/${item.sprite}" class="item-sprite-preview" alt="${item.name}" style="width:64px; height:64px; object-fit:contain; image-rendering:pixelated; align-self:center;">`
-        : `<div style="width:64px; height:64px; border:2px dashed var(--border-color); background:var(--panel-bg); display:flex; align-items:center; justify-content:center; align-self:center; font-size:1.5rem;">?</div>`;
+        ? `<img src="/sprites/${item.sprite}" class="item-sprite-preview" alt="${item.name}" style="width:128px; height:128px; object-fit:contain; image-rendering:pixelated; align-self:center; padding:0.5rem; margin-bottom: 0.5rem;">`
+        : `<div style="width:128px; height:128px; border:2px dashed var(--border-color); background:var(--panel-bg); display:flex; align-items:center; justify-content:center; align-self:center; font-size:2rem; margin-bottom: 0.5rem;">?</div>`;
 
     card.innerHTML = `
         ${imgHtml}
@@ -4757,8 +6126,12 @@ function showItemPreviewModal(itemKey) {
             </div>
             <p class="item-desc" style="font-size:0.8rem; text-align:center; opacity:0.8; margin-top:0.25rem;">${item.desc || 'No description provided.'}</p>
             <div style="display:flex; flex-direction:column; align-items:center; margin-top:0.25rem; gap:0.15rem;">
-                ${statsHtml}
-                <div style="font-size:0.75rem; font-family:var(--font-mono); font-weight:700; margin-top:0.25rem; background:rgba(0,0,0,0.05); padding:0.1rem 0.4rem; border:1px solid var(--border-color);">⟁ Base Value: ${item.value || 0} coins</div>
+                <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center; margin-top:0.5rem; gap:0.35rem;">
+                    ${statsHtml}
+                </div>
+                <div style="display:flex; justify-content:center;">
+                    <div style="font-size:0.75rem; font-family:var(--font-mono); font-weight:700; margin-top:0.25rem; background:rgba(0,0,0,0.05); padding:0.1rem 0.4rem; border:1px solid var(--border-color);">⟁ Value: ${item.value || 0} coins</div>
+                </div>
             </div>
         </div>
     `;
@@ -4955,6 +6328,19 @@ function setupAdminDbFilters() {
     }
     if (ui.dbDeleteEntryBtn) {
         ui.dbDeleteEntryBtn.addEventListener('click', () => deleteEntry());
+    }
+
+    const dbViewModeBtn = document.getElementById('db-view-mode-btn');
+    if (dbViewModeBtn) {
+        dbViewModeBtn.addEventListener('click', () => {
+            dbListViewMode = dbListViewMode === 'list' ? 'grid' : 'list';
+            dbViewModeBtn.textContent = dbListViewMode === 'list' ? '⊞' : '☰';
+            renderEntriesList();
+            setTimeout(() => {
+                const activeEl = ui.dbEntriesList.querySelector('.active');
+                if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 50);
+        });
     }
 
     // Editor mode toggle listener
@@ -5252,7 +6638,7 @@ socket.on('partyUpdate', (data) => {
         if (ui.partySetupPanel) ui.partySetupPanel.style.display = 'none';
         if (ui.partyLobbyPanel) ui.partyLobbyPanel.style.display = 'flex';
         if (ui.partyLobbyCodeDisplay) ui.partyLobbyCodeDisplay.textContent = data.lobbyCode;
-        
+
         if (ui.partyMembersList) {
             ui.partyMembersList.innerHTML = '';
             data.members.forEach(member => {
@@ -5265,13 +6651,13 @@ socket.on('partyUpdate', (data) => {
                 card.style.display = 'flex';
                 card.style.justifyContent = 'space-between';
                 card.style.alignItems = 'center';
-                
+
                 const nameSpan = document.createElement('span');
                 nameSpan.style.fontFamily = 'var(--font-mono)';
                 nameSpan.style.fontWeight = 'bold';
                 nameSpan.textContent = member;
                 if (member === data.leader) {
-                    nameSpan.innerHTML += ' <span style="color: gold; font-size: 0.85rem;" title="Party Leader">👑</span>';
+                    nameSpan.innerHTML += ' <span style="color: var(--text-color); font-size: 0.95rem; margin-left: 0.25rem;" title="Party Leader">♚</span>';
                 }
                 card.appendChild(nameSpan);
                 ui.partyMembersList.appendChild(card);
@@ -5295,16 +6681,16 @@ socket.on('partyCombatUpdate', (data) => {
         ui.combatPartyMembers.style.display = 'none';
         return;
     }
-    
+
     const otherMembers = data.members.filter(m => m.username !== currentUsername);
     if (otherMembers.length === 0) {
         ui.combatPartyMembers.style.display = 'none';
         return;
     }
-    
+
     ui.combatPartyMembers.style.display = 'flex';
     ui.combatPartyMembers.innerHTML = '';
-    
+
     otherMembers.forEach(member => {
         const hpPercent = Math.min(100, Math.max(0, (member.health / member.maxHealth) * 100));
         const card = document.createElement('div');
@@ -5547,4 +6933,3 @@ socket.on('spriteChangeResult', (data) => {
     // Initial check
     setTimeout(updateStats, 500);
 })();
-

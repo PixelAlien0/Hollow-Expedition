@@ -1,0 +1,78 @@
+{
+  "bamboo_grove": {
+    "name": "Vapor-Station 9",
+    "desc": "A floating industrial hub caught in a permanent storm of acidic rain. It is a Brutalist paradise of rusted steel and glowing hazard lights.",
+    "minLevel": 1,
+    "encounterChance": 0.35,
+    "forageChance": 0.4,
+    "yokaiPool": [
+      "kitsune"
+    ],
+    "lootPool": [
+      "stick",
+      "metal_scrap",
+      "t1_healing_potion"
+    ],
+    "difficultyMultiplier": 1,
+    "background": "Backgrounds/netrunners_74250.png",
+    "scavengeLootPool": [
+      "copper",
+      "tin",
+      "iron"
+    ]
+  },
+  "windy_peaks": {
+    "name": "Windy Peaks",
+    "desc": "A high cliffside trail swept by howling winds. More dangerous entities reside here.",
+    "minLevel": 5,
+    "encounterChance": 0.5,
+    "forageChance": 0.3,
+    "yokaiPool": [
+      "tengu",
+      "kitsune"
+    ],
+    "lootPool": [
+      "tengu_feather",
+      "rice_ball",
+      "matcha_tea",
+      "lotus_root"
+    ],
+    "difficultyMultiplier": 1.6,
+    "background": "Backgrounds/background_93_106025.png"
+  },
+  "demon_mount": {
+    "name": "The Synapse Collective",
+    "desc": "The Synapse Collective is not a country in the traditional sense; it is a single, continental-sized organism. There are no borders, no capitals, and no individual dwellings.",
+    "minLevel": 10,
+    "encounterChance": 0.7,
+    "forageChance": 0.25,
+    "yokaiPool": [
+      "oni",
+      "tengu"
+    ],
+    "lootPool": [
+      "stick",
+      "stone",
+      "t1_healing_potion",
+      "wild_root"
+    ],
+    "difficultyMultiplier": 2,
+    "background": "Backgrounds/background_97_115632.png",
+    "scavengeLootPool": []
+  },
+  "dragon_nest": {
+    "name": "Dragon's Nest",
+    "desc": "The summit crater where the ancient Dragon Lord slumbers. The air crackles with pure energy.",
+    "minLevel": 20,
+    "encounterChance": 1,
+    "forageChance": 0,
+    "yokaiPool": [
+      "dragon_lord"
+    ],
+    "lootPool": [
+      "light-eater"
+    ],
+    "difficultyMultiplier": 3,
+    "background": "Backgrounds/the_foundation_123549.png"
+  }
+}

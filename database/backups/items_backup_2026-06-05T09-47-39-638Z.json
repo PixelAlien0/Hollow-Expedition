@@ -1,0 +1,210 @@
+{
+  "green_tea_leaves": {
+    "name": "Green Tea Leaves",
+    "desc": "Fresh green leaves. Highly demanded by tea masters.",
+    "value": 5,
+    "type": "material",
+    "rarity": "common",
+    "sprite": "Materials/green_tea_leaves.png",
+    "shopListed": false
+  },
+  "wild_fruit": {
+    "name": "Wild Fruit",
+    "desc": "Sweet forest fruit.",
+    "value": 5,
+    "type": "material",
+    "rarity": "common",
+    "sprite": "Materials/wild_fruit.png",
+    "shopListed": false
+  },
+  "wild_root": {
+    "name": "Wild Root",
+    "desc": "A crunchy root foraged from muddy ponds.",
+    "value": 8,
+    "type": "material",
+    "rarity": "uncommon",
+    "sprite": "Materials/wild_root.png",
+    "shopListed": false
+  },
+  "water_shell": {
+    "name": "Water Shell",
+    "desc": "A smooth water-resistant shell.",
+    "value": 20,
+    "type": "material",
+    "rarity": "rare",
+    "sprite": "Materials/water_shell.png",
+    "shopListed": false
+  },
+  "wind_feather": {
+    "name": "Wind Feather",
+    "desc": "A glossy dark feather carrying currents of wind.",
+    "value": 35,
+    "type": "material",
+    "rarity": "rare",
+    "sprite": "Materials/wind_feather.png",
+    "shopListed": false
+  },
+  "demon_horn": {
+    "name": "Demon Horn",
+    "desc": "A heavy, dark crimson horn vibrating with power.",
+    "value": 50,
+    "type": "material",
+    "rarity": "epic",
+    "sprite": "Materials/demon_horn.png",
+    "shopListed": false
+  },
+  "wooden_shield": {
+    "name": "Wooden Shield",
+    "desc": "A round wooden shield reinforced with iron rings. Adds +2 Defense.",
+    "value": 15,
+    "type": "shield",
+    "rarity": "common",
+    "sprite": "Shields/wooden_shield.png",
+    "effects": {
+      "defenseBonus": 2
+    },
+    "shopListed": false
+  },
+  "lucky_amulet": {
+    "name": "Lucky Amulet",
+    "desc": "A protective temple amulet. Adds +1 Attack and +1 Defense.",
+    "value": 30,
+    "type": "accessory",
+    "rarity": "uncommon",
+    "sprite": "Accessory/lucky_amulet.png",
+    "effects": {
+      "attackBonus": 1,
+      "defenseBonus": 1
+    },
+    "shopListed": false
+  },
+  "sleepy_dragon": {
+    "name": "Sleepy Dragon",
+    "desc": "eepy eepy",
+    "value": 5000,
+    "type": "avatar",
+    "rarity": "legendary",
+    "sprite": "Avatars/soulhunt34_179772.png",
+    "shopListed": false
+  },
+  "stick": {
+    "name": "Wooden stick",
+    "desc": "A simple, unadorned length of branch, roughly hewn and stripped of its bark.",
+    "value": 5,
+    "type": "material",
+    "rarity": "common",
+    "sprite": "Materials/wooden_sword.png",
+    "shopListed": false
+  },
+  "steel_dagger": {
+    "name": "Rusty Steel Dagger",
+    "desc": "A utilitarian blade forged from tempered steel.",
+    "value": 150,
+    "type": "weapon",
+    "rarity": "uncommon",
+    "sprite": "High Quality Weapons/tile153.png",
+    "effects": {
+      "attackBonus": 3,
+      "poisonChance": 0.5
+    },
+    "skills": []
+  },
+  "t1_healing_potion": {
+    "name": "low healing potion",
+    "desc": "Contained within a small, unadorned glass vial, this thin, translucent liquid glows with a faint, pale amber hue.",
+    "value": 10,
+    "type": "consumable",
+    "rarity": "common",
+    "sprite": "Consumable/energy_tea.png",
+    "effects": {
+      "hpRestore": 20
+    }
+  },
+  "basic_spear": {
+    "name": "Wooden Spear",
+    "desc": "A functional, no-nonsense weapon consisting of a straight, seasoned ash wood shaft topped with a simple iron spearhead.",
+    "value": 60,
+    "type": "weapon",
+    "rarity": "common",
+    "sprite": "Non Animated Weapons/wooden_staff.png",
+    "effects": {
+      "attackBonus": 1,
+      "defenseBonus": 1
+    },
+    "skills": []
+  },
+  "swift-draw_stiletto": {
+    "name": "Swift-Draw Stiletto",
+    "desc": "Forged for the moment between breath and blood.",
+    "value": 250,
+    "type": "weapon",
+    "rarity": "rare",
+    "sprite": "High Quality Weapons/tile0075.png",
+    "effects": {
+      "attackBonus": 5,
+      "critChance": 0.5
+    },
+    "skills": []
+  },
+  "silent_striker": {
+    "name": "Silent Striker",
+    "desc": "Weighted perfectly for a quick, silent strike.",
+    "value": 300,
+    "type": "weapon",
+    "rarity": "rare",
+    "sprite": "High Quality Weapons/tile177.png",
+    "effects": {
+      "attackBonus": 2,
+      "poisonChance": 5
+    },
+    "skills": []
+  },
+  "vipers_kiss": {
+    "name": "Viper’s Kiss",
+    "desc": "A single scratch is all the medicine you'll ever need.",
+    "value": 750,
+    "type": "weapon",
+    "rarity": "epic",
+    "sprite": "High Quality Weapons/tile0065.png",
+    "effects": {
+      "poisonChance": 15,
+      "attackBonus": 5
+    },
+    "skills": []
+  },
+  "calamitys_edge": {
+    "name": "Calamity’s Edge",
+    "desc": "To draw this blade is to invite catastrophe.",
+    "value": 5000,
+    "type": "weapon",
+    "rarity": "legendary",
+    "sprite": "Animated Quality Weapons/demon_kings_sword.png",
+    "effects": {
+      "attackBonus": 15,
+      "defenseBonus": 5,
+      "lifesteal": 30,
+      "burnChance": 5
+    },
+    "skills": [
+      "flame_strike",
+      "heavy_slash"
+    ]
+  },
+  "the_silence_of_eternity": {
+    "name": "The Silence of Eternity",
+    "desc": "It makes no sound, for it has seen the end of all things.",
+    "value": 5000,
+    "type": "weapon",
+    "rarity": "legendary",
+    "sprite": "Animated Quality Weapons/behelit_sword_174789.png",
+    "effects": {
+      "attackBonus": 10,
+      "lifesteal": 50,
+      "burnChance": 50
+    },
+    "skills": [
+      "heavy_slash",
+      "piercing_stab"
+    ]
+  }
+}

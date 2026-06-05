@@ -142,7 +142,7 @@ function validateActionsSchema(data) {
     if (typeof data !== 'object' || data === null || Array.isArray(data)) {
         return 'Actions database must be a JSON object (not an array or null).';
     }
-    const requiredBlocks = ['strike', 'parry', 'flee', 'rest', 'startingState', 'leveling', 'explore'];
+    const requiredBlocks = ['strike', 'parry', 'flee', 'rest', 'startingState', 'leveling', 'explore', 'scavenge'];
     for (const block of requiredBlocks) {
         if (!data[block] || typeof data[block] !== 'object') {
             return `Actions database is missing required block "${block}". Deleting core engine configuration blocks is not permitted.`;
@@ -192,400 +192,414 @@ function validateAreasSchema(data) {
 }
 
 const DEFAULT_ITEMS = {
-  "green_tea_leaves": {
-    "name": "Green Tea Leaves",
-    "desc": "Fresh green leaves. Highly demanded by tea masters.",
-    "value": 5,
-    "type": "material",
-    "rarity": "common",
-    "sprite": "green_tea_leaves.png"
-  },
-  "bamboo_shoots": {
-    "name": "Bamboo Shoots",
-    "desc": "Crisp and edible. A common forest ingredient.",
-    "value": 5,
-    "type": "material",
-    "rarity": "common",
-    "sprite": "bamboo_shoots.png"
-  },
-  "wild_fruit": {
-    "name": "Wild Fruit",
-    "desc": "Sweet forest fruit.",
-    "value": 5,
-    "type": "material",
-    "rarity": "common",
-    "sprite": "wild_fruit.png"
-  },
-  "wild_root": {
-    "name": "Wild Root",
-    "desc": "A crunchy root foraged from muddy ponds.",
-    "value": 8,
-    "type": "material",
-    "rarity": "uncommon",
-    "sprite": "wild_root.png"
-  },
-  "healing_herbs": {
-    "name": "Healing Herbs",
-    "desc": "Restores 15 HP.",
-    "value": 4,
-    "type": "consumable",
-    "rarity": "common",
-    "sprite": "healing_herbs.png",
-    "effects": {
-      "hpRestore": 15
+    "green_tea_leaves": {
+        "name": "Green Tea Leaves",
+        "desc": "Fresh green leaves. Highly demanded by tea masters.",
+        "value": 5,
+        "type": "material",
+        "rarity": "common",
+        "sprite": "green_tea_leaves.png"
+    },
+    "bamboo_shoots": {
+        "name": "Bamboo Shoots",
+        "desc": "Crisp and edible. A common forest ingredient.",
+        "value": 5,
+        "type": "material",
+        "rarity": "common",
+        "sprite": "bamboo_shoots.png"
+    },
+    "wild_fruit": {
+        "name": "Wild Fruit",
+        "desc": "Sweet forest fruit.",
+        "value": 5,
+        "type": "material",
+        "rarity": "common",
+        "sprite": "wild_fruit.png"
+    },
+    "wild_root": {
+        "name": "Wild Root",
+        "desc": "A crunchy root foraged from muddy ponds.",
+        "value": 8,
+        "type": "material",
+        "rarity": "uncommon",
+        "sprite": "wild_root.png"
+    },
+    "healing_herbs": {
+        "name": "Healing Herbs",
+        "desc": "Restores 15 HP.",
+        "value": 4,
+        "type": "consumable",
+        "rarity": "common",
+        "sprite": "healing_herbs.png",
+        "effects": {
+            "hpRestore": 15
+        }
+    },
+    "energy_tea": {
+        "name": "Energy Tea",
+        "desc": "Restores 25 Stamina.",
+        "value": 6,
+        "type": "consumable",
+        "rarity": "common",
+        "sprite": "energy_tea.png",
+        "effects": {
+            "staminaRestore": 25
+        }
+    },
+    "rice_bowl": {
+        "name": "Rice Bowl",
+        "desc": "Savory meal. Restores 30 HP and 15 Stamina.",
+        "value": 10,
+        "type": "consumable",
+        "rarity": "uncommon",
+        "sprite": "rice_bowl.png",
+        "effects": {
+            "hpRestore": 30,
+            "staminaRestore": 15
+        }
+    },
+    "water_shell": {
+        "name": "Water Shell",
+        "desc": "A smooth water-resistant shell.",
+        "value": 20,
+        "type": "material",
+        "rarity": "rare",
+        "sprite": "water_shell.png"
+    },
+    "wind_feather": {
+        "name": "Wind Feather",
+        "desc": "A glossy dark feather carrying currents of wind.",
+        "value": 35,
+        "type": "material",
+        "rarity": "rare",
+        "sprite": "wind_feather.png"
+    },
+    "demon_horn": {
+        "name": "Demon Horn",
+        "desc": "A heavy, dark crimson horn vibrating with power.",
+        "value": 50,
+        "type": "material",
+        "rarity": "epic",
+        "sprite": "demon_horn.png"
+    },
+    "wooden_sword": {
+        "name": "Wooden Sword",
+        "desc": "A heavy wooden training sword. Adds +3 Attack.",
+        "value": 15,
+        "type": "weapon",
+        "rarity": "common",
+        "sprite": "wooden_sword.png",
+        "effects": {
+            "attackBonus": 3
+        }
+    },
+    "steel_sword": {
+        "name": "Steel Sword",
+        "desc": "A legendary, razor-sharp steel blade. Adds +8 Attack.",
+        "value": 150,
+        "type": "weapon",
+        "rarity": "epic",
+        "sprite": "steel_sword.png",
+        "effects": {
+            "attackBonus": 8
+        }
+    },
+    "golden_elixir": {
+        "name": "Golden Elixir",
+        "desc": "An elixir. Fully restores Health and Stamina.",
+        "value": 100,
+        "type": "consumable",
+        "rarity": "epic",
+        "sprite": "golden_elixir.gif",
+        "effects": {
+            "hpRestore": 999,
+            "staminaRestore": 999
+        }
+    },
+    "wooden_staff": {
+        "name": "Wooden Staff",
+        "desc": "A simple, light wooden staff. Adds +2 Attack.",
+        "value": 10,
+        "type": "weapon",
+        "rarity": "common",
+        "sprite": "wooden_staff.png",
+        "effects": {
+            "attackBonus": 2
+        }
+    },
+    "refined_blade": {
+        "name": "Refined Blade",
+        "desc": "A battle-worn curved blade. Perfect Condition. Adds +6 Attack.",
+        "value": 50,
+        "type": "weapon",
+        "rarity": "rare",
+        "sprite": "refined_blade.png",
+        "effects": {
+            "attackBonus": 6
+        }
+    },
+    "rusted_blade": {
+        "name": "Rusted Blade",
+        "desc": "An old, battle-worn curved blade. Adds +4 Attack.",
+        "value": 25,
+        "type": "weapon",
+        "rarity": "uncommon",
+        "sprite": "rusted_blade.png",
+        "effects": {
+            "attackBonus": 4
+        }
+    },
+    "agile_dagger": {
+        "name": "Agile Dagger",
+        "desc": "A short, agile steel sword. Adds +6 Attack.",
+        "value": 65,
+        "type": "weapon",
+        "rarity": "rare",
+        "sprite": "agile_dagger.png",
+        "effects": {
+            "attackBonus": 6
+        }
+    },
+    "iron_club": {
+        "name": "Iron Club",
+        "desc": "A spiked club capable of crushing bone. Adds +10 Attack.",
+        "value": 200,
+        "type": "weapon",
+        "rarity": "epic",
+        "sprite": "iron_club.png",
+        "effects": {
+            "attackBonus": 10
+        }
+    },
+    "straw_hat": {
+        "name": "Straw Hat",
+        "desc": "A simple woven straw hat. Adds +1 Defense.",
+        "value": 8,
+        "type": "helmet",
+        "rarity": "common",
+        "sprite": "straw_hat.png",
+        "effects": {
+            "defenseBonus": 1
+        }
+    },
+    "wooden_shield": {
+        "name": "Wooden Shield",
+        "desc": "A round wooden shield. Adds +2 Defense.",
+        "value": 15,
+        "type": "shield",
+        "rarity": "common",
+        "sprite": "wooden_shield.png",
+        "effects": {
+            "defenseBonus": 2
+        }
+    },
+    "iron_plate_armor": {
+        "name": "Iron Plate Armor",
+        "desc": "Traditional iron plate armor. Adds +5 Defense.",
+        "value": 120,
+        "type": "armor",
+        "rarity": "rare",
+        "sprite": "iron_plate_armor.png",
+        "effects": {
+            "defenseBonus": 5
+        }
+    },
+    "lucky_amulet": {
+        "name": "Lucky Amulet",
+        "desc": "A protective amulet. Adds +1 Attack and +1 Defense.",
+        "value": 30,
+        "type": "accessory",
+        "rarity": "uncommon",
+        "sprite": "lucky_amulet.png",
+        "effects": {
+            "attackBonus": 1,
+            "defenseBonus": 1
+        }
     }
-  },
-  "energy_tea": {
-    "name": "Energy Tea",
-    "desc": "Restores 25 Stamina.",
-    "value": 6,
-    "type": "consumable",
-    "rarity": "common",
-    "sprite": "energy_tea.png",
-    "effects": {
-      "staminaRestore": 25
-    }
-  },
-  "rice_bowl": {
-    "name": "Rice Bowl",
-    "desc": "Savory meal. Restores 30 HP and 15 Stamina.",
-    "value": 10,
-    "type": "consumable",
-    "rarity": "uncommon",
-    "sprite": "rice_bowl.png",
-    "effects": {
-      "hpRestore": 30,
-      "staminaRestore": 15
-    }
-  },
-  "water_shell": {
-    "name": "Water Shell",
-    "desc": "A smooth water-resistant shell.",
-    "value": 20,
-    "type": "material",
-    "rarity": "rare",
-    "sprite": "water_shell.png"
-  },
-  "wind_feather": {
-    "name": "Wind Feather",
-    "desc": "A glossy dark feather carrying currents of wind.",
-    "value": 35,
-    "type": "material",
-    "rarity": "rare",
-    "sprite": "wind_feather.png"
-  },
-  "demon_horn": {
-    "name": "Demon Horn",
-    "desc": "A heavy, dark crimson horn vibrating with power.",
-    "value": 50,
-    "type": "material",
-    "rarity": "epic",
-    "sprite": "demon_horn.png"
-  },
-  "wooden_sword": {
-    "name": "Wooden Sword",
-    "desc": "A heavy wooden training sword. Adds +3 Attack.",
-    "value": 15,
-    "type": "weapon",
-    "rarity": "common",
-    "sprite": "wooden_sword.png",
-    "effects": {
-      "attackBonus": 3
-    }
-  },
-  "steel_sword": {
-    "name": "Steel Sword",
-    "desc": "A legendary, razor-sharp steel blade. Adds +8 Attack.",
-    "value": 150,
-    "type": "weapon",
-    "rarity": "epic",
-    "sprite": "steel_sword.png",
-    "effects": {
-      "attackBonus": 8
-    }
-  },
-  "golden_elixir": {
-    "name": "Golden Elixir",
-    "desc": "An elixir. Fully restores Health and Stamina.",
-    "value": 100,
-    "type": "consumable",
-    "rarity": "epic",
-    "sprite": "golden_elixir.gif",
-    "effects": {
-      "hpRestore": 999,
-      "staminaRestore": 999
-    }
-  },
-  "wooden_staff": {
-    "name": "Wooden Staff",
-    "desc": "A simple, light wooden staff. Adds +2 Attack.",
-    "value": 10,
-    "type": "weapon",
-    "rarity": "common",
-    "sprite": "wooden_staff.png",
-    "effects": {
-      "attackBonus": 2
-    }
-  },
-  "refined_blade": {
-    "name": "Refined Blade",
-    "desc": "A battle-worn curved blade. Perfect Condition. Adds +6 Attack.",
-    "value": 50,
-    "type": "weapon",
-    "rarity": "rare",
-    "sprite": "refined_blade.png",
-    "effects": {
-      "attackBonus": 6
-    }
-  },
-  "rusted_blade": {
-    "name": "Rusted Blade",
-    "desc": "An old, battle-worn curved blade. Adds +4 Attack.",
-    "value": 25,
-    "type": "weapon",
-    "rarity": "uncommon",
-    "sprite": "rusted_blade.png",
-    "effects": {
-      "attackBonus": 4
-    }
-  },
-  "agile_dagger": {
-    "name": "Agile Dagger",
-    "desc": "A short, agile steel sword. Adds +6 Attack.",
-    "value": 65,
-    "type": "weapon",
-    "rarity": "rare",
-    "sprite": "agile_dagger.png",
-    "effects": {
-      "attackBonus": 6
-    }
-  },
-  "iron_club": {
-    "name": "Iron Club",
-    "desc": "A spiked club capable of crushing bone. Adds +10 Attack.",
-    "value": 200,
-    "type": "weapon",
-    "rarity": "epic",
-    "sprite": "iron_club.png",
-    "effects": {
-      "attackBonus": 10
-    }
-  },
-  "straw_hat": {
-    "name": "Straw Hat",
-    "desc": "A simple woven straw hat. Adds +1 Defense.",
-    "value": 8,
-    "type": "helmet",
-    "rarity": "common",
-    "sprite": "straw_hat.png",
-    "effects": {
-      "defenseBonus": 1
-    }
-  },
-  "wooden_shield": {
-    "name": "Wooden Shield",
-    "desc": "A round wooden shield. Adds +2 Defense.",
-    "value": 15,
-    "type": "shield",
-    "rarity": "common",
-    "sprite": "wooden_shield.png",
-    "effects": {
-      "defenseBonus": 2
-    }
-  },
-  "iron_plate_armor": {
-    "name": "Iron Plate Armor",
-    "desc": "Traditional iron plate armor. Adds +5 Defense.",
-    "value": 120,
-    "type": "armor",
-    "rarity": "rare",
-    "sprite": "iron_plate_armor.png",
-    "effects": {
-      "defenseBonus": 5
-    }
-  },
-  "lucky_amulet": {
-    "name": "Lucky Amulet",
-    "desc": "A protective amulet. Adds +1 Attack and +1 Defense.",
-    "value": 30,
-    "type": "accessory",
-    "rarity": "uncommon",
-    "sprite": "lucky_amulet.png",
-    "effects": {
-      "attackBonus": 1,
-      "defenseBonus": 1
-    }
-  }
 };
 
 const DEFAULT_YOKAI = {
-  "kappa": {
-    "name": "Kappa",
-    "hp": 40,
-    "maxHp": 40,
-    "attack": 4,
-    "defense": 3,
-    "speed": 3000,
-    "xpReward": 35,
-    "coinReward": 10,
-    "loot": {
-      "guaranteed": "water_shell",
-      "bonusChance": 0.35
+    "kappa": {
+        "name": "Kappa",
+        "hp": 40,
+        "maxHp": 40,
+        "attack": 4,
+        "defense": 3,
+        "speed": 3000,
+        "xpReward": 35,
+        "coinReward": 10,
+        "loot": {
+            "pool": ["water_shell"],
+            "bonusChance": 0.35
+        }
+    },
+    "tengu": {
+        "name": "Tengu",
+        "hp": 60,
+        "maxHp": 60,
+        "attack": 6,
+        "defense": 4,
+        "speed": 2500,
+        "xpReward": 55,
+        "coinReward": 15,
+        "loot": {
+            "pool": ["wind_feather"],
+            "bonusChance": 0.35
+        }
+    },
+    "kitsune": {
+        "name": "Kitsune",
+        "hp": 50,
+        "maxHp": 50,
+        "attack": 5,
+        "defense": 5,
+        "speed": 2000,
+        "xpReward": 50,
+        "coinReward": 12,
+        "loot": {
+            "pool": ["rice_bowl"],
+            "bonusChance": 0.35
+        }
+    },
+    "oni": {
+        "name": "Oni",
+        "hp": 80,
+        "maxHp": 80,
+        "attack": 8,
+        "defense": 6,
+        "speed": 3500,
+        "xpReward": 75,
+        "coinReward": 20,
+        "loot": {
+            "pool": ["demon_horn"],
+            "bonusChance": 0.35,
+            "drops": [
+                { "pool": ["golden_elixir"], "chance": 0.05 }
+            ]
+        }
     }
-  },
-  "tengu": {
-    "name": "Tengu",
-    "hp": 60,
-    "maxHp": 60,
-    "attack": 6,
-    "defense": 4,
-    "speed": 2500,
-    "xpReward": 55,
-    "coinReward": 15,
-    "loot": {
-      "guaranteed": "wind_feather",
-      "bonusChance": 0.35
-    }
-  },
-  "kitsune": {
-    "name": "Kitsune",
-    "hp": 50,
-    "maxHp": 50,
-    "attack": 5,
-    "defense": 5,
-    "speed": 2000,
-    "xpReward": 50,
-    "coinReward": 12,
-    "loot": {
-      "guaranteed": "rice_bowl",
-      "bonusChance": 0.35
-    }
-  },
-  "oni": {
-    "name": "Oni",
-    "hp": 80,
-    "maxHp": 80,
-    "attack": 8,
-    "defense": 6,
-    "speed": 3500,
-    "xpReward": 75,
-    "coinReward": 20,
-    "loot": {
-      "guaranteed": "demon_horn",
-      "bonusChance": 0.35
-    }
-  }
 };
 
 const DEFAULT_ACTIONS = {
-  "strike": {
-    "cooldown": 800,
-    "damageVariance": 3,
-    "baseMinDamage": 2
-  },
-  "parry": {
-    "cooldown": 2500,
-    "perfectWindow": 700,
-    "earlyWindow": 1800,
-    "perfectMitigation": 0.1,
-    "earlyMitigation": 0.5,
-    "missMultiplier": 1.4,
-    "counterMultiplier": 1.5,
-    "counterMinDamage": 3,
-    "missMinDamage": 2
-  },
-  "flee": {
-    "staminaCost": 15,
-    "successRate": 0.5
-  },
-  "rest": {
-    "coinCost": 5,
-    "innHealPercent": 1.0
-  },
-  "startingState": {
-    "level": 1,
-    "experience": 0,
-    "experienceNeeded": 100,
-    "coins": 0,
-    "stamina": 100,
-    "maxStamina": 100,
-    "stats": { "health": 50, "maxHealth": 50, "attack": 5, "defense": 5 },
-    "inventory": {}
-  },
-  "leveling": {
-    "xpMultiplier": 1.5,
-    "maxHealthIncrease": 10,
-    "attackIncrease": 2,
-    "defenseIncrease": 2
-  },
-  "passiveRegen": {
-    "interval": 5000,
-    "staminaAmount": 2
-  },
-  "combatDefeat": {
-    "minCoinsLost": 5,
-    "maxCoinsLost": 15,
-    "healthRestore": 10,
-    "staminaRestorePercent": 0.2
-  },
-  "combat": {
-    "bonusLootChance": 0.35,
-    "bonusLootPool": ["healing_herbs", "energy_tea", "rice_bowl"],
-    "defenseMitigationFactor": 2.0
-  },
-  "raritySettings": {
-    "weights": {
-      "common": 0.70,
-      "uncommon": 0.20,
-      "rare": 0.08,
-      "epic": 0.02
+    "strike": {
+        "cooldown": 800,
+        "damageVariance": 3,
+        "baseMinDamage": 2
     },
-    "valueMultipliers": {
-      "common": 1.0,
-      "uncommon": 1.5,
-      "rare": 2.5,
-      "epic": 4.0
+    "parry": {
+        "cooldown": 2500,
+        "perfectWindow": 700,
+        "earlyWindow": 1800,
+        "perfectMitigation": 0.1,
+        "earlyMitigation": 0.5,
+        "missMultiplier": 1.4,
+        "counterMultiplier": 1.5,
+        "counterMinDamage": 3,
+        "missMinDamage": 2
+    },
+    "flee": {
+        "staminaCost": 15,
+        "successRate": 0.5
+    },
+    "rest": {
+        "coinCost": 5,
+        "innHealPercent": 1.0
+    },
+    "startingState": {
+        "level": 1,
+        "experience": 0,
+        "experienceNeeded": 100,
+        "coins": 0,
+        "stamina": 100,
+        "maxStamina": 100,
+        "stats": { "health": 50, "maxHealth": 50, "attack": 5, "defense": 5 },
+        "inventory": {},
+        "sprite": "Avatars/yashinzen_180342.png"
+    },
+    "leveling": {
+        "xpMultiplier": 1.5,
+        "maxHealthIncrease": 10,
+        "attackIncrease": 2,
+        "defenseIncrease": 2
+    },
+    "passiveRegen": {
+        "interval": 5000,
+        "staminaAmount": 2
+    },
+    "combatDefeat": {
+        "minCoinsLost": 5,
+        "maxCoinsLost": 15,
+        "healthRestore": 10,
+        "staminaRestorePercent": 0.2
+    },
+    "combat": {
+        "bonusLootChance": 0.35,
+        "bonusLootPool": ["healing_herbs", "energy_tea", "rice_bowl"],
+        "defenseMitigationFactor": 2.0
+    },
+    "raritySettings": {
+        "weights": {
+            "common": 0.70,
+            "uncommon": 0.20,
+            "rare": 0.08,
+            "epic": 0.02
+        },
+        "valueMultipliers": {
+            "common": 1.0,
+            "uncommon": 1.5,
+            "rare": 2.5,
+            "epic": 4.0
+        }
+    },
+    "explore": {
+        "staminaCost": 10,
+        "sneakStaminaCost": 5,
+        "cooldown": 1500,
+        "encounterChance": 0.4,
+        "forageChance": 0.35,
+        "shrineChance": 0.15,
+        "springChance": 0.1,
+        "legendaryEncounterChance": 0.03,
+        "legendaryEvents": {
+            "sword_master": {
+                "name": "Wandering Sword Master",
+                "xpReward": 50,
+                "weaponChance": 0.50,
+                "weaponPool": ["wooden_sword", "steel_sword"]
+            },
+            "legendary_shrine": {
+                "name": "Ancient Shinto Shrine",
+                "xpReward": 100,
+                "minCoins": 25,
+                "maxCoins": 50,
+                "consumablePool": ["healing_herbs", "energy_tea", "rice_bowl", "golden_elixir"]
+            }
+        },
+        "forageXpMin": 12,
+        "forageXpMax": 20,
+        "forageCoinsMin": 2,
+        "forageCoinsMax": 6,
+        "foragePool": {
+            "material": ["green_tea_leaves", "bamboo_shoots", "wild_fruit", "wild_root"],
+            "consumable": ["healing_herbs", "energy_tea"],
+            "materialChance": 0.8
+        },
+        "shrineStaminaMin": 20,
+        "shrineStaminaMax": 40,
+        "shrineXpReward": 10,
+        "springHealthMin": 20,
+        "springHealthMax": 40
+    },
+    "scavenge": {
+        "staminaCost": 15,
+        "cooldown": 3000,
+        "successChance": 0.70,
+        "xpMin": 15,
+        "xpMax": 30,
+        "coinsMin": 5,
+        "coinsMax": 20,
+        "lootPool": ["bamboo_shoots", "wild_root", "water_shell", "wind_feather", "rusted_blade", "straw_hat"]
     }
-  },
-  "explore": {
-    "staminaCost": 10,
-    "sneakStaminaCost": 5,
-    "cooldown": 1500,
-    "encounterChance": 0.4,
-    "forageChance": 0.35,
-    "shrineChance": 0.15,
-    "springChance": 0.1,
-    "legendaryEncounterChance": 0.03,
-    "legendaryEvents": {
-      "sword_master": {
-        "name": "Wandering Sword Master",
-        "xpReward": 50,
-        "weaponChance": 0.50,
-        "weaponPool": ["wooden_sword", "steel_sword"]
-      },
-      "legendary_shrine": {
-        "name": "Ancient Shinto Shrine",
-        "xpReward": 100,
-        "minCoins": 25,
-        "maxCoins": 50,
-        "consumablePool": ["healing_herbs", "energy_tea", "rice_bowl", "golden_elixir"]
-      }
-    },
-    "forageXpMin": 12,
-    "forageXpMax": 20,
-    "forageCoinsMin": 2,
-    "forageCoinsMax": 6,
-    "foragePool": {
-      "material": ["green_tea_leaves", "bamboo_shoots", "wild_fruit", "wild_root"],
-      "consumable": ["healing_herbs", "energy_tea"],
-      "materialChance": 0.8
-    },
-    "shrineStaminaMin": 20,
-    "shrineStaminaMax": 40,
-    "shrineXpReward": 10,
-    "springHealthMin": 20,
-    "springHealthMax": 40
-  }
 };
 
 let itemDatabase = {};
@@ -597,87 +611,90 @@ const activeParties = {};
 const playerPartyMap = {};
 
 const DEFAULT_AREAS = {
-  "bamboo_grove": {
-    "name": "Bamboo Grove",
-    "desc": "A tranquil path lined with rustling bamboo stalks. Sights of common Yokai here.",
-    "minLevel": 1,
-    "encounterChance": 0.35,
-    "forageChance": 0.4,
-    "yokaiPool": ["kappa", "kitsune"],
-    "lootPool": ["matcha_leaves", "persimmons", "healing_herbs"],
-    "difficultyMultiplier": 1,
-    "background": "Map_Markers_Tree_Forest.png"
-  },
-  "windy_peaks": {
-    "name": "Windy Peaks",
-    "desc": "A high cliffside trail swept by howling winds. More dangerous entities reside here.",
-    "minLevel": 3,
-    "encounterChance": 0.45,
-    "forageChance": 0.3,
-    "yokaiPool": ["tengu", "kitsune"],
-    "lootPool": ["tengu_feather", "rice_ball", "matcha_tea", "lotus_root"],
-    "difficultyMultiplier": 1.3,
-    "background": "Map_Markers_Mountains_Hills_Cliffs_Terrain.png"
-  },
-  "demon_mount": {
-    "name": "Demon Mountain",
-    "desc": "A volcanic peak covered in ash. Home to the strongest Oni.",
-    "minLevel": 5,
-    "encounterChance": 0.5,
-    "forageChance": 0.25,
-    "yokaiPool": ["oni", "tengu"],
-    "lootPool": ["oni_horn", "training_sword", "steel_katana", "golden_elixir"],
-    "difficultyMultiplier": 1.7,
-    "background": "Map_Markers_Volcano.png"
-  }
+    "bamboo_grove": {
+        "name": "Bamboo Grove",
+        "desc": "A tranquil path lined with rustling bamboo stalks. Sights of common Yokai here.",
+        "minLevel": 1,
+        "encounterChance": 0.35,
+        "forageChance": 0.4,
+        "yokaiPool": ["kappa", "kitsune"],
+        "lootPool": ["matcha_leaves", "persimmons", "healing_herbs"],
+        "scavengeLootPool": ["bamboo_shoots", "wild_root"],
+        "difficultyMultiplier": 1,
+        "background": "Map_Markers_Tree_Forest.png"
+    },
+    "windy_peaks": {
+        "name": "Windy Peaks",
+        "desc": "A high cliffside trail swept by howling winds. More dangerous entities reside here.",
+        "minLevel": 3,
+        "encounterChance": 0.45,
+        "forageChance": 0.3,
+        "yokaiPool": ["tengu", "kitsune"],
+        "lootPool": ["tengu_feather", "rice_ball", "matcha_tea", "lotus_root"],
+        "scavengeLootPool": ["wind_feather", "rusted_blade"],
+        "difficultyMultiplier": 1.3,
+        "background": "Map_Markers_Mountains_Hills_Cliffs_Terrain.png"
+    },
+    "demon_mount": {
+        "name": "Demon Mountain",
+        "desc": "A volcanic peak covered in ash. Home to the strongest Oni.",
+        "minLevel": 5,
+        "encounterChance": 0.5,
+        "forageChance": 0.25,
+        "yokaiPool": ["oni", "tengu"],
+        "lootPool": ["oni_horn", "training_sword", "steel_katana", "golden_elixir"],
+        "scavengeLootPool": ["demon_horn", "iron_plate_armor"],
+        "difficultyMultiplier": 1.7,
+        "background": "Map_Markers_Volcano.png"
+    }
 };
 
 const DEFAULT_SKILLS = {
-  "heavy_slash": {
-    "name": "Heavy Slash",
-    "desc": "A sweeping heavy strike. Deals 1.6x weapon damage.",
-    "staminaCost": 15,
-    "cooldown": 4000,
-    "effects": {
-      "damageMultiplier": 1.6
+    "heavy_slash": {
+        "name": "Heavy Slash",
+        "desc": "A sweeping heavy strike. Deals 1.6x weapon damage.",
+        "staminaCost": 15,
+        "cooldown": 4000,
+        "effects": {
+            "damageMultiplier": 1.6
+        }
+    },
+    "flame_strike": {
+        "name": "Flame Strike",
+        "desc": "Ignites the blade. Deals 1.2x damage and inflicts Burn (8 dmg/tick for 3 ticks).",
+        "staminaCost": 20,
+        "cooldown": 6000,
+        "effects": {
+            "damageMultiplier": 1.2,
+            "inflictEffect": "burned",
+            "effectTicks": 3
+        }
+    },
+    "remedy_light": {
+        "name": "Healing Remedy",
+        "desc": "Chants a minor healing spell, restoring 20 Health.",
+        "staminaCost": 25,
+        "cooldown": 8000,
+        "effects": {
+            "healAmount": 20
+        }
+    },
+    "piercing_stab": {
+        "name": "Piercing Stab",
+        "desc": "Ignores Yokai defense entirely. Deals flat 1.1x attack damage.",
+        "staminaCost": 12,
+        "cooldown": 5000,
+        "effects": {
+            "damageMultiplier": 1.1,
+            "ignoreDefense": true
+        }
     }
-  },
-  "flame_strike": {
-    "name": "Flame Strike",
-    "desc": "Ignites the blade. Deals 1.2x damage and inflicts Burn (8 dmg/tick for 3 ticks).",
-    "staminaCost": 20,
-    "cooldown": 6000,
-    "effects": {
-      "damageMultiplier": 1.2,
-      "inflictEffect": "burned",
-      "effectTicks": 3
-    }
-  },
-  "remedy_light": {
-    "name": "Healing Remedy",
-    "desc": "Chants a minor healing spell, restoring 20 Health.",
-    "staminaCost": 25,
-    "cooldown": 8000,
-    "effects": {
-      "healAmount": 20
-    }
-  },
-  "piercing_stab": {
-    "name": "Piercing Stab",
-    "desc": "Ignores Yokai defense entirely. Deals flat 1.1x attack damage.",
-    "staminaCost": 12,
-    "cooldown": 5000,
-    "effects": {
-      "damageMultiplier": 1.1,
-      "ignoreDefense": true
-    }
-  }
 };
 
 async function loadGameDatabase() {
     try {
         await fs.mkdir(DATABASE_DIR, { recursive: true });
-        
+
         // Load items database with fallback generator
         try {
             itemDatabase = JSON.parse(await fs.readFile(ITEMS_FILE, 'utf8'));
@@ -737,7 +754,7 @@ function initDatabase() {
                 return reject(err);
             }
             console.log("[Database] Connected to SQLite database.");
-            
+
             db.serialize(() => {
                 db.run("PRAGMA journal_mode=WAL;");
                 db.run("PRAGMA busy_timeout=5000;");
@@ -764,7 +781,7 @@ function initDatabase() {
                 // Index optimizations for market listing lookups and sorting
                 db.run("CREATE INDEX IF NOT EXISTS idx_market_listings_seller ON market_listings(seller);");
                 db.run("CREATE INDEX IF NOT EXISTS idx_market_listings_created_at ON market_listings(created_at DESC);");
-                
+
                 db.run(`
                     CREATE TABLE IF NOT EXISTS saves (
                         username TEXT PRIMARY KEY,
@@ -773,7 +790,7 @@ function initDatabase() {
                     )
                 `, async (tableErr) => {
                     if (tableErr) return reject(tableErr);
-                    
+
                     try {
                         await migrateJsonToSqlite();
                         resolve();
@@ -791,30 +808,30 @@ async function migrateJsonToSqlite() {
     try {
         await fs.access(USERS_FILE);
         usersJsonExists = true;
-    } catch (e) {}
-    
+    } catch (e) { }
+
     if (usersJsonExists) {
         console.log("[Migration] Found users.json. Migrating data to SQLite...");
         try {
             const rawUsers = await fs.readFile(USERS_FILE, 'utf8');
             const users = JSON.parse(rawUsers);
-            
+
             await new Promise((resolve, reject) => {
                 db.serialize(() => {
                     db.run("BEGIN TRANSACTION");
-                    
+
                     const userStmt = db.prepare("INSERT OR IGNORE INTO users (username, password, is_admin) VALUES (?, ?, ?)");
                     const saveStmt = db.prepare("INSERT OR REPLACE INTO saves (username, state) VALUES (?, ?)");
-                    
+
                     const promises = [];
-                    
+
                     for (const [username, userData] of Object.entries(users)) {
                         const lowerUsername = username.toLowerCase();
                         const password = userData.password;
                         const isAdmin = userData.isAdmin ? 1 : 0;
-                        
+
                         userStmt.run(lowerUsername, password, isAdmin);
-                        
+
                         const savePath = path.join(SAVES_DIR, `${lowerUsername}.json`);
                         promises.push(
                             fs.readFile(savePath, 'utf8')
@@ -828,7 +845,7 @@ async function migrateJsonToSqlite() {
                                 })
                         );
                     }
-                    
+
                     Promise.all(promises).then(() => {
                         userStmt.finalize();
                         saveStmt.finalize();
@@ -839,17 +856,17 @@ async function migrateJsonToSqlite() {
                     }).catch(reject);
                 });
             });
-            
+
             const backupSuffix = `_migrated_${new Date().toISOString().replace(/[:.]/g, '-')}`;
             await fs.rename(USERS_FILE, `${USERS_FILE}${backupSuffix}`);
-            
+
             try {
                 await fs.rename(SAVES_DIR, `${SAVES_DIR}${backupSuffix}`);
                 console.log(`[Migration] Saves directory backed up to saves${backupSuffix}`);
             } catch (savesErr) {
                 console.error("[Migration] Failed to backup saves folder:", savesErr.message);
             }
-            
+
             console.log("[Migration] Migration completed successfully!");
         } catch (err) {
             console.error("[Migration] Error during migration:", err);
@@ -897,23 +914,31 @@ function requireAdmin(req, res, next) {
 }
 
 // XSS Prevention: escape HTML characters
-function sanitizeString(str) {
+function sanitizeString(str, key = '') {
     if (typeof str !== 'string') return '';
+
+    // Do not HTML-escape file paths, to avoid breaking links with '&' in them.
+    // Also, auto-repair any paths that were previously corrupted by double-encoding.
+    if (key === 'sprite' || key === 'background') {
+        let cleanStr = str.replace(/&amp;/g, "&");
+        return cleanStr.replace(/[<>"]/g, "");
+    }
+
     return str
-        .replace(/&/g, "&amp;")
+        .replace(/&(?!(amp|lt|gt|quot|#\d+);)/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
 }
 
 // Recursively sanitize objects (Prototype Pollution & XSS protection)
-function sanitizeObject(obj) {
+function sanitizeObject(obj, currentKey = '') {
     if (obj === null || obj === undefined) return obj;
     if (typeof obj === 'string') {
-        return sanitizeString(obj);
+        return sanitizeString(obj, currentKey);
     }
     if (Array.isArray(obj)) {
-        return obj.map(item => sanitizeObject(item));
+        return obj.map(item => sanitizeObject(item, currentKey));
     }
     if (typeof obj === 'object') {
         const sanitized = {};
@@ -923,7 +948,7 @@ function sanitizeObject(obj) {
             }
             const safeKey = key.replace(/[^a-zA-Z0-9_-]/g, '');
             if (safeKey) {
-                sanitized[safeKey] = sanitizeObject(value);
+                sanitized[safeKey] = sanitizeObject(value, safeKey);
             }
         }
         return sanitized;
@@ -1060,6 +1085,12 @@ async function getPlayerState(username) {
                 }
                 if (!Array.isArray(state.quests.active)) state.quests.active = [];
                 if (!Array.isArray(state.quests.available)) state.quests.available = [];
+                if (!state.quickBelt) {
+                    state.quickBelt = [null, null, null];
+                }
+                if (!state.sprite && (!state.equipment || !state.equipment.avatar)) {
+                    state.sprite = 'Avatars/yashinzen_180342.png';
+                }
 
                 playerCache[username] = state;
                 resolve(state);
@@ -1095,6 +1126,8 @@ function getInitialPlayerState() {
     if (!stateObj.quests) stateObj.quests = { active: [], available: [] };
     if (!Array.isArray(stateObj.quests.active)) stateObj.quests.active = [];
     if (!Array.isArray(stateObj.quests.available)) stateObj.quests.available = [];
+    if (!stateObj.quickBelt) stateObj.quickBelt = [null, null, null];
+    if (!stateObj.sprite) stateObj.sprite = 'Avatars/yashinzen_180342.png';
     return stateObj;
 }
 
@@ -1234,7 +1267,7 @@ setInterval(async () => {
     if (dirtyPlayers.size === 0) return;
     const playersToSave = Array.from(dirtyPlayers);
     dirtyPlayers.clear();
-    
+
     for (const username of playersToSave) {
         const state = playerCache[username];
         if (state) {
@@ -1260,30 +1293,30 @@ app.post('/api/register', async (req, res) => {
     if (typeof username !== 'string' || typeof password !== 'string') {
         return res.status(400).json({ error: 'Username and password must be strings.' });
     }
-    
+
     const trimmedUsername = username.trim();
     const trimmedPassword = password;
     if (!trimmedUsername || !trimmedPassword) {
         return res.status(400).json({ error: 'Username and password cannot be empty.' });
     }
-    
+
     if (trimmedUsername.length < 3 || trimmedUsername.length > 20) {
         return res.status(400).json({ error: 'Username must be between 3 and 20 characters.' });
     }
-    
+
     const lowerUsername = trimmedUsername.toLowerCase();
     const users = await getUsers();
-    
+
     if (users[lowerUsername]) {
         return res.status(400).json({ error: 'Username already exists' });
     }
-    
+
     const hashedPassword = await bcrypt.hash(trimmedPassword, 10);
     users[lowerUsername] = { password: hashedPassword };
-    
+
     await saveUsers(users);
     await savePlayerState(lowerUsername, getInitialPlayerState());
-    
+
     res.json({ success: true });
 });
 
@@ -1292,24 +1325,24 @@ app.post('/api/login', async (req, res) => {
     if (typeof username !== 'string' || typeof password !== 'string') {
         return res.status(400).json({ error: 'Username and password must be strings.' });
     }
-    
+
     const trimmedUsername = username.trim();
     if (!trimmedUsername || !password) {
         return res.status(400).json({ error: 'Username and password cannot be empty.' });
     }
-    
+
     const lowerUsername = trimmedUsername.toLowerCase();
     const users = await getUsers();
-    
+
     if (!users[lowerUsername]) {
         return res.status(401).json({ error: 'Invalid credentials' });
     }
-    
+
     const match = await bcrypt.compare(password, users[lowerUsername].password);
     if (!match) {
         return res.status(401).json({ error: 'Invalid credentials' });
     }
-    
+
     req.session.username = lowerUsername;
     const isAdmin = !!(users[lowerUsername] && users[lowerUsername].isAdmin);
     res.json({ success: true, username: lowerUsername, isAdmin });
@@ -1344,7 +1377,7 @@ app.get('/api/admin/database', requireAdmin, async (req, res) => {
             let state = {};
             try {
                 if (row.state) state = JSON.parse(row.state);
-            } catch (e) {}
+            } catch (e) { }
             players[row.username] = {
                 isAdmin: row.is_admin === 1,
                 state: state
@@ -1375,7 +1408,7 @@ async function getFilesRecursive(dir, baseDir = dir) {
                 results.push(relPath);
             }
         }
-    } catch (e) {}
+    } catch (e) { }
     return results;
 }
 
@@ -1438,8 +1471,8 @@ app.get('/api/sprites', async (req, res) => {
         const sprites = files.filter(file => {
             const basename = path.basename(file);
             return ownedSprites.has(file) &&
-                /\.(png|gif|jpg|jpeg|webp)$/i.test(file) && 
-                !basename.startsWith('background_') && 
+                /\.(png|gif|jpg|jpeg|webp)$/i.test(file) &&
+                !basename.startsWith('background_') &&
                 basename !== 'the_end_of_the_world_104602.png';
         });
         res.json({ success: true, sprites });
@@ -1453,16 +1486,16 @@ app.post('/api/admin/database/update', requireAdmin, async (req, res) => {
     if (!['items', 'yokai', 'actions', 'areas', 'skills', 'players'].includes(type)) {
         return res.status(400).json({ error: 'Invalid database type' });
     }
-    
+
     try {
         let parsedData = data;
         if (typeof data === 'string') {
             parsedData = JSON.parse(data);
         }
-        
+
         // Input Sanitization: XSS & Prototype Pollution Protection
         parsedData = sanitizeObject(parsedData);
-        
+
         if (type === 'players') {
             // Get all usernames in the database first to handle deletions
             const defaultHashedPassword = await bcrypt.hash("password", 10);
@@ -1472,7 +1505,7 @@ app.post('/api/admin/database/update', requireAdmin, async (req, res) => {
                 }
                 const existingUsernames = rows.map(r => r.username.toLowerCase());
                 const submittedUsernames = new Set(Object.keys(parsedData).map(k => k.toLowerCase()));
-                
+
                 const deleteQueries = [];
                 existingUsernames.forEach(uname => {
                     if (!submittedUsernames.has(uname)) {
@@ -1497,14 +1530,14 @@ app.post('/api/admin/database/update', requireAdmin, async (req, res) => {
                     }
                 });
                 await Promise.all(deleteQueries);
-                
+
                 const queries = [];
                 for (const [uname, udata] of Object.entries(parsedData)) {
                     if (!udata || typeof udata !== 'object') continue;
                     const lowerUname = uname.toLowerCase();
                     const is_admin = udata.isAdmin ? 1 : 0;
                     const stateStr = JSON.stringify(udata.state || {});
-                    
+
                     queries.push(new Promise((resolveQuery, rejectQuery) => {
                         db.run("INSERT OR IGNORE INTO users (username, password, is_admin) VALUES (?, ?, ?)", [lowerUname, defaultHashedPassword, is_admin], (err) => {
                             if (err) return rejectQuery(err);
@@ -1513,7 +1546,7 @@ app.post('/api/admin/database/update', requireAdmin, async (req, res) => {
                                 db.run("INSERT OR REPLACE INTO saves (username, state) VALUES (?, ?)", [lowerUname, stateStr], (err2) => {
                                     if (err2) return rejectQuery(err2);
                                     playerCache[lowerUname] = udata.state;
-                                    
+
                                     const activeSocketId = Object.keys(activeUsers).find(sid => activeUsers[sid] === lowerUname);
                                     if (activeSocketId) {
                                         const activeSocket = io.sockets.sockets.get(activeSocketId);
@@ -1527,7 +1560,7 @@ app.post('/api/admin/database/update', requireAdmin, async (req, res) => {
                         });
                     }));
                 }
-                
+
                 try {
                     await Promise.all(queries);
                     broadcastPlayerList();
@@ -1553,14 +1586,14 @@ app.post('/api/admin/database/update', requireAdmin, async (req, res) => {
         } else if (type === 'skills') {
             validationError = validateSkillsSchema(parsedData);
         }
-        
+
         if (validationError) {
             console.log(`[SAFETY NET] Schema validation REJECTED for ${type}: ${validationError}`);
-            return res.status(400).json({ 
-                error: `[VALIDATION FAILED] ${validationError} Save aborted — the active database remains intact.` 
-                });
+            return res.status(400).json({
+                error: `[VALIDATION FAILED] ${validationError} Save aborted — the active database remains intact.`
+            });
         }
-        
+
         // === SAFETY NET: Tier 2 — Automated Timestamped Backup ===
         let targetFile;
         if (type === 'items') {
@@ -1574,7 +1607,7 @@ app.post('/api/admin/database/update', requireAdmin, async (req, res) => {
         } else if (type === 'skills') {
             targetFile = SKILLS_FILE;
         }
-        
+
         try {
             await fs.mkdir(BACKUPS_DIR, { recursive: true });
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -1585,7 +1618,7 @@ app.post('/api/admin/database/update', requireAdmin, async (req, res) => {
         } catch (backupErr) {
             console.error(`[SAFETY NET] Backup warning (non-blocking): ${backupErr.message}`);
         }
-        
+
         // Apply changes to in-memory cache
         if (type === 'items') {
             itemDatabase = parsedData;
@@ -1598,12 +1631,12 @@ app.post('/api/admin/database/update', requireAdmin, async (req, res) => {
         } else if (type === 'skills') {
             skillsDatabase = parsedData;
         }
-        
+
         await fs.writeFile(targetFile, JSON.stringify(parsedData, null, 2), 'utf8');
-        
+
         // Broadcast the live synced database changes to ALL connected clients!
         io.emit('gameDatabase', { items: itemDatabase, actions: actionDatabase, yokai: yokaiPool, areas: areaDatabase, skills: skillsDatabase, updatedBy: req.session.username, updatedType: type });
-        
+
         console.log(`[SAFETY NET] ${req.session.username} successfully updated ${type} database.`);
         res.json({ success: true, message: `Successfully updated ${type} database! A backup was created automatically.` });
     } catch (err) {
@@ -1617,30 +1650,30 @@ app.get('/api/admin/database/backups', requireAdmin, async (req, res) => {
         await fs.mkdir(BACKUPS_DIR, { recursive: true });
         const files = await fs.readdir(BACKUPS_DIR);
         const backups = [];
-        
+
         for (const file of files) {
             if (!file.endsWith('.json')) continue;
             const filePath = path.join(BACKUPS_DIR, file);
             const stat = await fs.stat(filePath);
-            
+
             // Parse type and timestamp from filename: <type>_backup_<timestamp>.json
             const match = file.match(/^(items|yokai|actions|areas|skills)_backup_(.+)\.json$/);
             if (!match) continue;
-            
+
             backups.push({
                 filename: file,
                 type: match[1],
-                timestamp: match[2].replace(/-/g, function(m, offset) {
+                timestamp: match[2].replace(/-/g, function (m, offset) {
                     return m;
                 }),
                 size: stat.size,
                 created: stat.mtime.toISOString()
             });
         }
-        
+
         // Sort newest first
         backups.sort((a, b) => new Date(b.created) - new Date(a.created));
-        
+
         res.json({ backups });
     } catch (err) {
         res.status(500).json({ error: `Failed to list backups: ${err.message}` });
@@ -1653,26 +1686,26 @@ app.post('/api/admin/database/restore', requireAdmin, async (req, res) => {
     if (!filename || typeof filename !== 'string') {
         return res.status(400).json({ error: 'Missing backup filename.' });
     }
-    
+
     // Security: prevent path traversal
     const safeFilename = path.basename(filename);
     const backupPath = path.join(BACKUPS_DIR, safeFilename);
-    
+
     // Validate filename format
     const match = safeFilename.match(/^(items|yokai|actions|areas|skills)_backup_.+\.json$/);
     if (!match) {
         return res.status(400).json({ error: 'Invalid backup filename format.' });
     }
-    
+
     const type = match[1];
-    
+
     try {
         const rawData = await fs.readFile(backupPath, 'utf8');
         let parsedData = JSON.parse(rawData);
-        
+
         // Input Sanitization: XSS & Prototype Pollution Protection
         parsedData = sanitizeObject(parsedData);
-        
+
         // Validate the backup data before restoring
         let validationError = null;
         if (type === 'items') {
@@ -1686,13 +1719,13 @@ app.post('/api/admin/database/restore', requireAdmin, async (req, res) => {
         } else if (type === 'skills') {
             validationError = validateSkillsSchema(parsedData);
         }
-        
+
         if (validationError) {
-            return res.status(400).json({ 
-                error: `[RESTORE BLOCKED] Backup file failed schema validation: ${validationError}` 
+            return res.status(400).json({
+                error: `[RESTORE BLOCKED] Backup file failed schema validation: ${validationError}`
             });
         }
-        
+
         // Create a pre-restore backup of the CURRENT state before overwriting
         let targetFile;
         if (type === 'items') {
@@ -1706,7 +1739,7 @@ app.post('/api/admin/database/restore', requireAdmin, async (req, res) => {
         } else if (type === 'skills') {
             targetFile = SKILLS_FILE;
         }
-        
+
         try {
             const preRestoreTimestamp = new Date().toISOString().replace(/[:.]/g, '-');
             const preRestoreBackupName = `${type}_backup_${preRestoreTimestamp}.json`;
@@ -1715,7 +1748,7 @@ app.post('/api/admin/database/restore', requireAdmin, async (req, res) => {
         } catch (preErr) {
             console.error(`[BACKUP RESTORE] Pre-restore backup warning: ${preErr.message}`);
         }
-        
+
         // Apply the restore
         if (type === 'items') {
             itemDatabase = parsedData;
@@ -1728,12 +1761,12 @@ app.post('/api/admin/database/restore', requireAdmin, async (req, res) => {
         } else if (type === 'skills') {
             skillsDatabase = parsedData;
         }
-        
+
         await fs.writeFile(targetFile, JSON.stringify(parsedData, null, 2), 'utf8');
-        
+
         // Broadcast changes to all clients
         io.emit('gameDatabase', { items: itemDatabase, actions: actionDatabase, yokai: yokaiPool, areas: areaDatabase, skills: skillsDatabase, updatedBy: req.session.username, updatedType: type });
-        
+
         console.log(`[BACKUP RESTORE] ${req.session.username} restored ${type} from backup: ${safeFilename}`);
         res.json({ success: true, message: `Successfully restored ${type} database from backup!`, type });
     } catch (err) {
@@ -1748,7 +1781,7 @@ app.delete('/api/admin/database/backups/:filename', requireAdmin, async (req, re
     if (!match) {
         return res.status(400).json({ error: 'Invalid backup filename.' });
     }
-    
+
     try {
         await fs.unlink(path.join(BACKUPS_DIR, safeFilename));
         console.log(`[BACKUP] ${req.session.username} deleted backup: ${safeFilename}`);
@@ -1827,19 +1860,19 @@ async function handleCombatVictory(username, socket, combat, state) {
     if (combat.timerId) {
         clearTimeout(combat.timerId);
     }
-    
+
     const xpGain = combat.yokai.xpReward;
     const coinsGain = combat.yokai.coinReward;
-    
+
     state.experience += xpGain;
     state.coins += coinsGain;
-    
+
     // Award loot drops
     if (!state.inventory) state.inventory = {};
     let lootMessage = "";
-    
+
     const yokaiKey = combat.yokai.key;
-    
+
     // Slay Quest progress tracking
     if (state.quests && Array.isArray(state.quests.active)) {
         state.quests.active.forEach(quest => {
@@ -1852,13 +1885,27 @@ async function handleCombatVictory(username, socket, combat, state) {
     }
 
     const yokaiDbEntry = yokaiPool[yokaiKey];
-    const guaranteedItem = yokaiDbEntry?.loot?.guaranteed;
-    
-    if (guaranteedItem && itemDatabase[guaranteedItem]) {
-        state.inventory[guaranteedItem] = (state.inventory[guaranteedItem] || 0) + 1;
-        lootMessage += ` Spoils: Obtained 1x ${itemDatabase[guaranteedItem].name}.`;
+    const guaranteedItems = yokaiDbEntry?.loot?.pool || (yokaiDbEntry?.loot?.guaranteed ? [yokaiDbEntry.loot.guaranteed] : []);
+
+    for (const itemKey of guaranteedItems) {
+        if (itemDatabase[itemKey]) {
+            state.inventory[itemKey] = (state.inventory[itemKey] || 0) + 1;
+            lootMessage += ` Spoils: Obtained 1x ${itemDatabase[itemKey].name}.`;
+        }
     }
-    
+
+    if (yokaiDbEntry?.loot?.drops && Array.isArray(yokaiDbEntry.loot.drops)) {
+        for (const drop of yokaiDbEntry.loot.drops) {
+            if (Math.random() < drop.chance && drop.pool && drop.pool.length > 0) {
+                const itemKey = drop.pool[Math.floor(Math.random() * drop.pool.length)];
+                if (itemDatabase[itemKey]) {
+                    state.inventory[itemKey] = (state.inventory[itemKey] || 0) + 1;
+                    lootMessage += ` Rare Drop: Found 1x ${itemDatabase[itemKey].name}!`;
+                }
+            }
+        }
+    }
+
     // Rare bonus drop (read bonusChance and loot pool dynamically)
     const combConfig = actionDatabase.combat || { bonusLootChance: 0.35, bonusLootPool: ["healing_herbs", "energy_tea", "rice_bowl"] };
     const bonusChance = yokaiDbEntry?.loot?.bonusChance !== undefined ? yokaiDbEntry.loot.bonusChance : combConfig.bonusLootChance;
@@ -1870,7 +1917,7 @@ async function handleCombatVictory(username, socket, combat, state) {
             lootMessage += ` Bonus: Found 1x ${itemDatabase[bonusItem].name}!`;
         }
     }
-    
+
     let leveledUp = false;
     const lvlConfig = actionDatabase.leveling || { xpMultiplier: 1.5, maxHealthIncrease: 10, attackIncrease: 2, defenseIncrease: 2 };
     while (state.experience >= state.experienceNeeded) {
@@ -1883,11 +1930,11 @@ async function handleCombatVictory(username, socket, combat, state) {
         state.stats.defense += lvlConfig.defenseIncrease;
         leveledUp = true;
     }
-    
+
     delete activeCombats[username];
     await savePlayerState(username, state);
     broadcastPlayerList();
-    
+
     socket.emit('combatEnd', {
         success: true,
         message: `[VICTORY] You defeated the wild ${combat.yokai.name}! Gained ${xpGain} XP and ${coinsGain} coins.${lootMessage}`,
@@ -2004,21 +2051,21 @@ function getActiveBurnChance(state) {
 function startMonsterAttackLoop(username, socket) {
     const combat = activeCombats[username];
     if (!combat) return;
-    
+
     if (combat.timerId) {
         clearTimeout(combat.timerId);
     }
-    
+
     async function triggerAttack() {
         const liveCombat = activeCombats[username];
         if (!liveCombat) return;
-        
+
         const state = await getPlayerState(username);
         if (!state) {
             delete activeCombats[username];
             return;
         }
-        
+
         // Apply DOT damage (poison, burn) if active
         let dotDamage = 0;
         let dotType = null;
@@ -2033,41 +2080,41 @@ function startMonsterAttackLoop(username, socket) {
             if (liveCombat.yokai.burnTicks <= 0) liveCombat.yokai.burned = false;
             dotType = 'burn';
         }
-        
+
         if (dotDamage > 0) {
             liveCombat.yokai.hp = Math.max(0, liveCombat.yokai.hp - dotDamage);
-            socket.emit('combatFeedback', { 
+            socket.emit('combatFeedback', {
                 message: `* The Yokai takes ${dotDamage} ${dotType} damage!`,
                 yokaiHp: liveCombat.yokai.hp
             });
-            
+
             if (liveCombat.yokai.hp <= 0) {
                 await savePlayerState(username, state);
                 await handleCombatVictory(username, socket, liveCombat, state);
                 return;
             }
         }
-        
+
         let damage = liveCombat.yokai.attack;
         let eventType = "hit";
         let counterDamage = 0;
-        
+
         const combConfig = actionDatabase.combat || { defenseMitigationFactor: 2.0 };
         const defFactor = combConfig.defenseMitigationFactor || 2.0;
         const activeDef = getActiveDefense(state);
         const defBonus = Math.floor(activeDef / defFactor);
         const normalDamage = Math.max(1, damage - defBonus);
-        
+
         const parryConfig = actionDatabase.parry;
-        
+
         if (liveCombat.lastParryTime) {
             const msSinceParry = Date.now() - liveCombat.lastParryTime;
-            
+
             if (msSinceParry <= parryConfig.perfectWindow) {
                 // Perfect Parry: Block & counter-attack!
                 damage = Math.max(1, Math.floor(normalDamage * parryConfig.perfectMitigation));
                 eventType = "perfect_parry";
-                
+
                 const playerAtk = getActiveAttack(state);
                 const counterMin = parryConfig.counterMinDamage !== undefined ? parryConfig.counterMinDamage : 3;
                 counterDamage = Math.max(counterMin, Math.floor(playerAtk * parryConfig.counterMultiplier));
@@ -2082,29 +2129,29 @@ function startMonsterAttackLoop(username, socket) {
                 damage = Math.max(missMin, Math.floor(normalDamage * parryConfig.missMultiplier));
                 eventType = "staggered_hit";
             }
-            
+
             delete liveCombat.lastParryTime;
         } else {
             damage = normalDamage;
             eventType = "hit";
         }
-        
+
         state.stats.health = Math.max(0, state.stats.health - damage);
-        
+
         if (state.stats.health <= 0) {
             delete activeCombats[username];
-            
+
             const defConfig = actionDatabase.combatDefeat || { minCoinsLost: 5, maxCoinsLost: 15, healthRestore: 10, staminaRestorePercent: 0.2 };
             const range = defConfig.maxCoinsLost - defConfig.minCoinsLost + 1;
             const coinsLost = Math.min(state.coins, Math.floor(Math.random() * range) + defConfig.minCoinsLost);
-            
+
             state.coins -= coinsLost;
             state.stats.health = defConfig.healthRestore;
             state.stamina = Math.floor(state.maxStamina * defConfig.staminaRestorePercent);
-            
+
             await savePlayerState(username, state);
             broadcastPlayerList();
-            
+
             socket.emit('combatEnd', {
                 success: false,
                 message: `[DEFEAT] The wild ${liveCombat.yokai.name} knocked you unconscious! You lost ${coinsLost} coins and were brought to the village inn to recover.`,
@@ -2124,7 +2171,7 @@ function startMonsterAttackLoop(username, socket) {
             await handleCombatVictory(username, socket, liveCombat, state);
         } else {
             await savePlayerState(username, state);
-            
+
             // Randomize the next attack speed!
             const nextSpeed = randomizeSpeed(liveCombat.yokai.speed);
             socket.emit('combatMonsterAttack', {
@@ -2135,12 +2182,12 @@ function startMonsterAttackLoop(username, socket) {
                 nextSpeed,
                 state
             });
-            
+
             // Schedule the next attack!
             liveCombat.timerId = setTimeout(triggerAttack, nextSpeed);
         }
     }
-    
+
     // Schedule the first attack!
     const firstSpeed = randomizeSpeed(combat.yokai.speed);
     combat.firstAttackSpeed = firstSpeed;
@@ -2181,13 +2228,13 @@ function startPassiveRegenLoop() {
 async function handleExplorationComplete(username, socket) {
     const exploreRecord = activeExplores[username];
     if (!exploreRecord) return;
-    
+
     // Clean up active exploration status first
     delete activeExplores[username];
-    
+
     const state = await getPlayerState(username);
     if (!state) return;
-    
+
     const expConfig = actionDatabase.explore;
     const areaKeys = Object.keys(areaDatabase);
     const fallbackAreaKey = areaKeys[0] || 'bamboo_grove';
@@ -2203,7 +2250,7 @@ async function handleExplorationComplete(username, socket) {
         lootPool: Object.keys(itemDatabase),
         difficultyMultiplier: 1.0
     };
-    
+
     // Draw from random event
     const legendaryChance = expConfig.legendaryEncounterChance !== undefined ? expConfig.legendaryEncounterChance : 0.03;
     const rand = Math.random();
@@ -2213,34 +2260,34 @@ async function handleExplorationComplete(username, socket) {
     let staminaGain = 0;
     let eventMessage = "";
     let leveledUp = false;
-    
+
     if (Math.random() < legendaryChance) {
         // Trigger Rare Legendary Encounter Event!
         const events = expConfig.legendaryEvents || {
-          "sword_master": {
-            "name": "Wandering Sword Master",
-            "xpReward": 50,
-            "weaponChance": 0.50,
-            "weaponPool": ["wooden_sword", "steel_sword"]
-          },
-          "legendary_shrine": {
-            "name": "Ancient Shinto Shrine",
-            "xpReward": 100,
-            "minCoins": 25,
-            "maxCoins": 50,
-            "consumablePool": ["healing_herbs", "energy_tea", "rice_bowl", "golden_elixir"]
-          }
+            "sword_master": {
+                "name": "Wandering Sword Master",
+                "xpReward": 50,
+                "weaponChance": 0.50,
+                "weaponPool": ["wooden_sword", "steel_sword"]
+            },
+            "legendary_shrine": {
+                "name": "Ancient Shinto Shrine",
+                "xpReward": 100,
+                "minCoins": 25,
+                "maxCoins": 50,
+                "consumablePool": ["healing_herbs", "energy_tea", "rice_bowl", "golden_elixir"]
+            }
         };
-        
+
         const eventKeys = Object.keys(events);
         const rolledEvent = eventKeys[Math.floor(Math.random() * eventKeys.length)];
-        
+
         if (rolledEvent === 'sword_master') {
             const config = events.sword_master;
             state.stamina = state.maxStamina || 100;
             gainedXP = config.xpReward || 50;
             state.experience += gainedXP;
-            
+
             let lootMessage = "";
             if (Math.random() < (config.weaponChance !== undefined ? config.weaponChance : 0.50)) {
                 const pool = config.weaponPool || ["wooden_sword", "steel_sword"];
@@ -2251,7 +2298,7 @@ async function handleExplorationComplete(username, socket) {
                 const weaponRarity = (weaponItem.rarity || "common").toUpperCase();
                 lootMessage = ` In appreciation, he bequeaths a premium [${weaponRarity}] ${weaponItem.name}!`;
             }
-            
+
             eventMessage = `[LEGENDARY] You encountered a Wandering Sword Master in a quiet bamboo clearing. He patiently coaches your technique, restoring all Stamina (+${gainedXP} XP).${lootMessage}`;
         } else {
             // Ancient Shinto Shrine
@@ -2260,31 +2307,31 @@ async function handleExplorationComplete(username, socket) {
             state.stamina = state.maxStamina || 100;
             gainedXP = config.xpReward || 100;
             state.experience += gainedXP;
-            
+
             const coinMin = config.minCoins !== undefined ? config.minCoins : 25;
             const coinMax = config.maxCoins !== undefined ? config.maxCoins : 50;
             gainedCoins = Math.floor(Math.random() * (coinMax - coinMin + 1)) + coinMin;
             state.coins += gainedCoins;
-            
+
             const pool = config.consumablePool || ["healing_herbs", "energy_tea", "rice_bowl", "golden_elixir"];
             const itemKey = pool[Math.floor(Math.random() * pool.length)];
             if (!state.inventory) state.inventory = {};
             state.inventory[itemKey] = (state.inventory[itemKey] || 0) + 1;
-            
+
             const droppedItem = itemDatabase[itemKey] || { name: "Healing Herbs" };
             const droppedRarity = (droppedItem.rarity || "common").toUpperCase();
-            
+
             eventMessage = `[LEGENDARY] You discovered a hidden, glowing Ancient Shinto Shrine covered in sacred runes. Whispering spirits fully restore your Health & Stamina (+${gainedXP} XP, +${gainedCoins} coins) and award a [${droppedRarity}] ${droppedItem.name}!`;
         }
     } else {
         // Standard explore events
         const yokaiChance = area.encounterChance !== undefined ? area.encounterChance : expConfig.encounterChance;
         const forageChance = area.forageChance !== undefined ? area.forageChance : expConfig.forageChance;
-        
+
         const yokaiThreshold = yokaiChance;
         const forageThreshold = yokaiThreshold + forageChance;
         const shrineThreshold = forageThreshold + (expConfig.shrineChance || 0.15);
-        
+
         if (rand < yokaiThreshold) {
             // Encounter Yokai (Combat) - Open Confirmation Screen first!
             let yokaiKeys = area.yokaiPool || Object.keys(yokaiPool);
@@ -2293,15 +2340,16 @@ async function handleExplorationComplete(username, socket) {
             }
             const key = yokaiKeys[Math.floor(Math.random() * yokaiKeys.length)];
             const template = yokaiPool[key] || yokaiPool[Object.keys(yokaiPool)[0]];
-            
+
             pendingEncounters[username] = key;
-            
+
             await savePlayerState(username, state);
             broadcastPlayerList();
-            
+
             socket.emit('combatEncounter', {
                 yokai: {
                     name: template.name,
+                    sprite: template.sprite,
                     speed: template.speed,
                     hp: template.hp
                 },
@@ -2312,13 +2360,13 @@ async function handleExplorationComplete(username, socket) {
             // Foraging (Resource discovery)
             const xpRange = expConfig.forageXpMax - expConfig.forageXpMin + 1;
             gainedXP = Math.floor(Math.random() * xpRange) + expConfig.forageXpMin;
-            
+
             const coinsRange = expConfig.forageCoinsMax - expConfig.forageCoinsMin + 1;
             gainedCoins = Math.floor(Math.random() * coinsRange) + expConfig.forageCoinsMin;
-            
+
             state.experience += gainedXP;
             state.coins += gainedCoins;
-            
+
             // Roll item rarity dynamically based on weights
             const rarSettings = actionDatabase.raritySettings || { weights: { common: 0.7, uncommon: 0.2, rare: 0.08, epic: 0.02 } };
             const rRoll = Math.random();
@@ -2331,11 +2379,11 @@ async function handleExplorationComplete(username, socket) {
                     break;
                 }
             }
-            
+
             // Find all items in the area lootPool matching this rarity
             const areaLoot = area.lootPool || Object.keys(itemDatabase);
             let itemsInTier = areaLoot.filter(k => itemDatabase[k] && (itemDatabase[k].rarity || "common") === rolledRarity);
-            
+
             if (itemsInTier.length === 0) {
                 itemsInTier = areaLoot.filter(k => itemDatabase[k]);
             }
@@ -2346,10 +2394,10 @@ async function handleExplorationComplete(username, socket) {
                 itemsInTier = Object.keys(itemDatabase).filter(k => (itemDatabase[k].rarity || "common") === "common");
             }
             const itemKey = itemsInTier[Math.floor(Math.random() * itemsInTier.length)];
-            
+
             if (!state.inventory) state.inventory = {};
             state.inventory[itemKey] = (state.inventory[itemKey] || 0) + 1;
-            
+
             const itemDetails = itemDatabase[itemKey];
             const rarityBadge = `[${rolledRarity.toUpperCase()}]`;
             eventMessage = `[FORAGE] You foraged in the ${area.name} and harvested ${rarityBadge} ${itemDetails.name}. (+${gainedXP} XP, +${gainedCoins} coins)`;
@@ -2358,7 +2406,7 @@ async function handleExplorationComplete(username, socket) {
             const staminaRange = expConfig.shrineStaminaMax - expConfig.shrineStaminaMin + 1;
             staminaGain = Math.floor(Math.random() * staminaRange) + expConfig.shrineStaminaMin;
             gainedXP = expConfig.shrineXpReward;
-            
+
             state.stamina = Math.min(state.maxStamina || 100, state.stamina + staminaGain);
             state.experience += gainedXP;
             eventMessage = `[SHRINE] You offered prayers at a stone Shrine of Inari. A peaceful energy restores your spirit. (+${staminaGain} Stamina, +${gainedXP} XP)`;
@@ -2366,13 +2414,13 @@ async function handleExplorationComplete(username, socket) {
             // Hot Spring (Healing)
             const healthRange = expConfig.springHealthMax - expConfig.springHealthMin + 1;
             healthGain = Math.floor(Math.random() * healthRange) + expConfig.springHealthMin;
-            
+
             const maxHP = state.stats.maxHealth || 50;
             state.stats.health = Math.min(maxHP, state.stats.health + healthGain);
             eventMessage = `[HEAL] You found a hidden hot spring. The soothing hot waters restore your health! (+${healthGain} Health)`;
         }
     }
-    
+
     // Level up checks
     const lvlConfig = actionDatabase.leveling || { xpMultiplier: 1.5, maxHealthIncrease: 10, attackIncrease: 2, defenseIncrease: 2 };
     while (state.experience >= state.experienceNeeded) {
@@ -2385,10 +2433,76 @@ async function handleExplorationComplete(username, socket) {
         state.stats.defense += lvlConfig.defenseIncrease;
         leveledUp = true;
     }
-    
+
     await savePlayerState(username, state);
     broadcastPlayerList();
-    
+
+    socket.emit('exploreResult', {
+        success: true,
+        message: eventMessage,
+        state,
+        leveledUp
+    });
+}
+
+async function handleScavengeComplete(username, socket) {
+    const exploreRecord = activeExplores[username];
+    if (!exploreRecord) return;
+    delete activeExplores[username];
+
+    const state = await getPlayerState(username);
+    if (!state) return;
+
+    const scavConfig = actionDatabase.scavenge || { successChance: 0.70, xpMin: 15, xpMax: 30, coinsMin: 5, coinsMax: 20, lootPool: [] };
+    const areaKey = state.currentArea || Object.keys(areaDatabase)[0] || 'bamboo_grove';
+    const area = areaDatabase[areaKey] || {};
+
+    let eventMessage = "";
+    let leveledUp = false;
+
+    if (Math.random() < (scavConfig.successChance !== undefined ? scavConfig.successChance : 0.70)) {
+        const xpRange = (scavConfig.xpMax || 30) - (scavConfig.xpMin || 15) + 1;
+        const gainedXP = Math.floor(Math.random() * xpRange) + (scavConfig.xpMin || 15);
+
+        const coinsRange = (scavConfig.coinsMax || 20) - (scavConfig.coinsMin || 5) + 1;
+        const gainedCoins = Math.floor(Math.random() * coinsRange) + (scavConfig.coinsMin || 5);
+
+        state.experience += gainedXP;
+        state.coins += gainedCoins;
+
+        let lootMessage = "";
+        const activeLootPool = (area.scavengeLootPool && area.scavengeLootPool.length > 0) ? area.scavengeLootPool : (scavConfig.lootPool || []);
+
+        if (activeLootPool && activeLootPool.length > 0) {
+            const itemKey = activeLootPool[Math.floor(Math.random() * activeLootPool.length)];
+            if (!state.inventory) state.inventory = {};
+            state.inventory[itemKey] = (state.inventory[itemKey] || 0) + 1;
+
+            const itemDetails = itemDatabase[itemKey] || { name: itemKey, rarity: 'common' };
+            const rarityBadge = `[${(itemDetails.rarity || 'common').toUpperCase()}]`;
+            lootMessage = ` Found ${rarityBadge} ${itemDetails.name}!`;
+        }
+
+        eventMessage = `[SCAVENGE] You scavenged the area and recovered supplies. (+${gainedXP} XP, +${gainedCoins} coins)${lootMessage}`;
+    } else {
+        eventMessage = `[SCAVENGE] You searched the area but found nothing of value.`;
+    }
+
+    const lvlConfig = actionDatabase.leveling || { xpMultiplier: 1.5, maxHealthIncrease: 10, attackIncrease: 2, defenseIncrease: 2 };
+    while (state.experience >= state.experienceNeeded) {
+        state.experience -= state.experienceNeeded;
+        state.level++;
+        state.experienceNeeded = getXpNeededForLevel(state.level);
+        state.stats.maxHealth = (state.stats.maxHealth || 50) + lvlConfig.maxHealthIncrease;
+        state.stats.health = state.stats.maxHealth;
+        state.stats.attack += lvlConfig.attackIncrease;
+        state.stats.defense += lvlConfig.defenseIncrease;
+        leveledUp = true;
+    }
+
+    await savePlayerState(username, state);
+    broadcastPlayerList();
+
     socket.emit('exploreResult', {
         success: true,
         message: eventMessage,
@@ -2400,7 +2514,7 @@ async function handleExplorationComplete(username, socket) {
 async function broadcastPartyCombatUpdate(lobbyCode) {
     const party = activeParties[lobbyCode];
     if (!party) return;
-    
+
     const combat = party.combatInstance;
     const memberStatuses = [];
     for (const member of party.members) {
@@ -2425,39 +2539,55 @@ async function broadcastPartyCombatUpdate(lobbyCode) {
 async function handleBossVictory(lobbyCode) {
     const party = activeParties[lobbyCode];
     if (!party) return;
-    
+
     const combat = party.combatInstance;
     if (combat && combat.timerId) {
         clearTimeout(combat.timerId);
     }
-    
+
     const bossKey = (combat && combat.yokai && combat.yokai.key) || Object.keys(yokaiPool)[0] || 'dragon_lord';
     const bossTemplate = yokaiPool[bossKey] || { xpReward: 300, coinReward: 100 };
     const baseXP = bossTemplate.xpReward || 300;
     const baseCoins = bossTemplate.coinReward || 100;
-    
+
     for (const member of party.members) {
         if (activeCombats[member] === combat) {
             const state = await getPlayerState(member);
             if (state) {
                 state.experience += baseXP;
                 state.coins += baseCoins;
-                
+
                 let lootEarned = [];
                 if (bossTemplate.loot) {
-                    const guaranteed = bossTemplate.loot.guaranteed;
-                    if (guaranteed && itemDatabase[guaranteed]) {
-                        state.inventory[guaranteed] = (state.inventory[guaranteed] || 0) + 1;
-                        lootEarned.push(itemDatabase[guaranteed].name);
+                    const guaranteedItems = bossTemplate.loot.pool || (bossTemplate.loot.guaranteed ? [bossTemplate.loot.guaranteed] : []);
+                    for (const itemKey of guaranteedItems) {
+                        if (itemDatabase[itemKey]) {
+                            state.inventory[itemKey] = (state.inventory[itemKey] || 0) + 1;
+                            lootEarned.push(itemDatabase[itemKey].name);
+                        }
                     }
+
+                    if (bossTemplate.loot.drops && Array.isArray(bossTemplate.loot.drops)) {
+                        for (const drop of bossTemplate.loot.drops) {
+                            if (Math.random() < drop.chance && drop.pool && drop.pool.length > 0) {
+                                const itemKey = drop.pool[Math.floor(Math.random() * drop.pool.length)];
+                                if (itemDatabase[itemKey]) {
+                                    state.inventory[itemKey] = (state.inventory[itemKey] || 0) + 1;
+                                    lootEarned.push(`${itemDatabase[itemKey].name} (Rare)`);
+                                }
+                            }
+                        }
+                    }
+
                     if (Math.random() < bossTemplate.loot.bonusChance) {
-                        if (guaranteed && itemDatabase[guaranteed]) {
-                            state.inventory[guaranteed] = (state.inventory[guaranteed] || 0) + 1;
-                            lootEarned.push(`${itemDatabase[guaranteed].name} (Bonus)`);
+                        const firstItem = guaranteedItems.length > 0 ? guaranteedItems[0] : null;
+                        if (firstItem && itemDatabase[firstItem]) {
+                            state.inventory[firstItem] = (state.inventory[firstItem] || 0) + 1;
+                            lootEarned.push(`${itemDatabase[firstItem].name} (Bonus)`);
                         }
                     }
                 }
-                
+
                 let leveledUp = false;
                 const lvlConfig = actionDatabase.leveling || { xpMultiplier: 1.5, maxHealthIncrease: 10, attackIncrease: 2, defenseIncrease: 2 };
                 while (state.experience >= state.experienceNeeded) {
@@ -2470,13 +2600,13 @@ async function handleBossVictory(lobbyCode) {
                     state.stats.defense += lvlConfig.defenseIncrease;
                     leveledUp = true;
                 }
-                
+
                 await savePlayerState(member, state);
-                
+
                 let lootMsg = lootEarned.length > 0 ? ` Received drops: ${lootEarned.join(', ')}.` : '';
                 const bossName = (combat && combat.yokai && combat.yokai.name) || 'the boss';
                 const winMsg = `[VICTORY] You and your party defeated ${bossName}! Gained ${baseXP} XP and ${baseCoins} coins.${lootMsg}`;
-                
+
                 for (const [sid, name] of Object.entries(activeUsers)) {
                     if (name === member) {
                         io.to(sid).emit('combatEnd', {
@@ -2491,7 +2621,7 @@ async function handleBossVictory(lobbyCode) {
         }
         delete activeCombats[member];
     }
-    
+
     party.state = 'lobby';
     party.combatInstance = null;
     broadcastPartyUpdate(lobbyCode);
@@ -2501,33 +2631,33 @@ async function handleBossVictory(lobbyCode) {
 async function handleBossDefeat(lobbyCode) {
     const party = activeParties[lobbyCode];
     if (!party) return;
-    
+
     const combat = party.combatInstance;
     if (combat && combat.timerId) {
         clearTimeout(combat.timerId);
     }
-    
+
     const defConfig = actionDatabase.combatDefeat || { minCoinsLost: 5, maxCoinsLost: 15, healthRestore: 10, staminaRestorePercent: 0.2 };
-    
+
     for (const member of party.members) {
         if (activeCombats[member] === combat) {
             const state = await getPlayerState(member);
             if (state) {
                 const range = defConfig.maxCoinsLost - defConfig.minCoinsLost + 1;
                 const coinsLost = Math.min(state.coins, Math.floor(Math.random() * range) + defConfig.minCoinsLost);
-                
+
                 state.coins -= coinsLost;
                 state.stats.health = defConfig.healthRestore;
                 state.stamina = Math.floor(state.maxStamina * defConfig.staminaRestorePercent);
                 const areaKeys = Object.keys(areaDatabase);
                 const fallbackAreaKey = areaKeys[0] || 'bamboo_grove';
                 state.currentArea = fallbackAreaKey;
-                
+
                 await savePlayerState(member, state);
-                
+
                 const bossName = (combat && combat.yokai && combat.yokai.name) || 'the boss';
                 const fallbackAreaName = (areaDatabase[fallbackAreaKey] && areaDatabase[fallbackAreaKey].name) || 'Faraway Land';
-                
+
                 for (const [sid, name] of Object.entries(activeUsers)) {
                     if (name === member) {
                         io.to(sid).emit('combatEnd', {
@@ -2541,7 +2671,7 @@ async function handleBossDefeat(lobbyCode) {
         }
         delete activeCombats[member];
     }
-    
+
     party.state = 'lobby';
     party.combatInstance = null;
     broadcastPartyUpdate(lobbyCode);
@@ -2551,19 +2681,19 @@ async function handleBossDefeat(lobbyCode) {
 function startBossAttackLoop(lobbyCode) {
     const party = activeParties[lobbyCode];
     if (!party || !party.combatInstance) return;
-    
+
     const combat = party.combatInstance;
     if (combat.timerId) {
         clearTimeout(combat.timerId);
     }
-    
+
     async function triggerBossAttack() {
         const liveParty = activeParties[lobbyCode];
         if (!liveParty || !liveParty.combatInstance) return;
         const liveCombat = liveParty.combatInstance;
-        
+
         if (liveCombat.yokai.hp <= 0) return;
-        
+
         const aliveMembers = [];
         const memberStates = {};
         for (const member of liveParty.members) {
@@ -2575,12 +2705,12 @@ function startBossAttackLoop(lobbyCode) {
                 }
             }
         }
-        
+
         if (aliveMembers.length === 0) {
             await handleBossDefeat(lobbyCode);
             return;
         }
-        
+
         // DOT damage
         let dotDamage = 0;
         let dotType = null;
@@ -2595,7 +2725,7 @@ function startBossAttackLoop(lobbyCode) {
             if (liveCombat.yokai.burnTicks <= 0) liveCombat.yokai.burned = false;
             dotType = 'burn';
         }
-        
+
         if (dotDamage > 0) {
             liveCombat.yokai.hp = Math.max(0, liveCombat.yokai.hp - dotDamage);
             io.to(`party_${lobbyCode}`).emit('combatFeedback', {
@@ -2608,30 +2738,30 @@ function startBossAttackLoop(lobbyCode) {
                 return;
             }
         }
-        
+
         const targetUsername = aliveMembers[Math.floor(Math.random() * aliveMembers.length)];
         const state = memberStates[targetUsername];
-        
+
         let damage = liveCombat.yokai.attack;
         let eventType = "hit";
         let counterDamage = 0;
-        
+
         const combConfig = actionDatabase.combat || { defenseMitigationFactor: 2.0 };
         const defFactor = combConfig.defenseMitigationFactor || 2.0;
         const activeDef = getActiveDefense(state);
         const defBonus = Math.floor(activeDef / defFactor);
         const normalDamage = Math.max(1, damage - defBonus);
-        
+
         const parryConfig = actionDatabase.parry;
         const playerCombatRecord = liveCombat.players[targetUsername] || {};
-        
+
         if (playerCombatRecord.lastParryTime) {
             const msSinceParry = Date.now() - playerCombatRecord.lastParryTime;
-            
+
             if (msSinceParry <= parryConfig.perfectWindow) {
                 damage = Math.max(1, Math.floor(normalDamage * parryConfig.perfectMitigation));
                 eventType = "perfect_parry";
-                
+
                 const playerAtk = getActiveAttack(state);
                 const counterMin = parryConfig.counterMinDamage !== undefined ? parryConfig.counterMinDamage : 3;
                 counterDamage = Math.max(counterMin, Math.floor(playerAtk * parryConfig.counterMultiplier));
@@ -2649,11 +2779,11 @@ function startBossAttackLoop(lobbyCode) {
             damage = normalDamage;
             eventType = "hit";
         }
-        
+
         state.stats.health = Math.max(0, state.stats.health - damage);
         await savePlayerState(targetUsername, state);
         broadcastPlayerList();
-        
+
         if (liveCombat.yokai.hp <= 0) {
             io.to(`party_${lobbyCode}`).emit('combatMonsterAttack', {
                 damage,
@@ -2685,7 +2815,7 @@ function startBossAttackLoop(lobbyCode) {
             if (state.stats.health <= 0) {
                 msg += ` [KNOCKED OUT] ${targetUsername} has fallen unconscious!`;
             }
-            
+
             io.to(`party_${lobbyCode}`).emit('combatMonsterAttack', {
                 damage,
                 eventType,
@@ -2695,18 +2825,18 @@ function startBossAttackLoop(lobbyCode) {
                 nextSpeed,
                 message: msg
             });
-            
+
             for (const [sid, name] of Object.entries(activeUsers)) {
                 if (name === targetUsername) {
                     io.to(sid).emit('statUpdate', state);
                 }
             }
-            
+
             await broadcastPartyCombatUpdate(lobbyCode);
             liveCombat.timerId = setTimeout(triggerBossAttack, nextSpeed);
         }
     }
-    
+
     const firstSpeed = randomizeSpeed(combat.yokai.speed);
     combat.timerId = setTimeout(triggerBossAttack, firstSpeed);
 }
@@ -2724,14 +2854,14 @@ function broadcastPartyUpdate(lobbyCode) {
 
 io.on('connection', (socket) => {
     const session = socket.request.session;
-    
+
     if (!session || !session.username) {
         socket.disconnect();
         return;
     }
-    
+
     const username = session.username;
-    
+
     // Single-session enforcement (kick older connections/tabs)
     for (const [sid, name] of Object.entries(activeUsers)) {
         if (name === username && sid !== socket.id) {
@@ -2743,32 +2873,33 @@ io.on('connection', (socket) => {
             delete activeUsers[sid];
         }
     }
-    
+
     activeUsers[socket.id] = username;
-    
+
     // === Socket Rate Limiter ===
     const rateBuckets = {};
     const RATE_LIMITS = {
-        exploreStart:         { max: 3,  windowMs: 2000 },
-        rest:                 { max: 2,  windowMs: 3000 },
-        combatAction:         { max: 6,  windowMs: 1000 },
-        combatConfirm:        { max: 3,  windowMs: 2000 },
-        useItem:              { max: 4,  windowMs: 2000 },
-        buyItem:              { max: 4,  windowMs: 2000 },
-        craftItem:            { max: 4,  windowMs: 2000 },
-        equipItem:            { max: 4,  windowMs: 2000 },
-        unequipItem:          { max: 4,  windowMs: 2000 },
-        marketCreateListing:  { max: 3,  windowMs: 3000 },
-        marketBuyListing:     { max: 3,  windowMs: 3000 },
-        marketCancelListing:  { max: 3,  windowMs: 3000 },
-        chatMessage:          { max: 5,  windowMs: 3000 },
-        changeSprite:         { max: 3,  windowMs: 3000 },
-        travelArea:           { max: 3,  windowMs: 2000 },
-        questGetBoard:        { max: 5,  windowMs: 2000 },
-        questAccept:          { max: 3,  windowMs: 2000 },
-        questAbandon:         { max: 3,  windowMs: 2000 },
-        questComplete:        { max: 3,  windowMs: 2000 },
-        combatUseSkill:       { max: 6,  windowMs: 1000 }
+        exploreStart: { max: 3, windowMs: 2000 },
+        rest: { max: 2, windowMs: 3000 },
+        combatAction: { max: 6, windowMs: 1000 },
+        combatConfirm: { max: 3, windowMs: 2000 },
+        useItem: { max: 4, windowMs: 2000 },
+        buyItem: { max: 4, windowMs: 2000 },
+        craftItem: { max: 4, windowMs: 2000 },
+        equipItem: { max: 4, windowMs: 2000 },
+        unequipItem: { max: 4, windowMs: 2000 },
+        marketCreateListing: { max: 3, windowMs: 3000 },
+        marketBuyListing: { max: 3, windowMs: 3000 },
+        marketCancelListing: { max: 3, windowMs: 3000 },
+        chatMessage: { max: 5, windowMs: 3000 },
+        changeSprite: { max: 3, windowMs: 3000 },
+        travelArea: { max: 3, windowMs: 2000 },
+        questGetBoard: { max: 5, windowMs: 2000 },
+        questAccept: { max: 3, windowMs: 2000 },
+        questAbandon: { max: 3, windowMs: 2000 },
+        questComplete: { max: 3, windowMs: 2000 },
+        combatUseSkill: { max: 6, windowMs: 1000 },
+        scavengeStart: { max: 3, windowMs: 2000 }
     };
 
     function isRateLimited(eventName) {
@@ -2797,7 +2928,7 @@ io.on('connection', (socket) => {
 
     // Send Game Database configs to client dynamically
     socket.emit('gameDatabase', { items: itemDatabase, actions: actionDatabase, yokai: yokaiPool, areas: areaDatabase, skills: skillsDatabase });
-    
+
     // Broadcast updated player list
     io.emit('update-player-list', buildPlayerListPayload());
 
@@ -2822,12 +2953,12 @@ io.on('connection', (socket) => {
             socket.emit('partyFeedback', { success: false, message: "You are already in a party." });
             return;
         }
-        
+
         let lobbyCode;
         do {
             lobbyCode = Math.random().toString(36).substring(2, 8).toUpperCase();
         } while (activeParties[lobbyCode]);
-        
+
         activeParties[lobbyCode] = {
             leader: username,
             members: [username],
@@ -2835,7 +2966,7 @@ io.on('connection', (socket) => {
             combatInstance: null
         };
         playerPartyMap[username] = lobbyCode;
-        
+
         socket.join(`party_${lobbyCode}`);
         broadcastPartyUpdate(lobbyCode);
         socket.emit('partyFeedback', { success: true, message: `Party created with code: ${lobbyCode}` });
@@ -2845,31 +2976,31 @@ io.on('connection', (socket) => {
         const { lobbyCode } = data || {};
         if (typeof lobbyCode !== 'string') return;
         const cleanCode = lobbyCode.trim().toUpperCase();
-        
+
         if (playerPartyMap[username]) {
             socket.emit('partyFeedback', { success: false, message: "You are already in a party." });
             return;
         }
-        
+
         const party = activeParties[cleanCode];
         if (!party) {
             socket.emit('partyFeedback', { success: false, message: "Invalid lobby code." });
             return;
         }
-        
+
         if (party.members.length >= 4) {
             socket.emit('partyFeedback', { success: false, message: "Party is full (max 4 players)." });
             return;
         }
-        
+
         if (party.state !== 'lobby') {
             socket.emit('partyFeedback', { success: false, message: "Party is already in combat." });
             return;
         }
-        
+
         party.members.push(username);
         playerPartyMap[username] = cleanCode;
-        
+
         socket.join(`party_${cleanCode}`);
         broadcastPartyUpdate(cleanCode);
         socket.emit('partyFeedback', { success: true, message: "Successfully joined the party!" });
@@ -2878,18 +3009,18 @@ io.on('connection', (socket) => {
     socket.on('partyLeave', () => {
         const lobbyCode = playerPartyMap[username];
         if (!lobbyCode) return;
-        
+
         const party = activeParties[lobbyCode];
         if (party) {
             if (party.state === 'combat') {
                 socket.emit('partyFeedback', { success: false, message: "You cannot leave a party during combat!" });
                 return;
             }
-            
+
             party.members = party.members.filter(m => m !== username);
             delete playerPartyMap[username];
             socket.leave(`party_${lobbyCode}`);
-            
+
             if (party.members.length === 0) {
                 delete activeParties[lobbyCode];
             } else {
@@ -2906,13 +3037,13 @@ io.on('connection', (socket) => {
     socket.on('partyInvite', async (data) => {
         const { targetUsername } = data || {};
         if (typeof targetUsername !== 'string') return;
-        
+
         let lobbyCode = playerPartyMap[username];
         if (!lobbyCode) {
             do {
                 lobbyCode = Math.random().toString(36).substring(2, 8).toUpperCase();
             } while (activeParties[lobbyCode]);
-            
+
             activeParties[lobbyCode] = {
                 leader: username,
                 members: [username],
@@ -2925,13 +3056,13 @@ io.on('connection', (socket) => {
             socket.emit('partyFeedback', { success: true, message: `Party created with code: ${lobbyCode}` });
             io.emit('update-player-list', buildPlayerListPayload());
         }
-        
+
         const party = activeParties[lobbyCode];
         if (party.members.length >= 4) {
             socket.emit('partyFeedback', { success: false, message: "Your party is full." });
             return;
         }
-        
+
         if (party.state !== 'lobby') {
             socket.emit('partyFeedback', { success: false, message: "Cannot invite during combat." });
             return;
@@ -2944,7 +3075,7 @@ io.on('connection', (socket) => {
                 sent = true;
             }
         }
-        
+
         if (sent) {
             socket.emit('partyFeedback', { success: true, message: `Invitation sent to ${targetUsername}.` });
         } else {
@@ -2960,9 +3091,9 @@ io.on('connection', (socket) => {
         }
         const { sprite } = data || {};
         if (typeof sprite !== 'string') return;
-        
+
         const safeSprite = sprite.replace(/\\/g, '/');
-        
+
         try {
             const state = await getPlayerState(username);
             if (!state) return;
@@ -2994,7 +3125,7 @@ io.on('connection', (socket) => {
                 socket.emit('spriteChangeResult', { success: false, message: "You do not own the item associated with this sprite." });
                 return;
             }
-            
+
             // Check that file physically exists
             const files = await getAvailableSpriteFiles();
             const basename = path.basename(safeSprite);
@@ -3002,13 +3133,13 @@ io.on('connection', (socket) => {
                 socket.emit('spriteChangeResult', { success: false, message: "Invalid sprite file." });
                 return;
             }
-            
+
             // Perform the equipment swap
             if (!state.equipment) {
                 state.equipment = {};
                 EQUIPPABLE_TYPES.forEach(t => state.equipment[t] = null);
             }
-            
+
             let messagePart = "";
             if (state.equipment.avatar !== matchedItemKey) {
                 // Return old equipped avatar to inventory
@@ -3030,19 +3161,19 @@ io.on('connection', (socket) => {
             state.sprite = safeSprite;
             await savePlayerState(username, state);
             broadcastPlayerList();
-            
+
             const item = itemDatabase[matchedItemKey];
-            socket.emit('spriteChangeResult', { 
-                success: true, 
-                message: `Equipped avatar ${item ? item.name : matchedItemKey}.${messagePart}`, 
-                state 
+            socket.emit('spriteChangeResult', {
+                success: true,
+                message: `Equipped avatar ${item ? item.name : matchedItemKey}.${messagePart}`,
+                state
             });
         } catch (err) {
             console.error(err);
             socket.emit('spriteChangeResult', { success: false, message: "Error changing sprite." });
         }
     });
-    
+
     socket.on('marketGetListings', () => {
         db.all("SELECT * FROM market_listings ORDER BY created_at DESC", [], (err, rows) => {
             if (err) {
@@ -3064,18 +3195,18 @@ io.on('connection', (socket) => {
             socket.emit('marketCreateResult', { success: false, message: "[SYSTEM] You cannot list items on the market while in combat!" });
             return;
         }
-        
+
         const { itemKey, quantity, price } = data || {};
         if (typeof itemKey !== 'string' || typeof quantity !== 'number' || typeof price !== 'number') {
             socket.emit('marketCreateResult', { success: false, message: "Invalid parameters." });
             return;
         }
-        
+
         if (quantity <= 0 || price <= 0) {
             socket.emit('marketCreateResult', { success: false, message: "Quantity and price must be positive integers." });
             return;
         }
-        
+
         const item = itemDatabase[itemKey];
         if (!item) {
             socket.emit('marketCreateResult', { success: false, message: "Item does not exist." });
@@ -3090,7 +3221,7 @@ io.on('connection', (socket) => {
                 socket.emit('marketCreateResult', { success: false, message: "Player state not found." });
                 return;
             }
-            
+
             if (!state.inventory || !state.inventory[itemKey] || state.inventory[itemKey] < quantity) {
                 releaseLock(username);
                 socket.emit('marketCreateResult', { success: false, message: "Insufficient items in inventory." });
@@ -3100,13 +3231,13 @@ io.on('connection', (socket) => {
             db.run(
                 "INSERT INTO market_listings (seller, item_key, quantity, price) VALUES (?, ?, ?, ?)",
                 [username, itemKey, quantity, price],
-                async function(insertErr) {
+                async function (insertErr) {
                     if (insertErr) {
                         releaseLock(username);
                         socket.emit('marketCreateResult', { success: false, message: "Database error listing item." });
                         return;
                     }
-                    
+
                     const listingId = this.lastID;
                     try {
                         state.inventory[itemKey] -= quantity;
@@ -3114,14 +3245,14 @@ io.on('connection', (socket) => {
                             delete state.inventory[itemKey];
                         }
                         await savePlayerState(username, state);
-                        
+
                         // Push update to all sockets of this player
                         for (const [sid, name] of Object.entries(activeUsers)) {
                             if (name === username) {
                                 io.to(sid).emit('statUpdate', state);
                             }
                         }
-                        
+
                         socket.emit('marketCreateResult', { success: true, message: `Listed ${quantity}x ${item.name} for ${price} coins.` });
                         broadcastMarketListings();
                     } catch (saveErr) {
@@ -3149,47 +3280,47 @@ io.on('connection', (socket) => {
             socket.emit('marketCancelResult', { success: false, message: "[SYSTEM] You cannot cancel listings while in combat!" });
             return;
         }
-        
+
         const { listingId } = data || {};
         if (typeof listingId !== 'number') {
             socket.emit('marketCancelResult', { success: false, message: "Invalid parameter." });
             return;
         }
-        
+
         db.get("SELECT * FROM market_listings WHERE id = ?", [listingId], async (err, listing) => {
             if (err || !listing) {
                 socket.emit('marketCancelResult', { success: false, message: "Listing not found." });
                 return;
             }
-            
+
             if (listing.seller !== username) {
                 socket.emit('marketCancelResult', { success: false, message: "You do not own this listing." });
                 return;
             }
-            
+
             await acquireLock(username);
-            db.run("DELETE FROM market_listings WHERE id = ? AND seller = ?", [listingId, username], async function(delErr) {
+            db.run("DELETE FROM market_listings WHERE id = ? AND seller = ?", [listingId, username], async function (delErr) {
                 if (delErr || this.changes === 0) {
                     releaseLock(username);
                     socket.emit('marketCancelResult', { success: false, message: "Listing could not be cancelled." });
                     return;
                 }
-                
+
                 try {
                     const state = await getPlayerState(username);
                     const itemKey = listing.item_key;
                     const quantity = listing.quantity;
-                    
+
                     state.inventory[itemKey] = (state.inventory[itemKey] || 0) + quantity;
                     await savePlayerState(username, state);
-                    
+
                     // Notify user
                     for (const [sid, name] of Object.entries(activeUsers)) {
                         if (name === username) {
                             io.to(sid).emit('statUpdate', state);
                         }
                     }
-                    
+
                     socket.emit('marketCancelResult', { success: true, message: `Cancelled listing and returned items to inventory.` });
                     broadcastMarketListings();
                 } catch (saveErr) {
@@ -3214,30 +3345,30 @@ io.on('connection', (socket) => {
             socket.emit('marketBuyResult', { success: false, message: "[SYSTEM] You cannot purchase items while in combat!" });
             return;
         }
-        
+
         const { listingId } = data || {};
         if (typeof listingId !== 'number') {
             socket.emit('marketBuyResult', { success: false, message: "Invalid parameter." });
             return;
         }
-        
+
         db.get("SELECT * FROM market_listings WHERE id = ?", [listingId], async (err, listing) => {
             if (err || !listing) {
                 socket.emit('marketBuyResult', { success: false, message: "Listing not found or already sold." });
                 return;
             }
-            
+
             if (listing.seller === username) {
                 socket.emit('marketBuyResult', { success: false, message: "You cannot buy your own listing. Cancel it instead." });
                 return;
             }
-            
+
             const price = listing.price;
             const seller = listing.seller;
             const itemKey = listing.item_key;
             const quantity = listing.quantity;
             const item = itemDatabase[itemKey];
-            
+
             // Pre-check buyer coins
             const buyerState = await getPlayerState(username);
             if (!buyerState) {
@@ -3248,16 +3379,16 @@ io.on('connection', (socket) => {
                 socket.emit('marketBuyResult', { success: false, message: `Insufficient coins. You need ${price} coins.` });
                 return;
             }
-            
+
             await acquireLocks([username, seller]);
-            
-            db.run("DELETE FROM market_listings WHERE id = ?", [listingId], async function(delErr) {
+
+            db.run("DELETE FROM market_listings WHERE id = ?", [listingId], async function (delErr) {
                 if (delErr || this.changes === 0) {
                     releaseLocks([username, seller]);
                     socket.emit('marketBuyResult', { success: false, message: "Listing could not be purchased." });
                     return;
                 }
-                
+
                 try {
                     const bState = await getPlayerState(username);
                     if (bState.coins < price) {
@@ -3268,28 +3399,28 @@ io.on('connection', (socket) => {
                         socket.emit('marketBuyResult', { success: false, message: "Insufficient coins." });
                         return;
                     }
-                    
+
                     const sState = await getPlayerState(seller);
                     if (!sState) {
                         throw new Error("Failed to load seller state.");
                     }
-                    
+
                     // Perform exchange
                     bState.coins -= price;
                     bState.inventory[itemKey] = (bState.inventory[itemKey] || 0) + quantity;
-                    
+
                     sState.coins += price;
-                    
+
                     await savePlayerState(username, bState);
                     await savePlayerState(seller, sState);
-                    
+
                     // Notify buyer
                     for (const [sid, name] of Object.entries(activeUsers)) {
                         if (name === username) {
                             io.to(sid).emit('statUpdate', bState);
                         }
                     }
-                    
+
                     // Notify seller if online
                     for (const [sid, name] of Object.entries(activeUsers)) {
                         if (name === seller) {
@@ -3297,7 +3428,7 @@ io.on('connection', (socket) => {
                             io.to(sid).emit('chatMessage', { user: 'System', message: `[MARKET] Your listing of ${quantity}x ${item ? item.name : itemKey} was purchased by ${username} for ${price} coins.` });
                         }
                     }
-                    
+
                     socket.emit('marketBuyResult', { success: true, message: `Successfully purchased ${quantity}x ${item ? item.name : itemKey} for ${price} coins.` });
                     broadcastMarketListings();
                 } catch (buyErr) {
@@ -3475,7 +3606,7 @@ io.on('connection', (socket) => {
         if (typeof message !== 'string') return;
         const trimmed = message.trim();
         if (!trimmed || trimmed.length > 200) return;
-        
+
         const now = Date.now();
         if (now - (lastChatTime[username] || 0) < 1000) {
             socket.emit('chatMessage', { user: 'System', message: 'You are sending messages too quickly.' });
@@ -3494,10 +3625,10 @@ io.on('connection', (socket) => {
 
         io.emit('chatMessage', { user: username, message: escapeHtml(trimmed) });
     });
-    
+
     socket.on('exploreStart', async () => {
         if (isRateLimited('exploreStart')) return;
-        
+
         if (activeExplores[username]) {
             socket.emit('exploreResult', {
                 success: false,
@@ -3505,7 +3636,7 @@ io.on('connection', (socket) => {
             });
             return;
         }
-        
+
         if (activeCombats[username]) {
             socket.emit('exploreResult', {
                 success: false,
@@ -3513,7 +3644,7 @@ io.on('connection', (socket) => {
             });
             return;
         }
-        
+
         if (pendingEncounters[username]) {
             socket.emit('exploreResult', {
                 success: false,
@@ -3521,7 +3652,7 @@ io.on('connection', (socket) => {
             });
             return;
         }
-        
+
         const expConfig = actionDatabase.explore;
         const now = Date.now();
         if (now - (lastExploreTime[username] || 0) < expConfig.cooldown) {
@@ -3531,10 +3662,10 @@ io.on('connection', (socket) => {
             });
             return;
         }
-        
+
         const state = await getPlayerState(username);
         if (!state) return;
-        
+
         const areaKeys = Object.keys(areaDatabase);
         const fallbackAreaKey = areaKeys[0] || 'bamboo_grove';
         const areaKey = state.currentArea || fallbackAreaKey;
@@ -3567,7 +3698,7 @@ io.on('connection', (socket) => {
                 socket.emit('exploreResult', { success: false, message: "Only the party leader can initiate the Boss encounter." });
                 return;
             }
-            
+
             const onlinePlayers = Object.values(activeUsers);
             for (const member of party.members) {
                 if (!onlinePlayers.includes(member)) {
@@ -3584,7 +3715,7 @@ io.on('connection', (socket) => {
                     return;
                 }
             }
-            
+
             const staminaCost = expConfig.staminaCost;
             if (state.stamina < staminaCost) {
                 socket.emit('exploreResult', { success: false, message: "[EXHAUSTED] You are too exhausted to explore. Rest at the Inn or wait for your Stamina to recover!" });
@@ -3593,25 +3724,26 @@ io.on('connection', (socket) => {
             state.stamina -= staminaCost;
             await savePlayerState(username, state);
             socket.emit('statUpdate', state);
-            
+
             const template = yokaiPool[bossKey];
             if (!template) {
                 socket.emit('exploreResult', { success: false, message: "Boss configuration not found." });
                 return;
             }
-            
+
             const partySize = party.members.length;
             const scaledHp = template.hp * partySize;
             const scaledMaxHp = template.maxHp * partySize;
             const scaledAttack = template.attack;
             const scaledDefense = template.defense;
-            
+
             const bossCombatInstance = {
                 isBoss: true,
                 lobbyCode: lobbyCode,
                 yokai: {
                     key: bossKey,
                     name: template.name,
+                    sprite: template.sprite,
                     hp: scaledHp,
                     maxHp: scaledMaxHp,
                     attack: scaledAttack,
@@ -3625,7 +3757,7 @@ io.on('connection', (socket) => {
                 lastMonsterAttack: Date.now(),
                 timerId: null
             };
-            
+
             for (const member of party.members) {
                 bossCombatInstance.players[member] = {
                     lastStrikeTime: 0,
@@ -3636,11 +3768,11 @@ io.on('connection', (socket) => {
                 activeCombats[member] = bossCombatInstance;
                 delete pendingEncounters[member];
             }
-            
+
             party.state = 'combat';
             party.combatInstance = bossCombatInstance;
             broadcastPartyUpdate(lobbyCode);
-            
+
             for (const member of party.members) {
                 const memberState = await getPlayerState(member);
                 for (const [sid, name] of Object.entries(activeUsers)) {
@@ -3648,6 +3780,7 @@ io.on('connection', (socket) => {
                         io.to(sid).emit('combatStart', {
                             yokai: {
                                 name: bossCombatInstance.yokai.name,
+                                sprite: bossCombatInstance.yokai.sprite,
                                 hp: bossCombatInstance.yokai.hp,
                                 maxHp: bossCombatInstance.yokai.maxHp,
                                 speed: bossCombatInstance.yokai.speed
@@ -3657,7 +3790,7 @@ io.on('connection', (socket) => {
                     }
                 }
             }
-            
+
             startBossAttackLoop(lobbyCode);
             return;
         }
@@ -3673,7 +3806,7 @@ io.on('connection', (socket) => {
             lootPool: Object.keys(itemDatabase),
             difficultyMultiplier: 1.0
         };
-        
+
         if (state.level < area.minLevel) {
             state.currentArea = fallbackAreaKey;
             await savePlayerState(username, state);
@@ -3685,7 +3818,7 @@ io.on('connection', (socket) => {
             });
             return;
         }
-        
+
         const staminaCost = expConfig.staminaCost;
         if (state.stamina < staminaCost) {
             socket.emit('exploreResult', {
@@ -3694,9 +3827,9 @@ io.on('connection', (socket) => {
             });
             return;
         }
-        
+
         state.stamina -= staminaCost;
-        
+
         // Explore Quest progress tracking
         if (state.quests && Array.isArray(state.quests.active)) {
             state.quests.active.forEach(quest => {
@@ -3707,30 +3840,86 @@ io.on('connection', (socket) => {
                 }
             });
         }
-        
+
         lastExploreTime[username] = now;
         await savePlayerState(username, state);
-        
+
         const duration = expConfig.cooldown || 1500;
         const timerId = setTimeout(async () => {
             await handleExplorationComplete(username, socket);
         }, duration);
-        
+
         activeExplores[username] = {
             timerId,
             startTime: now,
             duration
         };
-        
+
         broadcastPlayerList();
-        
+
         socket.emit('exploreStarted', {
             success: true,
             duration,
             state
         });
     });
-    
+
+    socket.on('scavengeStart', async () => {
+        if (isRateLimited('scavengeStart')) return;
+
+        if (activeExplores[username]) {
+            socket.emit('exploreResult', {
+                success: false,
+                message: "[SYSTEM] You are already performing an action!"
+            });
+            return;
+        }
+
+        if (activeCombats[username] || pendingEncounters[username]) {
+            socket.emit('exploreResult', {
+                success: false,
+                message: "[SYSTEM] You cannot scavenge while busy with Yokai!"
+            });
+            return;
+        }
+
+        const scavConfig = actionDatabase.scavenge || { staminaCost: 15, cooldown: 3000 };
+        const now = Date.now();
+        if (now - (lastExploreTime[username] || 0) < (scavConfig.cooldown || 3000)) {
+            socket.emit('exploreResult', {
+                success: false,
+                message: "Slow down! You are acting too quickly."
+            });
+            return;
+        }
+
+        const state = await getPlayerState(username);
+        if (!state) return;
+
+        const staminaCost = scavConfig.staminaCost || 15;
+        if (state.stamina < staminaCost) {
+            socket.emit('exploreResult', {
+                success: false,
+                message: "[EXHAUSTED] You are too exhausted to scavenge. Rest at the Inn!"
+            });
+            return;
+        }
+
+        state.stamina -= staminaCost;
+        lastExploreTime[username] = now;
+        await savePlayerState(username, state);
+
+        const duration = scavConfig.cooldown || 3000;
+        const timerId = setTimeout(async () => {
+            await handleScavengeComplete(username, socket);
+        }, duration);
+
+        activeExplores[username] = { timerId, startTime: now, duration, type: 'scavenge' };
+        broadcastPlayerList();
+
+        socket.emit('exploreStarted', { success: true, duration, type: 'scavenge', state });
+    });
+
     socket.on('combatAction', async (data) => {
         if (isRateLimited('combatAction')) return;
         const combat = activeCombats[username];
@@ -3738,33 +3927,33 @@ io.on('connection', (socket) => {
             socket.emit('combatFeedback', { message: "You are not in active combat." });
             return;
         }
-        
+
         const state = await getPlayerState(username);
         if (!state) return;
-        
+
         const { action } = data || {};
         if (typeof action !== 'string') return;
         const now = Date.now();
         const playerRecord = combat.isBoss ? combat.players[username] : combat;
-        
+
         if (action === 'strike') {
             const strikeConfig = actionDatabase.strike;
             if (now - (playerRecord.lastStrikeTime || 0) < strikeConfig.cooldown) return;
             playerRecord.lastStrikeTime = now;
-            
+
             const baseDmg = getActiveAttack(state);
             const variance = Math.floor(Math.random() * strikeConfig.damageVariance) + 1;
             let dmgDealt = baseDmg + variance - Math.floor(combat.yokai.defense / 2);
-            
+
             let isCrit = false;
             const critChance = getActiveCritChance(state);
             if (Math.random() < critChance) {
                 dmgDealt *= 2;
                 isCrit = true;
             }
-            
+
             dmgDealt = Math.max(strikeConfig.baseMinDamage, dmgDealt);
-            
+
             let isExhaustedStrike = false;
             if (state.stamina <= 0) {
                 dmgDealt = Math.max(1, Math.floor(dmgDealt * 0.5));
@@ -3786,7 +3975,7 @@ io.on('connection', (socket) => {
             let statusApplied = null;
             const poisonChance = getActivePoisonChance(state);
             const burnChance = getActiveBurnChance(state);
-            
+
             if (Math.random() < poisonChance) {
                 combat.yokai.poisoned = true;
                 combat.yokai.poisonTicks = 3;
@@ -3798,7 +3987,7 @@ io.on('connection', (socket) => {
             }
 
             combat.yokai.hp = Math.max(0, combat.yokai.hp - dmgDealt);
-            
+
             await savePlayerState(username, state);
             broadcastPlayerList();
 
@@ -3849,14 +4038,14 @@ io.on('connection', (socket) => {
             broadcastPlayerList();
 
             if (combat.isBoss) {
-                io.to(`party_${combat.lobbyCode}`).emit('combatFeedback', { 
+                io.to(`party_${combat.lobbyCode}`).emit('combatFeedback', {
                     message: `* [PARRY] ${username} raised their guard! (+10 Stamina)`,
                     state: null
                 });
                 socket.emit('statUpdate', state);
                 await broadcastPartyCombatUpdate(combat.lobbyCode);
             } else {
-                socket.emit('combatFeedback', { 
+                socket.emit('combatFeedback', {
                     message: "You raised your guard! (+10 Stamina)",
                     state
                 });
@@ -3868,15 +4057,15 @@ io.on('connection', (socket) => {
                 socket.emit('combatFeedback', { message: `Not enough stamina to escape (needs ${escapeStamina})!` });
                 return;
             }
-            
+
             state.stamina -= escapeStamina;
-            
+
             const coinsLost = Math.floor(state.coins * 0.1);
             state.coins = Math.max(0, state.coins - coinsLost);
-            
+
             const xpLost = Math.floor(state.experienceNeeded * 0.05);
             state.experience = Math.max(0, state.experience - xpLost);
-            
+
             let penaltyMsg = "";
             if (coinsLost > 0 && xpLost > 0) {
                 penaltyMsg = ` Lost ${coinsLost} coins and ${xpLost} XP.`;
@@ -3890,26 +4079,26 @@ io.on('connection', (socket) => {
                 const areaKeys = Object.keys(areaDatabase);
                 const fallbackAreaKey = areaKeys[0] || 'bamboo_grove';
                 state.currentArea = fallbackAreaKey;
-                
+
                 delete activeCombats[username];
                 await savePlayerState(username, state);
                 broadcastPlayerList();
-                
+
                 const bossName = (combat && combat.yokai && combat.yokai.name) || 'the boss';
                 const fallbackAreaName = (areaDatabase[fallbackAreaKey] && areaDatabase[fallbackAreaKey].name) || 'Faraway Land';
-                
+
                 socket.emit('combatEnd', {
                     success: false,
                     escaped: true,
                     message: `[ESCAPE] You fled from ${bossName} back to the ${fallbackAreaName}. (-${escapeStamina} Stamina).${penaltyMsg}`,
                     state
                 });
-                
+
                 io.to(`party_${combat.lobbyCode}`).emit('combatFeedback', {
                     message: `* [FLEE] ${username} fled the boss battle!`,
                     state: null
                 });
-                
+
                 await broadcastPartyCombatUpdate(combat.lobbyCode);
             } else {
                 if (combat.timerId) {
@@ -3918,7 +4107,7 @@ io.on('connection', (socket) => {
                 delete activeCombats[username];
                 await savePlayerState(username, state);
                 broadcastPlayerList();
-                
+
                 socket.emit('combatEnd', {
                     success: false,
                     escaped: true,
@@ -3928,7 +4117,7 @@ io.on('connection', (socket) => {
             }
         }
     });
-    
+
     socket.on('combatUseSkill', async (data) => {
         if (isRateLimited('combatUseSkill')) return;
         const combat = activeCombats[username];
@@ -3936,26 +4125,26 @@ io.on('connection', (socket) => {
             socket.emit('combatFeedback', { message: "You are not in active combat." });
             return;
         }
-        
+
         const state = await getPlayerState(username);
         if (!state) return;
-        
+
         const { skillKey } = data || {};
         if (typeof skillKey !== 'string') return;
-        
+
         const skill = skillsDatabase[skillKey];
         if (!skill) {
             socket.emit('combatFeedback', { message: "Unknown skill." });
             return;
         }
-        
+
         const weaponKey = state.equipment?.weapon;
         const weaponItem = weaponKey ? itemDatabase[weaponKey] : null;
         if (!weaponItem || !Array.isArray(weaponItem.skills) || !weaponItem.skills.includes(skillKey)) {
             socket.emit('combatFeedback', { message: "Your equipped weapon cannot use this skill." });
             return;
         }
-        
+
         const playerRecord = combat.isBoss ? combat.players[username] : combat;
         playerRecord.lastSkillTimes = playerRecord.lastSkillTimes || {};
         const now = Date.now();
@@ -3963,21 +4152,21 @@ io.on('connection', (socket) => {
             socket.emit('combatFeedback', { message: "Skill is on cooldown!" });
             return;
         }
-        
+
         if (state.stamina < skill.staminaCost) {
             socket.emit('combatFeedback', { message: `Not enough stamina (needs ${skill.staminaCost}st)!` });
             return;
         }
-        
+
         state.stamina = Math.max(0, state.stamina - skill.staminaCost);
         playerRecord.lastSkillTimes[skillKey] = now;
-        
+
         let dmgDealt = 0;
         let hpHealed = 0;
         let message = "";
         let isCrit = false;
         let statusApplied = null;
-        
+
         if (skill.effects && skill.effects.healAmount) {
             hpHealed = skill.effects.healAmount;
             const maxHp = state.stats.maxHealth || 50;
@@ -3987,24 +4176,24 @@ io.on('connection', (socket) => {
             const baseDmg = getActiveAttack(state);
             const strikeConfig = actionDatabase.strike || { damageVariance: 3, baseMinDamage: 2 };
             const variance = Math.floor(Math.random() * (strikeConfig.damageVariance || 3)) + 1;
-            
+
             let defense = combat.yokai.defense;
             if (skill.effects.ignoreDefense) {
                 defense = 0;
             }
-            
+
             const baseMult = skill.effects.damageMultiplier || 1.0;
             let rawDmg = Math.floor((baseDmg + variance) * baseMult);
             let finalDmg = rawDmg - Math.floor(defense / 2);
-            
+
             const critChance = getActiveCritChance(state);
             if (Math.random() < critChance) {
                 finalDmg *= 2;
                 isCrit = true;
             }
-            
+
             dmgDealt = Math.max(strikeConfig.baseMinDamage || 2, finalDmg);
-            
+
             const lifestealRate = getActiveLifesteal(state);
             if (lifestealRate > 0) {
                 const lsHeal = Math.floor(dmgDealt * lifestealRate);
@@ -4014,24 +4203,24 @@ io.on('connection', (socket) => {
                     state.stats.health = Math.min(maxHp, state.stats.health + lsHeal);
                 }
             }
-            
+
             if (skill.effects.inflictEffect === 'burned') {
                 combat.yokai.burned = true;
                 combat.yokai.burnTicks = skill.effects.effectTicks || 3;
                 statusApplied = 'burn';
             }
-            
+
             combat.yokai.hp = Math.max(0, combat.yokai.hp - dmgDealt);
-            
+
             message = `${username} unleashed ${skill.name} dealing ${dmgDealt} damage.`;
             if (isCrit) message = `* [CRIT] ${message}`;
             if (hpHealed > 0) message += ` (+${hpHealed} HP Lifesteal)`;
             if (statusApplied === 'burn') message += ` [BURNED]`;
         }
-        
+
         await savePlayerState(username, state);
         broadcastPlayerList();
-        
+
         if (combat.isBoss) {
             if (combat.yokai.hp <= 0) {
                 await handleBossVictory(combat.lobbyCode);
@@ -4072,51 +4261,52 @@ io.on('connection', (socket) => {
             }
         }
     });
-    
+
     socket.on('combatConfirm', async (data) => {
         if (isRateLimited('combatConfirm')) return;
         const username = activeUsers[socket.id];
         if (!username) return;
-        
+
         if (activeCombats[username]) {
             socket.emit('combatFeedbackEncounter', { message: "You are already in active combat!" });
             return;
         }
-        
+
         const pendingKey = pendingEncounters[username];
         if (!pendingKey) {
             socket.emit('combatFeedbackEncounter', { message: "No pending encounter found." });
             return;
         }
-        
+
         const state = await getPlayerState(username);
         if (!state) return;
-        
+
         const { choice } = data || {};
         if (typeof choice !== 'string') return;
-        
+
         if (choice === 'fight') {
             const template = yokaiPool[pendingKey];
             if (!template) {
                 delete pendingEncounters[username];
                 return;
             }
-            
+
             const areaKeys = Object.keys(areaDatabase);
             const fallbackAreaKey = areaKeys[0] || 'bamboo_grove';
             const areaKey = state.currentArea || fallbackAreaKey;
             const area = areaDatabase[areaKey] || { difficultyMultiplier: 1.0 };
             const diffMult = area.difficultyMultiplier !== undefined ? area.difficultyMultiplier : 1.0;
-            
+
             const scaledHp = Math.floor(template.hp * diffMult);
             const scaledMaxHp = Math.floor(template.maxHp * diffMult);
             const scaledAttack = Math.floor(template.attack * diffMult);
             const scaledDefense = Math.floor(template.defense * diffMult);
-            
+
             const combatInstance = {
                 yokai: {
                     key: pendingKey,
                     name: template.name,
+                    sprite: template.sprite,
                     hp: scaledHp,
                     maxHp: scaledMaxHp,
                     attack: scaledAttack,
@@ -4130,14 +4320,14 @@ io.on('connection', (socket) => {
                 parryActive: false,
                 timerId: null
             };
-            
+
             activeCombats[username] = combatInstance;
             delete pendingEncounters[username];
-            
+
             await savePlayerState(username, state);
             broadcastPlayerList();
             startMonsterAttackLoop(username, socket);
-            
+
             socket.emit('combatStart', {
                 yokai: {
                     ...combatInstance.yokai,
@@ -4152,15 +4342,15 @@ io.on('connection', (socket) => {
                 socket.emit('combatFeedbackEncounter', { message: `Not enough stamina to avoid Yokai (needs ${escapeCost})!` });
                 return;
             }
-            
+
             state.stamina -= escapeCost;
             const template = yokaiPool[pendingKey];
             const name = template ? template.name : "Yokai";
-            
+
             delete pendingEncounters[username];
             await savePlayerState(username, state);
             broadcastPlayerList();
-            
+
             socket.emit('combatSneakResult', {
                 success: true,
                 message: `[SYSTEM] You successfully avoided the ${name} and slipped back onto the main trail. (-${escapeCost} Stamina)`,
@@ -4168,7 +4358,7 @@ io.on('connection', (socket) => {
             });
         }
     });
-    
+
     socket.on('rest', async () => {
         if (isRateLimited('rest')) return;
         if (activeExplores[username]) {
@@ -4182,7 +4372,7 @@ io.on('connection', (socket) => {
             });
             return;
         }
-        
+
         if (pendingEncounters[username]) {
             socket.emit('restResult', {
                 success: false,
@@ -4190,10 +4380,10 @@ io.on('connection', (socket) => {
             });
             return;
         }
-        
+
         const state = await getPlayerState(username);
         if (!state) return;
-        
+
         const restConfig = actionDatabase.rest;
         const cost = (restConfig.coinCost || 5) * (state.level || 1);
         if (state.coins < cost) {
@@ -4203,20 +4393,20 @@ io.on('connection', (socket) => {
             });
             return;
         }
-        
+
         state.coins -= cost;
         state.stats.health = Math.floor((state.stats.maxHealth || 50) * restConfig.innHealPercent);
         state.stamina = Math.floor((state.maxStamina || 100) * restConfig.innHealPercent);
-        
+
         await savePlayerState(username, state);
-        
+
         socket.emit('restResult', {
             success: true,
             message: `[INN] You paid ${cost} coins and rested at the village inn. Your Health and Stamina have been fully restored!`,
             state
         });
     });
-    
+
     socket.on('travelArea', async (data) => {
         if (isRateLimited('travelArea')) return;
         if (activeExplores[username]) {
@@ -4227,40 +4417,40 @@ io.on('connection', (socket) => {
             socket.emit('travelResult', { success: false, message: "[SYSTEM] You cannot travel while in active combat!" });
             return;
         }
-        
+
         if (pendingEncounters[username]) {
             socket.emit('travelResult', { success: false, message: "[SYSTEM] You must deal with the pending encounter first!" });
             return;
         }
-        
+
         const { areaKey } = data || {};
         if (typeof areaKey !== 'string') return;
-        
+
         const area = areaDatabase[areaKey];
         if (!area) {
             socket.emit('travelResult', { success: false, message: "[SYSTEM] Destination area does not exist." });
             return;
         }
-        
+
         const state = await getPlayerState(username);
         if (!state) return;
-        
+
         if (state.level < area.minLevel) {
             socket.emit('travelResult', { success: false, message: `[RESTRICTED] You do not meet the minimum level for ${area.name} (Requires Level ${area.minLevel}).` });
             return;
         }
-        
+
         state.currentArea = areaKey;
         await savePlayerState(username, state);
         broadcastPlayerList();
-        
+
         socket.emit('travelResult', {
             success: true,
             message: `[TRAVEL] You have arrived at ${area.name}.`,
             state
         });
     });
-    
+
     socket.on('useItem', async (data) => {
         if (isRateLimited('useItem')) return;
         if (activeExplores[username]) {
@@ -4271,32 +4461,32 @@ io.on('connection', (socket) => {
             socket.emit('itemUseResult', { success: false, message: "[SYSTEM] You cannot manage your inventory while in combat!" });
             return;
         }
-        
+
         if (pendingEncounters[username]) {
             socket.emit('itemUseResult', { success: false, message: "[SYSTEM] You must deal with the pending encounter first!" });
             return;
         }
-        
+
         const { itemKey } = data || {};
         if (typeof itemKey !== 'string') return;
-        
+
         const state = await getPlayerState(username);
         if (!state) return;
-        
+
         if (!state.inventory || !state.inventory[itemKey] || state.inventory[itemKey] <= 0) {
             socket.emit('itemUseResult', { success: false, message: "You do not own this item!" });
             return;
         }
-        
+
         const item = itemDatabase[itemKey];
         if (!item || item.type !== "consumable") {
             socket.emit('itemUseResult', { success: false, message: "This item cannot be consumed!" });
             return;
         }
-        
+
         let used = false;
         let recoveryMessage = "";
-        
+
         const hpRestore = item.effects?.hpRestore;
         if (hpRestore) {
             const maxHP = state.stats.maxHealth || 50;
@@ -4306,7 +4496,7 @@ io.on('connection', (socket) => {
                 used = true;
             }
         }
-        
+
         const staminaRestore = item.effects?.staminaRestore;
         if (staminaRestore) {
             const maxStam = state.maxStamina || 100;
@@ -4329,13 +4519,13 @@ io.on('connection', (socket) => {
             }
             return;
         }
-        
+
         if (used) {
             state.inventory[itemKey]--;
             if (state.inventory[itemKey] === 0) {
                 delete state.inventory[itemKey];
             }
-            
+
             await savePlayerState(username, state);
             socket.emit('itemUseResult', {
                 success: true,
@@ -4355,40 +4545,37 @@ io.on('connection', (socket) => {
             socket.emit('itemSellResult', { success: false, message: "[SYSTEM] You cannot trade while in combat!" });
             return;
         }
-        
+
         if (pendingEncounters[username]) {
             socket.emit('itemSellResult', { success: false, message: "[SYSTEM] You must deal with the pending encounter first!" });
             return;
         }
-        
+
         const { itemKey } = data || {};
         if (typeof itemKey !== 'string') return;
-        
+
         const state = await getPlayerState(username);
         if (!state) return;
-        
+
         if (!state.inventory || !state.inventory[itemKey] || state.inventory[itemKey] <= 0) {
             socket.emit('itemSellResult', { success: false, message: "You do not own this item!" });
             return;
         }
-        
+
         const item = itemDatabase[itemKey];
         if (!item) {
             socket.emit('itemSellResult', { success: false, message: "Invalid item!" });
             return;
         }
-        
-        const baseValue = item.value || 0;
-        const rarSettings = actionDatabase.raritySettings || { valueMultipliers: { common: 1.0, uncommon: 1.5, rare: 2.5, epic: 4.0 } };
-        const mult = rarSettings.valueMultipliers[item.rarity || "common"] || 1.0;
-        const coinsEarned = Math.floor(baseValue * mult);
+
+        const coinsEarned = Math.floor((item.value || 0) / 2);
         state.coins += coinsEarned;
-        
+
         state.inventory[itemKey]--;
         if (state.inventory[itemKey] === 0) {
             delete state.inventory[itemKey];
         }
-        
+
         await savePlayerState(username, state);
         socket.emit('itemSellResult', {
             success: true,
@@ -4407,39 +4594,35 @@ io.on('connection', (socket) => {
             socket.emit('itemBuyResult', { success: false, message: "[SYSTEM] You cannot shop while in combat!" });
             return;
         }
-        
+
         if (pendingEncounters[username]) {
             socket.emit('itemBuyResult', { success: false, message: "[SYSTEM] You must deal with the pending encounter first!" });
             return;
         }
-        
+
         const { itemKey } = data || {};
         if (typeof itemKey !== 'string') return;
-        
+
         const state = await getPlayerState(username);
         if (!state) return;
-        
+
         const item = itemDatabase[itemKey];
-        if (!item || item.value <= 0 || item.type === 'material' || item.shopListed === false) {
+        if (!item || item.value <= 0 || item.shopListed === false) {
             socket.emit('itemBuyResult', { success: false, message: "This item is not for sale!" });
             return;
         }
-        
-        const rarity = item.rarity || "common";
-        const baseValue = item.value || 0;
-        const rarSettings = actionDatabase.raritySettings || { valueMultipliers: { common: 1.0, uncommon: 1.5, rare: 2.5, epic: 4.0 } };
-        const mult = rarSettings.valueMultipliers[rarity] || 1.0;
-        const buyPrice = Math.floor(baseValue * mult * 2.0);
-        
+
+        const buyPrice = item.value || 0;
+
         if (state.coins < buyPrice) {
             socket.emit('itemBuyResult', { success: false, message: "You do not have enough coins to purchase this item!" });
             return;
         }
-        
+
         state.coins -= buyPrice;
         if (!state.inventory) state.inventory = {};
         state.inventory[itemKey] = (state.inventory[itemKey] || 0) + 1;
-        
+
         await savePlayerState(username, state);
         socket.emit('itemBuyResult', {
             success: true,
@@ -4462,28 +4645,28 @@ io.on('connection', (socket) => {
             socket.emit('itemCraftResult', { success: false, message: "[SYSTEM] You must deal with the pending encounter first!" });
             return;
         }
-        
+
         const { itemKey } = data || {};
         if (typeof itemKey !== 'string') return;
-        
+
         const state = await getPlayerState(username);
         if (!state) return;
-        
+
         const item = itemDatabase[itemKey];
         if (!item || !item.recipe) {
             socket.emit('itemCraftResult', { success: false, message: "This item cannot be crafted!" });
             return;
         }
-        
+
         const recipe = item.recipe;
         const ingredients = recipe.ingredients || {};
         const cost = recipe.cost || 0;
-        
+
         if (cost > 0 && state.coins < cost) {
             socket.emit('itemCraftResult', { success: false, message: "You do not have enough coins to craft this!" });
             return;
         }
-        
+
         if (!state.inventory) state.inventory = {};
         for (const [ingKey, qtyRequired] of Object.entries(ingredients)) {
             const currentQty = state.inventory[ingKey] || 0;
@@ -4494,7 +4677,7 @@ io.on('connection', (socket) => {
                 return;
             }
         }
-        
+
         if (cost > 0) {
             state.coins -= cost;
         }
@@ -4504,9 +4687,9 @@ io.on('connection', (socket) => {
                 delete state.inventory[ingKey];
             }
         }
-        
+
         state.inventory[itemKey] = (state.inventory[itemKey] || 0) + 1;
-        
+
         await savePlayerState(username, state);
         socket.emit('itemCraftResult', {
             success: true,
@@ -4525,36 +4708,36 @@ io.on('connection', (socket) => {
             socket.emit('equipResult', { success: false, message: "[SYSTEM] You cannot manage your equipment while in combat!" });
             return;
         }
-        
+
         if (pendingEncounters[username]) {
             socket.emit('equipResult', { success: false, message: "[SYSTEM] You must deal with the pending encounter first!" });
             return;
         }
-        
+
         const { itemKey } = data || {};
         if (typeof itemKey !== 'string') return;
-        
+
         const state = await getPlayerState(username);
         if (!state) return;
-        
+
         if (!state.inventory || !state.inventory[itemKey] || state.inventory[itemKey] <= 0) {
             socket.emit('equipResult', { success: false, message: "You do not own this item!" });
             return;
         }
-        
+
         const item = itemDatabase[itemKey];
         if (!item || !EQUIPPABLE_TYPES.includes(item.type)) {
             socket.emit('equipResult', { success: false, message: "This item cannot be equipped!" });
             return;
         }
-        
+
         const slot = item.type;
-        
+
         if (!state.equipment) {
             state.equipment = {};
             EQUIPPABLE_TYPES.forEach(t => state.equipment[t] = null);
         }
-        
+
         let swappedMessage = "";
         if (state.equipment[slot]) {
             const oldItemKey = state.equipment[slot];
@@ -4562,7 +4745,7 @@ io.on('connection', (socket) => {
             const oldItem = itemDatabase[oldItemKey];
             swappedMessage = ` Unequipped ${oldItem ? oldItem.name : oldItemKey}.`;
         }
-        
+
         state.equipment[slot] = itemKey;
         if (slot === 'avatar') {
             state.sprite = item.sprite;
@@ -4571,7 +4754,7 @@ io.on('connection', (socket) => {
         if (state.inventory[itemKey] === 0) {
             delete state.inventory[itemKey];
         }
-        
+
         await savePlayerState(username, state);
         broadcastPlayerList();
         socket.emit('equipResult', {
@@ -4591,35 +4774,35 @@ io.on('connection', (socket) => {
             socket.emit('equipResult', { success: false, message: "[SYSTEM] You cannot manage your equipment while in combat!" });
             return;
         }
-        
+
         if (pendingEncounters[username]) {
             socket.emit('equipResult', { success: false, message: "[SYSTEM] You must deal with the pending encounter first!" });
             return;
         }
-        
+
         const { slot } = data || {};
         if (typeof slot !== 'string' || !EQUIPPABLE_TYPES.includes(slot)) {
             socket.emit('equipResult', { success: false, message: "Invalid equipment slot!" });
             return;
         }
-        
+
         const state = await getPlayerState(username);
         if (!state) return;
-        
+
         if (!state.equipment || !state.equipment[slot]) {
             socket.emit('equipResult', { success: false, message: `You do not have any item equipped in the ${slot} slot!` });
             return;
         }
-        
+
         const itemKey = state.equipment[slot];
         const item = itemDatabase[itemKey];
-        
+
         state.inventory[itemKey] = (state.inventory[itemKey] || 0) + 1;
         state.equipment[slot] = null;
         if (slot === 'avatar') {
-            state.sprite = null;
+            state.sprite = 'Avatars/yashinzen_180342.png';
         }
-        
+
         await savePlayerState(username, state);
         broadcastPlayerList();
         socket.emit('equipResult', {
@@ -4628,11 +4811,96 @@ io.on('connection', (socket) => {
             state
         });
     });
-    
+
+    socket.on('equipToBelt', async (data) => {
+        if (isRateLimited('equipItem')) return;
+        if (activeExplores[username]) {
+            socket.emit('equipResult', { success: false, message: "[SYSTEM] You cannot manage your equipment while exploring!" });
+            return;
+        }
+        if (activeCombats[username] || pendingEncounters[username]) {
+            socket.emit('equipResult', { success: false, message: "[SYSTEM] You cannot manage your equipment while in combat!" });
+            return;
+        }
+
+        const { itemKey, slotIndex } = data || {};
+        if (typeof itemKey !== 'string') return;
+
+        const state = await getPlayerState(username);
+        if (!state) return;
+
+        if (!state.inventory || !state.inventory[itemKey] || state.inventory[itemKey] <= 0) {
+            socket.emit('equipResult', { success: false, message: "You do not own this item!" });
+            return;
+        }
+
+        const item = itemDatabase[itemKey];
+        if (!item || item.type !== 'consumable') {
+            socket.emit('equipResult', { success: false, message: "Only consumables can be added to the belt!" });
+            return;
+        }
+
+        if (!state.quickBelt) state.quickBelt = [null, null, null];
+
+        if (state.quickBelt.includes(itemKey)) {
+            socket.emit('equipResult', { success: false, message: "This item is already on your Quick Belt!" });
+            return;
+        }
+
+        let targetIndex = slotIndex !== undefined ? slotIndex : state.quickBelt.indexOf(null);
+        if (targetIndex === -1) {
+            socket.emit('equipResult', { success: false, message: "Quick belt is full! Remove an item first." });
+            return;
+        }
+
+        state.quickBelt[targetIndex] = itemKey;
+        await savePlayerState(username, state);
+        broadcastPlayerList();
+        socket.emit('equipResult', {
+            success: true,
+            message: `[BELT] Added ${item.name} to Quick Belt.`,
+            state
+        });
+    });
+
+    socket.on('unequipFromBelt', async (data) => {
+        if (isRateLimited('unequipItem')) return;
+        if (activeExplores[username]) {
+            socket.emit('equipResult', { success: false, message: "[SYSTEM] You cannot manage your equipment while exploring!" });
+            return;
+        }
+        if (activeCombats[username] || pendingEncounters[username]) {
+            socket.emit('equipResult', { success: false, message: "[SYSTEM] You cannot manage your equipment while in combat!" });
+            return;
+        }
+
+        const { slotIndex } = data || {};
+        if (typeof slotIndex !== 'number' || slotIndex < 0 || slotIndex >= 3) return;
+
+        const state = await getPlayerState(username);
+        if (!state) return;
+
+        if (!state.quickBelt || !state.quickBelt[slotIndex]) {
+            return;
+        }
+
+        const itemKey = state.quickBelt[slotIndex];
+        const item = itemDatabase[itemKey];
+        state.quickBelt[slotIndex] = null;
+
+        await savePlayerState(username, state);
+        broadcastPlayerList();
+        socket.emit('equipResult', {
+            success: true,
+            message: `[BELT] Removed ${item ? item.name : 'item'} from Quick Belt.`,
+            state
+        });
+    });
+
     socket.on('disconnect', async () => {
         delete activeUsers[socket.id];
         io.emit('update-player-list', buildPlayerListPayload());
-        
+
         // Handle party leave on disconnect if in lobby state
         const lobbyCode = playerPartyMap[username];
         if (lobbyCode) {
@@ -4650,14 +4918,14 @@ io.on('connection', (socket) => {
                 }
             }
         }
-        
+
         // Clear active exploration timer if any
         const exploreRecord = activeExplores[username];
         if (exploreRecord && exploreRecord.timerId) {
             clearTimeout(exploreRecord.timerId);
         }
         delete activeExplores[username];
-        
+
         await forceSavePlayer(username);
         const stillOnline = Object.values(activeUsers).includes(username);
         if (!stillOnline) {
@@ -4822,17 +5090,17 @@ async function migrateDatabaseKeys() {
         if (rows.length > 0) {
             console.log(`[Migration] Scanning ${rows.length} player save states...`);
             let updatedCount = 0;
-            
+
             await new Promise((resolve, reject) => {
                 db.serialize(() => {
                     db.run("BEGIN TRANSACTION");
                     const stmt = db.prepare("UPDATE saves SET state = ? WHERE username = ?");
-                    
+
                     for (const row of rows) {
                         try {
                             const state = JSON.parse(row.state);
                             let saveChanged = false;
-                            
+
                             if (state.inventory) {
                                 const oldKeys = Object.keys(state.inventory);
                                 const hasOldKeys = oldKeys.some(k => ITEM_KEY_MAPPING[k]);
@@ -4841,7 +5109,7 @@ async function migrateDatabaseKeys() {
                                     saveChanged = true;
                                 }
                             }
-                            
+
                             if (state.equipment) {
                                 const oldVals = Object.values(state.equipment);
                                 const hasOldVals = oldVals.some(v => ITEM_KEY_MAPPING[v]);
@@ -4850,7 +5118,7 @@ async function migrateDatabaseKeys() {
                                     saveChanged = true;
                                 }
                             }
-                            
+
                             if (saveChanged) {
                                 stmt.run(JSON.stringify(state), row.username);
                                 updatedCount++;
@@ -4860,7 +5128,7 @@ async function migrateDatabaseKeys() {
                             console.error(`[Migration] Failed to parse state for user ${row.username}:`, parseErr.message);
                         }
                     }
-                    
+
                     stmt.finalize();
                     db.run("COMMIT", (err) => {
                         if (err) reject(err);
@@ -4891,7 +5159,7 @@ async function renameLegacySprites() {
         'rusted_tachi.png': 'rusted_blade.png',
         'samurai_yoroi.png': 'iron_plate_armor.png'
     };
-    
+
     for (const [oldName, newName] of Object.entries(fileMapping)) {
         const oldPath = path.join(spritesDir, oldName);
         const newPath = path.join(spritesDir, newName);
